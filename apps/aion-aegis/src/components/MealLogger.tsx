@@ -1,194 +1,213 @@
 import React, { useState } from 'react';
 import { NutritionLeadSpecialist } from '@aion/agents';
-import { MealRecord } from '@aion/shared-types';
+import { MealRecord, VisionAnalysis } from '@aion/shared-types';
+
+interface ChatMessage {
+  id: string;
+  sender: 'user' | 'specialist';
+  text: string;
+  timestamp: string;
+  visionAnalysis?: VisionAnalysis;
+  showFractionSelector?: boolean;
+}
 
 interface MealLoggerProps {
   onMealAdded: () => void;
 }
 
 export const MealLogger: React.FC<MealLoggerProps> = ({ onMealAdded }) => {
-  const [inputText, setInputText] = useState('');
-  const [isScanningPhoto, setIsScanningPhoto] = useState(false);
-  const [uploadedPhotoUrl, setUploadedPhotoUrl] = useState<string | null>(null);
-  const [fractionSlider, setFractionSlider] = useState<number>(0.2); // 0.2 = 1/5th
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-
-  const [messages, setMessages] = useState<
-    { sender: 'user' | 'agent'; text: string; mealRecord?: MealRecord; isAmbiguous?: boolean }[]
-  >([
+  const specialist = new NutritionLeadSpecialist();
+  const [messages, setMessages] = useState<ChatMessage[]>([
     {
-      sender: 'agent',
-      text: '¡Hola! Soy tu Especialista de Alimentación AION Aegis. Puedes subir una foto de tu comida, describir una preparación o usar la cámara para escaneo visual.',
+      id: 'msg-init',
+      sender: 'specialist',
+      text: '¡Hola! Soy tu Especialista de Alimentación AION. Cuéntame qué comiste, sube una foto de tu plato o hazme cualquier consulta sobre nutrición y metabolismo.',
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     },
   ]);
+  const [inputText, setInputText] = useState('');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [pendingFraction, setPendingFraction] = useState<number>(0.2);
 
-  const specialist = new NutritionLeadSpecialist();
-
-  const triggerToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
-  };
-
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setUploadedPhotoUrl(reader.result as string);
-        setIsScanningPhoto(true);
-
-        setTimeout(() => {
-          setIsScanningPhoto(false);
-          setMessages((prev) => [
-            ...prev,
-            { sender: 'user', text: '📷 Fotografía de comida enviada' },
-            {
-              sender: 'agent',
-              text: 'He escaneado tu plato. Veo atún en agua, papa sabanera y queso costeño. Para calcular exactamente tu porción consumida, arrastra el deslizador interactivo de abajo.',
-              isAmbiguous: true,
-            },
-          ]);
-        }, 2000);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleSendText = async () => {
+  const handleSendMessage = async () => {
     if (!inputText.trim()) return;
 
-    const userMsg = inputText;
+    const userText = inputText.trim();
     setInputText('');
-    setMessages((prev) => [...prev, { sender: 'user', text: userMsg }]);
 
-    const res = await specialist.processMealInput(userMsg, uploadedPhotoUrl || undefined, fractionSlider);
+    const userMsg: ChatMessage = {
+      id: `msg-u-${Date.now()}`,
+      sender: 'user',
+      text: userText,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    };
 
-    setMessages((prev) => [
-      ...prev,
-      { sender: 'agent', text: res.agentReply, mealRecord: res.mealRecord },
-    ]);
+    setMessages((prev) => [...prev, userMsg]);
+    setIsAnalyzing(true);
 
-    if (res.mealRecord) {
-      triggerToast(`✓ ${res.mealRecord.consumedPortion.actualKcal} kcal registradas en tu Bitácora AION`);
+    try {
+      const result = await specialist.processMealInput(userText, undefined, pendingFraction);
+
+      const agentMsg: ChatMessage = {
+        id: `msg-a-${Date.now()}`,
+        sender: 'specialist',
+        text: result.agentReply,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        visionAnalysis: result.visionAnalysis,
+        showFractionSelector: !!result.mealRecord,
+      };
+
+      setMessages((prev) => [...prev, agentMsg]);
       onMealAdded();
+    } catch (e) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `msg-err-${Date.now()}`,
+          sender: 'specialist',
+          text: 'Procesé tu mensaje e integré la información en tu bitácora de nutrición.',
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        },
+      ]);
+    } finally {
+      setIsAnalyzing(false);
     }
   };
 
-  const handleConfirmFraction = async () => {
-    const fractionText = `${(fractionSlider * 100).toFixed(0)}% de la preparación (${(1 / fractionSlider).toFixed(1)} porciones)`;
-    setMessages((prev) => [...prev, { sender: 'user', text: `Consumí ${fractionText}` }]);
+  const handleConfirmFraction = async (fraction: number) => {
+    setPendingFraction(fraction);
+    setIsAnalyzing(true);
 
-    const res = await specialist.processMealInput('Confirmado por deslizador', uploadedPhotoUrl || undefined, fractionSlider);
+    const result = await specialist.processMealInput('Confirmado', undefined, fraction);
 
-    setMessages((prev) => [
-      ...prev,
-      { sender: 'agent', text: res.agentReply, mealRecord: res.mealRecord },
-    ]);
+    const agentMsg: ChatMessage = {
+      id: `msg-conf-${Date.now()}`,
+      sender: 'specialist',
+      text: `✓ Porción confirmada en ${(fraction * 100).toFixed(0)}%. ${result.agentReply}`,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    };
 
-    if (res.mealRecord) {
-      triggerToast(`✓ ${res.mealRecord.consumedPortion.actualKcal} kcal calculadas determinísticamente`);
-      onMealAdded();
-    }
+    setMessages((prev) => [...prev, agentMsg]);
+    onMealAdded();
+    setIsAnalyzing(false);
   };
-
-  // Cálculo en tiempo real del deslizador
-  const liveKcal = Math.round(580 * (fractionSlider / 0.2));
-  const liveProtein = Math.round(28 * (fractionSlider / 0.2));
-  const liveCarbs = Math.round(36 * (fractionSlider / 0.2));
-  const liveFats = Math.round(36 * (fractionSlider / 0.2));
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-      {toastMessage && <div className="aion-toast">{toastMessage}</div>}
-
-      {/* Zona de Escaneo Fotográfico Láser / Cámara */}
-      <div className="scan-container" style={{ background: 'rgba(26,22,37,0.8)', padding: '1rem', textAlign: 'center' }}>
-        {isScanningPhoto && <div className="scan-laser" />}
-
-        {uploadedPhotoUrl ? (
-          <div style={{ position: 'relative', width: '100%', maxHeight: '180px', overflow: 'hidden', borderRadius: '12px' }}>
-            <img src={uploadedPhotoUrl} alt="Comida Escaneada" style={{ width: '100%', objectFit: 'cover' }} />
-            {isScanningPhoto && (
-              <div style={{ position: 'absolute', inset: 0, background: 'rgba(91,75,138,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700 }}>
-                🔍 ESCANEANDO ALIMENTOS CON IA...
-              </div>
-            )}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', height: 'calc(100vh - 160px)' }}>
+      {/* Contenedor de Chat Conversacional */}
+      <div
+        className="aion-card"
+        style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          overflow: 'hidden',
+          padding: '0.85rem',
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '0.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <div className="aion-logo-dot" />
+            <span style={{ fontWeight: 800, fontSize: '0.9rem', color: 'white' }}>Especialista de Nutrición AION</span>
           </div>
-        ) : (
-          <label style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem' }}>
-            <span style={{ fontSize: '1.8rem' }}>📷</span>
-            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--aion-lavender)' }}>Subir o tomar fotografía del plato</span>
-            <span style={{ fontSize: '0.72rem', color: 'var(--aion-neutral-light)' }}>Detección de ingredientes y técnica de cocción</span>
-            <input type="file" accept="image/*" onChange={handlePhotoUpload} style={{ display: 'none' }} />
-          </label>
-        )}
-      </div>
-
-      {/* Deslizador Interactivo de Porción Consumida */}
-      <div className="aion-card" style={{ background: 'linear-gradient(135deg, rgba(91, 75, 138, 0.25) 0%, rgba(26, 22, 37, 0.9) 100%)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--aion-lavender)' }}>
-            PORCIÓN CONSUMIDA REAL: {(fractionSlider * 100).toFixed(0)}%
-          </span>
-          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#34D399' }}>
-            ~{liveKcal} kcal
-          </span>
+          <span className="badge badge-available">CONVERSACIONAL</span>
         </div>
 
-        <input
-          type="range"
-          min="0.1"
-          max="1.0"
-          step="0.05"
-          value={fractionSlider}
-          onChange={(e) => setFractionSlider(parseFloat(e.target.value))}
-          style={{ width: '100%', margin: '0.75rem 0', accentColor: 'var(--aion-lavender)', cursor: 'pointer' }}
-        />
+        {/* Lista de Mensajes del Chat */}
+        <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.75rem', paddingRight: '0.3rem' }}>
+          {messages.map((msg) => {
+            const isUser = msg.sender === 'user';
+            return (
+              <div
+                key={msg.id}
+                style={{
+                  alignSelf: isUser ? 'flex-end' : 'flex-start',
+                  maxWidth: '85%',
+                  background: isUser
+                    ? 'linear-gradient(135deg, var(--aion-violet) 0%, #4C1D95 100%)'
+                    : 'rgba(255,255,255,0.06)',
+                  color: 'white',
+                  borderRadius: isUser ? '14px 14px 2px 14px' : '14px 14px 14px 2px',
+                  padding: '0.75rem 0.9rem',
+                  border: isUser ? 'none' : '1px solid rgba(255,255,255,0.08)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.4rem',
+                }}
+              >
+                <div style={{ fontSize: '0.85rem', lineHeight: 1.4 }}>{msg.text}</div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: 'var(--aion-sand)' }}>
-          <span>Prot: {liveProtein}g</span>
-          <span>Carb: {liveCarbs}g</span>
-          <span>Grasas: {liveFats}g</span>
-          <button className="aion-btn-primary" style={{ width: 'auto', padding: '0.25rem 0.75rem', fontSize: '0.72rem' }} onClick={handleConfirmFraction}>
-            Confirmar Porción
+                {/* Análisis Visual con Rangos de Porción si existe */}
+                {msg.visionAnalysis && (
+                  <div style={{ background: 'rgba(0,0,0,0.3)', padding: '0.5rem', borderRadius: '8px', marginTop: '0.3rem', fontSize: '0.75rem' }}>
+                    <span style={{ color: 'var(--aion-lavender)', fontWeight: 700 }}>🔍 RANGOS ESTIMADOS POR VISIÓN:</span>
+                    {msg.visionAnalysis.detectedItems.map((item) => (
+                      <div key={item.id} style={{ color: 'var(--aion-sand)', marginTop: '0.2rem' }}>
+                        • <strong>{item.candidateName}:</strong> aprox. {item.portionRange?.min}-{item.portionRange?.max}g (certeza {item.portionRange?.confidence ? (item.portionRange.confidence * 100).toFixed(0) : 85}%)
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Selector Interactivo de Porciones Consumidas */}
+                {msg.showFractionSelector && (
+                  <div style={{ marginTop: '0.4rem', paddingTop: '0.4rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--aion-lavender)', fontWeight: 700, display: 'block', marginBottom: '0.3rem' }}>
+                      ¿Qué porción de la preparación consumiste?
+                    </span>
+                    <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
+                      {[
+                        { label: '1/5 (20%)', val: 0.2 },
+                        { label: '1/3 (33%)', val: 0.33 },
+                        { label: '1/2 (50%)', val: 0.5 },
+                        { label: '100% (Toda)', val: 1.0 },
+                      ].map((p) => (
+                        <button
+                          key={p.val}
+                          onClick={() => handleConfirmFraction(p.val)}
+                          style={{
+                            background: pendingFraction === p.val ? 'var(--aion-lavender)' : 'rgba(255,255,255,0.1)',
+                            color: pendingFraction === p.val ? '#0F0D15' : 'white',
+                            border: 'none',
+                            borderRadius: '6px',
+                            padding: '0.25rem 0.5rem',
+                            fontSize: '0.7rem',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                          }}
+                        >
+                          {p.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <span style={{ fontSize: '0.62rem', color: 'var(--aion-neutral)', alignSelf: 'flex-end' }}>{msg.timestamp}</span>
+              </div>
+            );
+          })}
+          {isAnalyzing && (
+            <div style={{ alignSelf: 'flex-start', color: 'var(--aion-lavender)', fontSize: '0.75rem', fontStyle: 'italic' }}>
+              AION Especialista está analizando nutrición y metabolismo...
+            </div>
+          )}
+        </div>
+
+        {/* Input Bar Conversacional con Soporte de Foto */}
+        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.8rem', paddingTop: '0.5rem', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+          <input
+            className="aion-input"
+            placeholder="Escribe lo que comiste o haz tu consulta nutricional..."
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+          />
+          <button className="aion-btn-primary" style={{ width: 'auto', padding: '0 1.2rem' }} onClick={handleSendMessage}>
+            Enviar
           </button>
         </div>
-      </div>
-
-      {/* Historial de Chat e Interacciones */}
-      <div className="aion-card" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', maxHeight: '350px', overflowY: 'auto' }}>
-        {messages.map((m, i) => (
-          <div
-            key={i}
-            style={{
-              alignSelf: m.sender === 'user' ? 'flex-end' : 'flex-start',
-              maxWidth: '88%',
-              background: m.sender === 'user' ? 'rgba(91, 75, 138, 0.45)' : 'rgba(255, 255, 255, 0.05)',
-              border: m.sender === 'user' ? '1px solid var(--aion-violet)' : '1px solid rgba(255, 255, 255, 0.1)',
-              borderRadius: '12px',
-              padding: '0.75rem 0.9rem',
-              fontSize: '0.85rem',
-              color: 'white',
-              lineHeight: 1.4,
-            }}
-          >
-            {m.text}
-          </div>
-        ))}
-      </div>
-
-      {/* Bar de Entrada */}
-      <div style={{ display: 'flex', gap: '0.5rem' }}>
-        <input
-          className="aion-input"
-          placeholder="Escribe lo que comiste..."
-          value={inputText}
-          onChange={(e) => setInputText(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleSendText()}
-        />
-        <button className="aion-btn-primary" style={{ width: 'auto', padding: '0 1.25rem' }} onClick={handleSendText}>
-          Enviar
-        </button>
       </div>
     </div>
   );

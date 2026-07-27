@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { MetabolicState, EnergyBalance, ResponseLanguageProfile } from '@aion/shared-types';
-import { NutritionLeadSpecialist } from '@aion/agents';
+import { NutritionLeadSpecialist, LanguageEngine } from '@aion/agents';
 import { AionMemoryStore } from '@aion/memory';
+import { TechnicalGlossary } from './TechnicalGlossary';
 
 interface YourBodyNowProps {
   metabolicState: MetabolicState;
@@ -11,6 +12,7 @@ interface YourBodyNowProps {
 export const YourBodyNow: React.FC<YourBodyNowProps> = ({ energyBalance }) => {
   const memoryStore = AionMemoryStore.getInstance();
   const specialist = new NutritionLeadSpecialist();
+  const languageEngine = LanguageEngine.getInstance();
 
   const [selectedBubble, setSelectedBubble] = useState<string | null>(null);
   const [simulatedHoursOffset, setSimulatedHoursOffset] = useState<number>(0);
@@ -24,50 +26,20 @@ export const YourBodyNow: React.FC<YourBodyNowProps> = ({ energyBalance }) => {
     memoryStore.setLanguageMode(newMode);
   };
 
-  // Obtener estado metabólico traducido en vivo según el modo seleccionado
   const currentState = specialist.getCurrentMetabolicState(languageMode);
   const hoursElapsed = (currentState.hoursElapsedSinceLastMeal || 0.5) + simulatedHoursOffset;
 
-  const bubbles = [
-    {
-      id: 'glucose',
-      tag: 'Glucosa',
-      title: currentState.glucoseStatus,
-      simple: 'Energía activa proveniente de los carbohidratos consumidos.',
-      detail: 'Absorción intestinal y fosforilación por hexocinasa/glucocinasa para almacenamiento o glucólisis.',
-      color: 'var(--aion-glucose)',
-    },
-    {
-      id: 'fats',
-      tag: 'Grasas',
-      title: currentState.fatsStatus,
-      simple: 'Lípidos dietarios o almacenados transportándose para energía.',
-      detail: 'Hidrólisis de triglicéridos por lipoproteína lipasa y transporte hacia adipocitos y músculo.',
-      color: 'var(--aion-fats)',
-    },
-    {
-      id: 'protein',
-      tag: 'Proteínas',
-      title: currentState.proteinsStatus,
-      simple: 'Pool de aminoácidos disponible para recambio muscular.',
-      detail: 'Activación del complejo mTORC1 facilitando la síntesis proteica de reparación.',
-      color: 'var(--aion-protein)',
-    },
-    {
-      id: 'glycogen',
-      tag: 'Glucógeno',
-      title: currentState.glycogenStatus,
-      simple: 'Reserva energética de glucosa almacenada.',
-      detail: 'Glucogenogénesis posprandial o glucogenólisis por fosforilasa a.',
-      color: 'var(--aion-glycogen)',
-    },
-  ];
+  // Burbujas dinámicas traducidas en tiempo real según el modo de lenguaje seleccionado
+  const bubbles = languageEngine.getNutrientBubbles(currentState.currentPhase, languageMode);
 
   const pctConsumed = Math.min(100, Math.round((energyBalance.consumedKcal / energyBalance.targetKcal) * 100));
   const strokeDashoffset = 283 - (283 * pctConsumed) / 100;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      {/* Glosario Técnico Lateral Flotante */}
+      <TechnicalGlossary />
+
       {/* Selector de Modo de Lenguaje en Tiempo Real */}
       <div className="aion-card" style={{ padding: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span style={{ fontSize: '0.75rem', color: 'var(--aion-lavender)', fontWeight: 700 }}>
@@ -141,7 +113,7 @@ export const YourBodyNow: React.FC<YourBodyNowProps> = ({ energyBalance }) => {
           {currentState.naturalExplanation}
         </p>
 
-        {/* Profundidad Progresiva: Tocar para desplegar detalle técnico / bioquímico */}
+        {/* Profundidad Progresiva */}
         <div style={{ marginTop: '0.75rem' }}>
           <button
             onClick={() => setShowTechnicalDetail(!showTechnicalDetail)}
@@ -210,15 +182,15 @@ export const YourBodyNow: React.FC<YourBodyNowProps> = ({ energyBalance }) => {
             </p>
           </div>
           <div style={{ fontSize: '0.68rem', color: 'var(--aion-neutral)', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '0.3rem' }}>
-            Ajustado a tu lenguaje
+            Ajustado a: {languageMode}
           </div>
         </div>
       </div>
 
-      {/* Burbujas Interactivas Nutrientes */}
+      {/* Burbujas Interactivas Nutrientes Traducidas Dinámicamente */}
       <div>
         <h3 style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--aion-sand)', marginBottom: '0.4rem' }}>
-          COMPONENTES EN PROCESAMIENTO
+          COMPONENTES EN PROCESAMIENTO ({languageMode.toUpperCase()})
         </h3>
         <div className="bubbles-grid">
           {bubbles.map((b) => (

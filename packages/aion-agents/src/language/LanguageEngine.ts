@@ -1,5 +1,14 @@
 import { MetabolicPhase, ResponseLanguageProfile } from '@aion/shared-types';
 
+export interface DynamicNutrientBubble {
+  id: 'glucose' | 'fats' | 'protein' | 'glycogen';
+  tag: string;
+  title: string;
+  simple: string;
+  detail: string;
+  color: string;
+}
+
 export class LanguageEngine {
   private static instance: LanguageEngine;
 
@@ -30,7 +39,7 @@ export class LanguageEngine {
         return {
           title: 'Comida Reciente (Digestión)',
           naturalExplanation: 'Acabas de comer. Tu cuerpo está procesando los alimentos para darle energía a tus músculos y cuerpo.',
-          technicalExplanation: 'Glucemia e insulina elevadas.',
+          technicalExplanation: 'Glucemia e insulina elevadas en plasma.',
           fatBurnHuman: 'En pausa temporal',
         };
       } else if (mode === 'technical' || mode === 'clinical') {
@@ -48,7 +57,7 @@ export class LanguageEngine {
           fatBurnHuman: 'Inhibida por Insulina',
         };
       } else {
-        // MODO HUMANO / ADAPTATIVO (Predeterminado)
+        // MODO HUMANO / ADAPTATIVO
         return {
           title: 'Digestión y Absorción Activa',
           naturalExplanation: `Terminaste de comer hace aproximadamente ${hoursElapsed.toFixed(1)} horas${lastMealName ? ` (${lastMealName})` : ''}. Tu cuerpo está usando los nutrientes que ingeriste para reponer tu energía y reparar tejidos.`,
@@ -119,6 +128,160 @@ export class LanguageEngine {
           fatBurnHuman: 'Usando grasas como fuente principal',
         };
       }
+    }
+  }
+
+  /**
+   * Genera la traducción dinámica en tiempo real de las 4 burbujas nutricionales
+   * (Glucosa, Grasas, Proteínas, Glucógeno) según la modalidad de lenguaje activa.
+   */
+  public getNutrientBubbles(
+    phase: MetabolicPhase,
+    mode: ResponseLanguageProfile['mode'] = 'human'
+  ): DynamicNutrientBubble[] {
+    const isPostprandial = phase === 'POSPRANDIAL';
+
+    if (mode === 'simple') {
+      return [
+        {
+          id: 'glucose',
+          tag: 'Glucosa',
+          title: isPostprandial ? 'Azúcar de la comida' : 'Azúcar en nivel normal',
+          simple: isPostprandial ? 'Energía rápida que acabas de comer.' : 'Tu cuerpo mantiene el azúcar estable.',
+          detail: 'Medido en sangre para dar fuerza a los músculos.',
+          color: 'var(--aion-glucose)',
+        },
+        {
+          id: 'fats',
+          tag: 'Grasas',
+          title: isPostprandial ? 'Grasas guardándose' : 'Quemando reservas de grasa',
+          simple: isPostprandial ? 'Las grasas de la comida se absorben despacio.' : 'Tu cuerpo usa la gordura acumulada para tener energía.',
+          detail: 'Transporte de lípidos en sangre.',
+          color: 'var(--aion-fats)',
+        },
+        {
+          id: 'protein',
+          tag: 'Proteínas',
+          title: 'Construcción muscular',
+          simple: 'Nutrientes que reparan tus músculos.',
+          detail: 'Bloques de construcción celular.',
+          color: 'var(--aion-protein)',
+        },
+        {
+          id: 'glycogen',
+          tag: 'Glucógeno',
+          title: isPostprandial ? 'Batería llenándose' : 'Usando batería de reserva',
+          simple: isPostprandial ? 'Cargando reservas de energía.' : 'Gastando la energía guardada en el hígado.',
+          detail: 'Reserva energética hepática.',
+          color: 'var(--aion-glycogen)',
+        },
+      ];
+    } else if (mode === 'technical' || mode === 'clinical') {
+      return [
+        {
+          id: 'glucose',
+          tag: 'Glucosa Plasmática',
+          title: isPostprandial ? '↑ Ingesta e Incremento Basal' : '→ Normoglucemia Basal',
+          simple: isPostprandial ? 'Glucemia en elevación por absorción entérica.' : 'Homeostasis de glucosa sostenida por gluconeogénesis.',
+          detail: 'Glicemia medida en mg/dL. Regulada por insulina.',
+          color: 'var(--aion-glucose)',
+        },
+        {
+          id: 'fats',
+          tag: 'Ácidos Grasos Libres',
+          title: isPostprandial ? '→ Transporte Quilomicrónico' : '↑ Beta-oxidación Adipocitaria',
+          simple: isPostprandial ? 'Lípidos en tránsito endotelial.' : 'Inhibición de lipogénesis y activación lipolítica.',
+          detail: 'Metabolismo lipídico y acil-carnitinas.',
+          color: 'var(--aion-fats)',
+        },
+        {
+          id: 'protein',
+          tag: 'Aminoácidos Plasmáticos',
+          title: 'Balance Nitrogenado Positivo',
+          simple: 'Recambio proteico muscular en fase anabólica/mantenimiento.',
+          detail: 'Pool circulante de Leucina, Isoleucina y Valina.',
+          color: 'var(--aion-protein)',
+        },
+        {
+          id: 'glycogen',
+          tag: 'Glucógeno Hepático/Muscular',
+          title: isPostprandial ? '↑ Glucogenogénesis Activa' : '↓ Glucogenólisis Hepática',
+          simple: isPostprandial ? 'Saturación de depósitos glucogénicos.' : 'Deplición paulatina de depósitos de carbohidratos.',
+          detail: 'Reserva poliglucídica de glucosa.',
+          color: 'var(--aion-glycogen)',
+        },
+      ];
+    } else if (mode === 'biochemical') {
+      return [
+        {
+          id: 'glucose',
+          tag: 'Vía GLUT4 / Glucólisis',
+          title: isPostprandial ? 'Insulina / Akt / Hexocinasa II' : 'Gluconeogénesis / PEPCK',
+          simple: isPostprandial ? 'Traslocación de GLUT4 por fosforilación de Akt.' : 'Expresión de fosfoenolpiruvato carboxicinasa (PEPCK).',
+          detail: 'Fosforilación de glucosa a glucosa-6-fosfato.',
+          color: 'var(--aion-glucose)',
+        },
+        {
+          id: 'fats',
+          tag: 'Lipólisis / HSL / CPT-1',
+          title: isPostprandial ? 'Lipoproteína Lipasa (LPL)' : 'AMPK / PKA / Beta-oxidación',
+          simple: isPostprandial ? 'LPL endotelial hidrolizando triglicéridos.' : 'PKA fosforila HSL; CPT-1 introduce acil-CoA a la mitocondria.',
+          detail: 'Cascada de AMPc y beta-oxidación celular.',
+          color: 'var(--aion-fats)',
+        },
+        {
+          id: 'protein',
+          tag: 'Vía mTORC1 / S6K1',
+          title: 'Activación Rheb / mTORC1',
+          simple: 'La leucina activa Rag GTPasas estimulando la traducción de ARNm en el ribosoma.',
+          detail: 'Fosforilación de p70S6K y 4E-BP1.',
+          color: 'var(--aion-protein)',
+        },
+        {
+          id: 'glycogen',
+          tag: 'Glucógeno Fosforilasa a',
+          title: isPostprandial ? 'Glucógeno Sintasa Activa' : 'Fosforilasa a por Glucagón',
+          simple: isPostprandial ? 'Desfosforilación de la glucógeno sintasa.' : 'Glucagón vía proteína Gs estimula glucógeno fosforilasa a.',
+          detail: 'Ruptura de enlaces alfa-1,4 y alfa-1,6 glucosídicos.',
+          color: 'var(--aion-glycogen)',
+        },
+      ];
+    } else {
+      // MODO HUMANO / ADAPTATIVO
+      return [
+        {
+          id: 'glucose',
+          tag: 'Glucosa',
+          title: isPostprandial ? 'Energía disponible de la comida' : 'Glucosa estable en sangre',
+          simple: isPostprandial ? 'Energía rápida que acabas de ingerir.' : 'Tu cuerpo mantiene tu energía estable usando glucosa del hígado.',
+          detail: 'Nutriente primario procesado desde carbohidratos.',
+          color: 'var(--aion-glucose)',
+        },
+        {
+          id: 'fats',
+          tag: 'Grasas',
+          title: isPostprandial ? 'Grasas en proceso de digestión' : 'Utilizando grasas almacenadas',
+          simple: isPostprandial ? 'Nutrientes esenciales absorbiéndose despacio.' : 'Tu cuerpo está recurriendo a la grasa guardada para mantener tu energía.',
+          detail: 'Combustible denso para actividades sostenidas.',
+          color: 'var(--aion-fats)',
+        },
+        {
+          id: 'protein',
+          tag: 'Proteínas',
+          title: 'Reparación de tejidos y músculo',
+          simple: 'Aminoácidos usados para mantener tu musculatura fuerte.',
+          detail: 'Componente estructural fundamental del cuerpo.',
+          color: 'var(--aion-protein)',
+        },
+        {
+          id: 'glycogen',
+          tag: 'Glucógeno',
+          title: isPostprandial ? 'Recargando depósitos de reserva' : 'Liberando glucógeno del hígado',
+          simple: isPostprandial ? 'Llenando el tanque de energía de reserva.' : 'Liberando el azúcar almacenado en tu hígado.',
+          detail: 'Batería interna de almacenamiento de carbohidratos.',
+          color: 'var(--aion-glycogen)',
+        },
+      ];
     }
   }
 }

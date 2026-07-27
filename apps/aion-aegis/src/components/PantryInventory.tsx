@@ -2,10 +2,32 @@ import React, { useState } from 'react';
 import { AionMemoryStore } from '@aion/memory';
 import { InventoryItem, InventoryAvailability, InventoryTransaction } from '@aion/shared-types';
 
+const INITIAL_CATALOG_SEED: InventoryItem[] = [
+  { id: 'inv-prot-1', name: 'Pechuga de Pollo', amount: 500, unit: 'g', location: 'congelador', availability: 'DISPONIBLE', addedDate: new Date().toISOString(), confidence: 'ALTA', source: 'USER_CONFIRMED' },
+  { id: 'inv-prot-2', name: 'Carne molida magra', amount: 400, unit: 'g', location: 'congelador', availability: 'DISPONIBLE', addedDate: new Date().toISOString(), confidence: 'ALTA', source: 'USER_CONFIRMED' },
+  { id: 'inv-prot-3', name: 'Atún en lata', amount: 3, unit: 'latas', location: 'despensa', availability: 'DISPONIBLE', addedDate: new Date().toISOString(), confidence: 'ALTA', source: 'USER_CONFIRMED' },
+  { id: 'inv-emb-1', name: 'Jamón pavo / cerdo', amount: 200, unit: 'g', location: 'refrigerador', availability: 'DISPONIBLE', addedDate: new Date().toISOString(), confidence: 'ALTA', source: 'USER_CONFIRMED' },
+  { id: 'inv-lac-1', name: 'Queso costeño', amount: 250, unit: 'g', location: 'refrigerador', availability: 'BAJO', addedDate: new Date().toISOString(), confidence: 'ALTA', source: 'USER_CONFIRMED' },
+  { id: 'inv-lac-2', name: 'Leche entera', amount: 1, unit: 'litro', location: 'refrigerador', availability: 'DISPONIBLE', addedDate: new Date().toISOString(), confidence: 'ALTA', source: 'USER_CONFIRMED' },
+  { id: 'inv-gra-1', name: 'Papas sabaneras', amount: 6, unit: 'unidades', location: 'despensa', availability: 'DISPONIBLE', addedDate: new Date().toISOString(), confidence: 'ALTA', source: 'USER_CONFIRMED' },
+  { id: 'inv-gra-2', name: 'Arroz blanco', amount: 1000, unit: 'g', location: 'despensa', availability: 'DISPONIBLE', addedDate: new Date().toISOString(), confidence: 'ALTA', source: 'USER_CONFIRMED' },
+  { id: 'inv-veg-1', name: 'Tomates frescos', amount: 3, unit: 'unidades', location: 'refrigerador', availability: 'PRÓXIMO A VENCER', addedDate: new Date().toISOString(), confidence: 'MEDIA', source: 'VISUAL_ESTIMATE_HIGH' },
+  { id: 'inv-veg-2', name: 'Aguacate Hass', amount: 2, unit: 'unidades', location: 'refrigerador', availability: 'DISPONIBLE', addedDate: new Date().toISOString(), confidence: 'ALTA', source: 'USER_CONFIRMED' },
+];
+
 export const PantryInventory: React.FC = () => {
   const memoryStore = AionMemoryStore.getInstance();
-  const [items, setItems] = useState<InventoryItem[]>(memoryStore.getInventory());
+  let currentInventory = memoryStore.getInventory();
+
+  // Si el inventario está completamente vacío, se inicializa el catálogo realista enriquecido
+  if (currentInventory.length === 0) {
+    INITIAL_CATALOG_SEED.forEach((item) => memoryStore.addInventoryItem(item));
+    currentInventory = memoryStore.getInventory();
+  }
+
+  const [items, setItems] = useState<InventoryItem[]>(currentInventory);
   const [newItemText, setNewItemText] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [expandedItemId, setExpandedItemId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -14,21 +36,24 @@ export const PantryInventory: React.FC = () => {
     setTimeout(() => setToastMessage(null), 3000);
   };
 
-  const handleAddItem = () => {
-    if (!newItemText.trim()) return;
+  const handleAddItem = (customName?: string) => {
+    const textToAdd = customName || newItemText.trim();
+    if (!textToAdd) return;
+
     const newItem: InventoryItem = {
       id: `inv-${Date.now()}`,
-      name: newItemText.trim(),
+      name: textToAdd,
       amount: 1,
-      unit: 'unidad/lata',
+      unit: 'unidad/g',
       availability: 'DISPONIBLE',
       addedDate: new Date().toISOString(),
       confidence: 'ALTA',
       source: 'USER_CONFIRMED',
     };
+
     memoryStore.addInventoryItem(newItem);
     setItems(memoryStore.getInventory());
-    setNewItemText('');
+    if (!customName) setNewItemText('');
     triggerToast(`+ ${newItem.name} agregado a tu Despensa`);
   };
 
@@ -56,32 +81,107 @@ export const PantryInventory: React.FC = () => {
     triggerToast(`${item.name} ahora está ${nextStatus}`);
   };
 
+  const quickPresets = [
+    { label: '+ Pechuga Pollo', name: 'Pechuga de Pollo' },
+    { label: '+ Jamón Pavo', name: 'Jamón pavo' },
+    { label: '+ Huevos', name: 'Huevos' },
+    { label: '+ Queso Costeño', name: 'Queso costeño' },
+    { label: '+ Aguacate', name: 'Aguacate Hass' },
+    { label: '+ Arroz', name: 'Arroz blanco' },
+    { label: '+ Atún', name: 'Atún en lata' },
+  ];
+
+  const filteredItems = items.filter((item) => {
+    if (selectedCategory === 'all') return true;
+    const nameLower = item.name.toLowerCase();
+    if (selectedCategory === 'proteins') return nameLower.includes('pollo') || nameLower.includes('carne') || nameLower.includes('atún') || nameLower.includes('huevo');
+    if (selectedCategory === 'deli') return nameLower.includes('jamón') || nameLower.includes('salchicha') || nameLower.includes('tocineta');
+    if (selectedCategory === 'dairy') return nameLower.includes('queso') || nameLower.includes('leche') || nameLower.includes('yogur');
+    if (selectedCategory === 'grains') return nameLower.includes('papa') || nameLower.includes('arroz') || nameLower.includes('avena') || nameLower.includes('pan');
+    if (selectedCategory === 'veggies') return nameLower.includes('tomate') || nameLower.includes('cebolla') || nameLower.includes('aguacate') || nameLower.includes('manzana');
+    return true;
+  });
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
       {toastMessage && <div className="aion-toast">{toastMessage}</div>}
 
-      <div className="aion-card">
-        <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'white' }}>Despensa e Historial Auditable</h2>
+      <div className="aion-card" style={{ background: 'linear-gradient(135deg, rgba(91, 75, 138, 0.4) 0%, rgba(26, 22, 37, 0.95) 100%)' }}>
+        <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'white' }}>Despensa, Refrigerador e Historial</h2>
         <p style={{ fontSize: '0.8rem', color: 'var(--aion-sand)', margin: '0.2rem 0 0.8rem 0' }}>
-          Toca cualquier alimento para ver su historial de movimientos (*¿Por qué AION cree que te queda esta cantidad?*).
+          Inventario inteligente categorizado (Proteínas, Lácteos, Embutidos, Granos). Toca cualquier alimento para ver su historial (*¿Por qué AION cree esto?*).
         </p>
 
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
+        {/* Paleta de Selección Rápida 1-Tap */}
+        <div style={{ fontSize: '0.72rem', color: 'var(--aion-lavender)', fontWeight: 700, marginBottom: '0.3rem' }}>
+          ENTRADA RÁPIDA DE ALIMENTOS:
+        </div>
+        <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap', marginBottom: '0.8rem' }}>
+          {quickPresets.map((p) => (
+            <button
+              key={p.label}
+              onClick={() => handleAddItem(p.name)}
+              style={{
+                background: 'rgba(255,255,255,0.08)',
+                color: 'white',
+                border: '1px solid rgba(255,255,255,0.15)',
+                borderRadius: '16px',
+                padding: '0.25rem 0.65rem',
+                fontSize: '0.7rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+              }}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
+
+        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem' }}>
           <input
             className="aion-input"
-            placeholder="Ej. Tengo latas de atún, pollo, verduras..."
+            placeholder="Ej. Pechuga de pollo, huevos, queso, jamón..."
             value={newItemText}
             onChange={(e) => setNewItemText(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleAddItem()}
           />
-          <button className="aion-btn-primary" style={{ width: 'auto', padding: '0 1rem' }} onClick={handleAddItem}>
+          <button className="aion-btn-primary" style={{ width: 'auto', padding: '0 1rem' }} onClick={() => handleAddItem()}>
             + Agregar
           </button>
+        </div>
+
+        {/* Píldoras de Filtro por Categorías Realistas */}
+        <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+          {[
+            { id: 'all', label: 'Todos' },
+            { id: 'proteins', label: '🍗 Proteínas' },
+            { id: 'deli', label: '🥓 Embutidos' },
+            { id: 'dairy', label: '🧀 Lácteos' },
+            { id: 'grains', label: '🌾 Granos / Tubérculos' },
+            { id: 'veggies', label: '🥑 Vegetales / Frutas' },
+          ].map((c) => (
+            <button
+              key={c.id}
+              onClick={() => setSelectedCategory(c.id)}
+              style={{
+                background: selectedCategory === c.id ? 'var(--aion-lavender)' : 'rgba(255,255,255,0.06)',
+                color: selectedCategory === c.id ? '#0F0D15' : 'white',
+                border: 'none',
+                borderRadius: '20px',
+                padding: '0.3rem 0.65rem',
+                fontSize: '0.72rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+              }}
+            >
+              {c.label}
+            </button>
+          ))}
         </div>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-        {items.map((item) => {
+        {filteredItems.map((item) => {
           const transactions: InventoryTransaction[] = memoryStore.getInventoryTransactions(item.id);
           const isExpanded = expandedItemId === item.id;
 
@@ -94,7 +194,7 @@ export const PantryInventory: React.FC = () => {
                 >
                   <div style={{ fontWeight: 600, fontSize: '0.9rem', color: 'white', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                     <span>{item.name}</span>
-                    <span style={{ fontSize: '0.7rem', color: 'var(--aion-lavender)' }}>{isExpanded ? '▲ Ocultar Historial' : '▼ ¿Por qué AION cree esto?'}</span>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--aion-lavender)' }}>{isExpanded ? '▲ Ocultar' : '▼ ¿Por qué AION cree esto?'}</span>
                   </div>
                   <div style={{ fontSize: '0.75rem', color: 'var(--aion-neutral-light)' }}>
                     Ubicación: {item.location || 'despensa'} • Certeza: {item.source}
@@ -138,7 +238,7 @@ export const PantryInventory: React.FC = () => {
                 </div>
               </div>
 
-              {/* Historial de Movimientos Explicables (Audit Trail) */}
+              {/* Historial de Movimientos Explicables */}
               {isExpanded && (
                 <div style={{ marginTop: '0.5rem', paddingTop: '0.5rem', borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                   <span style={{ fontSize: '0.7rem', color: 'var(--aion-lavender)', fontWeight: 700 }}>
