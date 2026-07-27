@@ -2,23 +2,18 @@ import {
   MealRecord,
   InventoryItem,
   LivePlan,
-  EnergyBalance,
-  MetabolicState,
-  CertaintyLevel,
+  AionUserProfile,
+  AegisProfile,
+  MemoryFact,
+  EvidenceLevel,
 } from '@aion/shared-types';
-
-export interface MemoryRecord<T> {
-  id: string;
-  key: string;
-  data: T;
-  certainty: CertaintyLevel;
-  timestamp: string;
-  updatedAt: string;
-}
 
 const STORAGE_KEY_MEALS = 'aion_memory_meals';
 const STORAGE_KEY_INVENTORY = 'aion_memory_inventory';
 const STORAGE_KEY_PLAN = 'aion_memory_live_plan';
+const STORAGE_KEY_CORE_PROFILE = 'aion_memory_core_profile';
+const STORAGE_KEY_AEGIS_PROFILE = 'aion_memory_aegis_profile';
+const STORAGE_KEY_FACTS = 'aion_memory_facts';
 
 export class AionMemoryStore {
   private static instance: AionMemoryStore;
@@ -26,8 +21,13 @@ export class AionMemoryStore {
   private meals: MealRecord[] = [];
   private inventory: InventoryItem[] = [];
   private livePlan: LivePlan;
+  private coreProfile: AionUserProfile;
+  private aegisProfile: AegisProfile;
+  private facts: MemoryFact[] = [];
 
   private constructor() {
+    this.coreProfile = this.createDefaultCoreProfile();
+    this.aegisProfile = this.createDefaultAegisProfile();
     this.livePlan = this.createInitialPlan();
     this.seedInitialInventory();
     this.seedInitialMeals();
@@ -41,6 +41,36 @@ export class AionMemoryStore {
     return AionMemoryStore.instance;
   }
 
+  private createDefaultCoreProfile(): AionUserProfile {
+    return {
+      displayName: 'Usuario AION',
+      language: 'es',
+      country: 'Colombia',
+      region: 'Cundinamarca',
+      city: 'Bogotá',
+      timezone: 'America/Bogota',
+      locale: 'es-CO',
+      currency: 'COP',
+      unitSystem: 'metric',
+      dateFormat: 'DD/MM/YYYY',
+      timeFormat: '12h',
+    };
+  }
+
+  private createDefaultAegisProfile(): AegisProfile {
+    return {
+      goals: [{ type: 'deficit', targetKcal: 1800, targetProteinG: 120 }],
+      preferredEatingPattern: ['Desayuno', 'Almuerzo', 'Cena'],
+      allergies: [],
+      intolerances: [],
+      dislikedFoods: [],
+      preferredFoods: ['Atún', 'Papa sabanera', 'Pollo', 'Queso costeño', 'Tomate'],
+      cookingSkill: 'medium',
+      typicalPrepTimeMinutes: 20,
+      householdSize: 1,
+    };
+  }
+
   private createInitialPlan(): LivePlan {
     return {
       dailyTargetKcal: 1800,
@@ -49,12 +79,12 @@ export class AionMemoryStore {
       macroTargets: { protein: 120, carbs: 180, fats: 60 },
       macroConsumed: { protein: 30, carbs: 36, fats: 36 },
       plannedMeals: [
-        { mealType: 'Almuerzo', suggestedTime: '14:00', recipeTitle: 'Pollo salteado con vegetales', kcal: 520 },
-        { mealType: 'Cena', suggestedTime: '20:00', recipeTitle: 'Ensalada de Atún con aguacate', kcal: 450 },
-        { mealType: 'Snack Opcional', suggestedTime: '17:30', recipeTitle: 'Yogurt natural con almendras', kcal: 250 },
+        { mealType: 'Almuerzo', suggestedTime: '14:00', recipeTitle: 'Pechuga de pollo salteada con vegetales', kcal: 520 },
+        { mealType: 'Cena', suggestedTime: '20:00', recipeTitle: 'Ensalada de Atún con tomate', kcal: 450 },
+        { mealType: 'Snack', suggestedTime: '17:30', recipeTitle: 'Manzana con almendras', kcal: 250 },
       ],
       lastRecalculated: new Date().toISOString(),
-      adaptiveNote: 'Plan reorganizado automáticamente tras tu desayuno de 580 kcal.',
+      adaptiveNote: 'Plan reorganizado automáticamente tras tu desayuno.',
     };
   }
 
@@ -69,7 +99,7 @@ export class AionMemoryStore {
         availability: 'DISPONIBLE',
         addedDate: new Date().toISOString(),
         confidence: 'ALTA',
-        source: 'user_informed',
+        source: 'USER_CONFIRMED',
       },
       {
         id: 'inv-2',
@@ -80,7 +110,7 @@ export class AionMemoryStore {
         availability: 'DISPONIBLE',
         addedDate: new Date().toISOString(),
         confidence: 'ALTA',
-        source: 'user_informed',
+        source: 'USER_CONFIRMED',
       },
       {
         id: 'inv-3',
@@ -92,7 +122,7 @@ export class AionMemoryStore {
         addedDate: new Date().toISOString(),
         expirationDate: new Date(Date.now() + 86400000 * 2).toISOString(),
         confidence: 'ALTA',
-        source: 'user_informed',
+        source: 'USER_CONFIRMED',
       },
       {
         id: 'inv-4',
@@ -103,7 +133,7 @@ export class AionMemoryStore {
         availability: 'DISPONIBLE',
         addedDate: new Date().toISOString(),
         confidence: 'ALTA',
-        source: 'user_informed',
+        source: 'USER_CONFIRMED',
       },
       {
         id: 'inv-5',
@@ -115,7 +145,7 @@ export class AionMemoryStore {
         addedDate: new Date().toISOString(),
         expirationDate: new Date(Date.now() + 86400000).toISOString(),
         confidence: 'MEDIA',
-        source: 'observed_event',
+        source: 'VISUAL_ESTIMATE_HIGH',
       },
     ];
   }
@@ -141,7 +171,7 @@ export class AionMemoryStore {
               carbsGrams: 0,
               fatsGrams: 0.5,
               confidence: 'ALTA',
-              source: 'usuario',
+              source: 'USER_CONFIRMED',
             },
             {
               id: 'ing-2',
@@ -154,7 +184,7 @@ export class AionMemoryStore {
               carbsGrams: 36,
               fatsGrams: 0.2,
               confidence: 'ALTA',
-              source: 'foto',
+              source: 'VISUAL_ESTIMATE_HIGH',
             },
             {
               id: 'ing-3',
@@ -167,20 +197,7 @@ export class AionMemoryStore {
               carbsGrams: 0,
               fatsGrams: 24,
               confidence: 'MEDIA',
-              source: 'usuario',
-            },
-            {
-              id: 'ing-4',
-              name: 'Margarina',
-              amountPreparation: 1,
-              amountConsumed: 1,
-              unit: 'cucharada',
-              kcal: 100,
-              proteinGrams: 0,
-              carbsGrams: 0,
-              fatsGrams: 11.3,
-              confidence: 'MEDIA',
-              source: 'calculo',
+              source: 'USER_CONFIRMED',
             },
           ],
           totalKcal: 1100,
@@ -189,7 +206,7 @@ export class AionMemoryStore {
           totalFats: 70,
         },
         consumedPortion: {
-          fractionText: '1/5 de la ensalada + 1 papa + 100g queso + margarina',
+          fractionText: '1/5 de la ensalada + 1 papa + 100g queso',
           fractionValue: 0.2,
           consumedItems: [],
           actualKcal: 580,
@@ -198,7 +215,8 @@ export class AionMemoryStore {
           actualFats: 36,
         },
         confidence: 'MEDIA',
-        evidenceSummary: 'Analizado por foto y confirmado por el usuario en 1/5 de la preparación.',
+        evidenceSummary: 'Analizado por foto y confirmado en 1/5 de la preparación.',
+        evidenceLevel: 'USER_CONFIRMED',
         userConfirmed: true,
       },
     ];
@@ -207,6 +225,12 @@ export class AionMemoryStore {
   private loadFromStorage(): void {
     if (typeof window === 'undefined' || !window.localStorage) return;
     try {
+      const savedCore = localStorage.getItem(STORAGE_KEY_CORE_PROFILE);
+      if (savedCore) this.coreProfile = JSON.parse(savedCore);
+
+      const savedAegis = localStorage.getItem(STORAGE_KEY_AEGIS_PROFILE);
+      if (savedAegis) this.aegisProfile = JSON.parse(savedAegis);
+
       const savedMeals = localStorage.getItem(STORAGE_KEY_MEALS);
       if (savedMeals) this.meals = JSON.parse(savedMeals);
 
@@ -215,33 +239,89 @@ export class AionMemoryStore {
 
       const savedPlan = localStorage.getItem(STORAGE_KEY_PLAN);
       if (savedPlan) this.livePlan = JSON.parse(savedPlan);
+
+      const savedFacts = localStorage.getItem(STORAGE_KEY_FACTS);
+      if (savedFacts) this.facts = JSON.parse(savedFacts);
     } catch (e) {
-      console.warn('[AION Memory] Could not load from localStorage, using in-memory state.');
+      console.warn('[AION Memory] Usando memoria de tiempo de ejecución.');
     }
   }
 
-  private saveToStorage(): void {
+  public saveToStorage(): void {
     if (typeof window === 'undefined' || !window.localStorage) return;
     try {
+      localStorage.setItem(STORAGE_KEY_CORE_PROFILE, JSON.stringify(this.coreProfile));
+      localStorage.setItem(STORAGE_KEY_AEGIS_PROFILE, JSON.stringify(this.aegisProfile));
       localStorage.setItem(STORAGE_KEY_MEALS, JSON.stringify(this.meals));
       localStorage.setItem(STORAGE_KEY_INVENTORY, JSON.stringify(this.inventory));
       localStorage.setItem(STORAGE_KEY_PLAN, JSON.stringify(this.livePlan));
+      localStorage.setItem(STORAGE_KEY_FACTS, JSON.stringify(this.facts));
     } catch (e) {
-      console.warn('[AION Memory] Could not save to localStorage');
+      console.warn('[AION Memory] Error guardando en localStorage');
     }
   }
 
-  // API Métodos de Consulta y Guardado
+  // API de Perfiles
+  public getCoreProfile(): AionUserProfile {
+    return { ...this.coreProfile };
+  }
+
+  public updateCoreProfile(updates: Partial<AionUserProfile>): void {
+    this.coreProfile = { ...this.coreProfile, ...updates };
+    this.saveToStorage();
+  }
+
+  public getAegisProfile(): AegisProfile {
+    return { ...this.aegisProfile };
+  }
+
+  public updateAegisProfile(updates: Partial<AegisProfile>): void {
+    this.aegisProfile = { ...this.aegisProfile, ...updates };
+    this.saveToStorage();
+  }
+
+  // API de Hechos de Memoria (MemoryFact)
+  public addFact(fact: MemoryFact): void {
+    this.facts.unshift(fact);
+    this.saveToStorage();
+  }
+
+  public getFacts(): MemoryFact[] {
+    return [...this.facts];
+  }
+
+  // API Comidas
   public getMeals(): MealRecord[] {
     return [...this.meals];
   }
 
   public addMeal(meal: MealRecord): void {
     this.meals.unshift(meal);
-    this.recalculatePlanAfterMeal(meal.consumedPortion.actualKcal, meal.consumedPortion.actualProtein, meal.consumedPortion.actualCarbs, meal.consumedPortion.actualFats);
+    this.recalculatePlanAfterMeal(
+      meal.consumedPortion.actualKcal,
+      meal.consumedPortion.actualProtein,
+      meal.consumedPortion.actualCarbs,
+      meal.consumedPortion.actualFats
+    );
+    this.deductInventoryFromMeal(meal);
     this.saveToStorage();
   }
 
+  private deductInventoryFromMeal(meal: MealRecord): void {
+    meal.preparation.ingredients.forEach((ing) => {
+      const matchIdx = this.inventory.findIndex(
+        (inv) => inv.name.toLowerCase().includes(ing.name.toLowerCase()) || ing.name.toLowerCase().includes(inv.name.toLowerCase())
+      );
+      if (matchIdx !== -1) {
+        const current = this.inventory[matchIdx];
+        const newAmount = Math.max(0, current.amount - (ing.amountConsumed || 1));
+        const newAvailability = newAmount === 0 ? 'AGOTADO' : newAmount <= 1 ? 'BAJO' : 'DISPONIBLE';
+        this.inventory[matchIdx] = { ...current, amount: newAmount, availability: newAvailability };
+      }
+    });
+  }
+
+  // API Inventario
   public getInventory(): InventoryItem[] {
     return [...this.inventory];
   }
@@ -259,6 +339,7 @@ export class AionMemoryStore {
     }
   }
 
+  // API Plan Vivo
   public getLivePlan(): LivePlan {
     return { ...this.livePlan };
   }
@@ -270,6 +351,6 @@ export class AionMemoryStore {
     this.livePlan.macroConsumed.carbs += carbs;
     this.livePlan.macroConsumed.fats += fats;
     this.livePlan.lastRecalculated = new Date().toISOString();
-    this.livePlan.adaptiveNote = `Plan vivo recalculado: te quedan ${this.livePlan.remainingKcal} kcal para el resto del día.`;
+    this.livePlan.adaptiveNote = `Plan vivo recalculado automáticamente: te quedan ${this.livePlan.remainingKcal} kcal para el resto del día.`;
   }
 }

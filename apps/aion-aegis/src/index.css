@@ -1,4 +1,4 @@
-@import '../../packages/aion-design-tokens/tokens.css';
+@import '../../../packages/aion-design-tokens/tokens.css';
 
 * {
   box-sizing: border-box;

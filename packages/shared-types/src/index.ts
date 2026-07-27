@@ -1,16 +1,78 @@
-// Tipos de Certeza y Procedencia de Datos en AION Memory
-export type CertaintyLevel =
-  | 'observed_event'
-  | 'user_informed'
-  | 'estimate'
-  | 'inference'
-  | 'detected_pattern'
-  | 'preference'
-  | 'habit'
-  | 'user_confirmed'
-  | 'user_corrected'
-  | 'recommendation';
+// Contratos Base Ecosistema AION - Modelo Universal de Certeza & Perfiles
 
+export type EvidenceLevel =
+  | 'USER_CONFIRMED'
+  | 'SENSOR_MEASURED'
+  | 'DETERMINISTIC_CALCULATION'
+  | 'VISUAL_ESTIMATE_HIGH'
+  | 'VISUAL_ESTIMATE_MEDIUM'
+  | 'VISUAL_ESTIMATE_LOW'
+  | 'AI_INFERENCE'
+  | 'UNKNOWN';
+
+export type CertaintyLevel = EvidenceLevel;
+
+export interface MemoryFact<T = any> {
+  key: string;
+  value: T;
+  evidence: EvidenceLevel;
+  source: 'user' | 'vision' | 'sensor' | 'calculation' | 'integration' | 'agent';
+  createdAt: string; // ISO 8601
+  lastConfirmedAt?: string;
+  confidence?: number; // 0.0 - 1.0
+  scope: 'core' | 'aegis' | string;
+  sensitive?: boolean;
+  expiresAt?: string;
+  userEditable: boolean;
+}
+
+// Perfil Transversal AION Core
+export interface AionUserProfile {
+  displayName?: string;
+  language: string; // ej. 'es'
+  country?: string; // ej. 'Colombia'
+  region?: string; // ej. 'Cundinamarca'
+  city?: string; // ej. 'Bogotá'
+  timezone: string; // ej. 'America/Bogota'
+  locale: string; // ej. 'es-CO'
+  currency?: string; // ej. 'COP'
+  unitSystem: 'metric' | 'imperial';
+  dateFormat?: string;
+  timeFormat?: '12h' | '24h';
+}
+
+// Perfil Especializado AION Aegis
+export interface NutritionGoal {
+  type: 'deficit' | 'maintenance' | 'surplus' | 'health';
+  targetKcal?: number;
+  targetProteinG?: number;
+}
+
+export interface MealWindow {
+  name: string; // ej. 'Desayuno', 'Almuerzo'
+  startHour: string; // ej. '08:00'
+  endHour: string; // ej. '10:00'
+}
+
+export interface AegisProfile {
+  goals?: NutritionGoal[];
+  preferredEatingPattern?: string[];
+  allergies?: string[];
+  intolerances?: string[];
+  dislikedFoods?: string[];
+  preferredFoods?: string[];
+  dietaryRestrictions?: string[];
+  usualMealWindows?: MealWindow[];
+  cookingSkill?: 'low' | 'medium' | 'high';
+  cookingEquipment?: string[];
+  typicalPrepTimeMinutes?: number;
+  householdSize?: number;
+  groceryFrequency?: string;
+  foodBudget?: { min: number; max: number; currency: string };
+  optionalBodyMetrics?: { weightKg?: number; heightCm?: number; age?: number; sex?: 'M' | 'F' | 'other' };
+}
+
+// Estructura de Alimentos e Ingredientes
 export interface IngredientItem {
   id: string;
   name: string;
@@ -26,7 +88,7 @@ export interface IngredientItem {
   fiberGrams?: number;
   waterMl?: number;
   confidence: 'ALTA' | 'MEDIA' | 'BAJA';
-  source: 'usuario' | 'foto' | 'calculo' | 'estimacion';
+  source: EvidenceLevel;
 }
 
 export interface Preparation {
@@ -37,6 +99,7 @@ export interface Preparation {
   totalProtein: number;
   totalCarbs: number;
   totalFats: number;
+  totalServingsEstimated?: number;
 }
 
 export interface ConsumedPortion {
@@ -58,6 +121,7 @@ export interface MealRecord {
   consumedPortion: ConsumedPortion;
   confidence: 'ALTA' | 'MEDIA' | 'BAJA';
   evidenceSummary: string;
+  evidenceLevel: EvidenceLevel;
   userConfirmed: boolean;
 }
 
@@ -73,7 +137,7 @@ export interface EnergyBalance {
   trend: 'estable' | 'en_progreso' | 'excedido';
 }
 
-// Estados Metabólicos
+// Estados Metabólicos Fisiológicos
 export type MetabolicPhase =
   | 'POSPRANDIAL'
   | 'POSTABSORTIVO'
@@ -94,6 +158,7 @@ export interface MetabolicState {
   glycogenStatus: string;
   fatBurnRate: 'alta' | 'moderada' | 'menor_temporalmente' | 'baja';
   lastMealTime?: string;
+  hoursElapsedSinceLastMeal?: number;
 }
 
 // Timeline Metabólico
@@ -120,7 +185,7 @@ export interface InventoryItem {
   expirationDate?: string;
   kcalPerUnit?: number;
   confidence: 'ALTA' | 'MEDIA' | 'BAJA';
-  source: CertaintyLevel;
+  source: EvidenceLevel;
 }
 
 // Motor de Recetas Contextuales
@@ -134,7 +199,7 @@ export interface RecipeOption {
   fatsGrams: number;
   prepTimeMinutes: number;
   reasonToRecommend: string;
-  category: 'MEJOR OPCIÓN' | 'MÁS RÁPIDA' | 'MÁS SACIANTE';
+  category: 'MEJOR OPCIÓN' | 'MÁS RÁPIDA' | 'MÁS SACIANTE' | 'APROVECHA LO QUE VA A VENCER';
   ingredientsNeeded: { name: string; amount: string; availableInPantry: boolean }[];
   substitutions?: string[];
   steps: string[];
@@ -152,12 +217,16 @@ export interface LivePlan {
   adaptiveNote: string;
 }
 
-// AION Event Architecture
+// Eventos Versionados AION Protocol
 export interface AionEvent<T = any> {
   eventId: string;
   eventType: string; // ej. "aion.aegis.nutrition.meal.logged"
-  publisherApp: string; // "aion-aegis"
-  timestamp: string;
+  appId: string; // "aion-aegis" o "aion-core"
+  userId: string;
+  occurredAt: string; // ISO 8601
   payload: T;
-  certainty: CertaintyLevel;
+  confidence?: number;
+  provenance?: string;
+  sensitivity?: 'normal' | 'sensitive';
+  schemaVersion: string; // "1.0.0"
 }

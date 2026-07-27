@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Header } from './components/Header';
 import { YourBodyNow } from './components/YourBodyNow';
 import { MealLogger } from './components/MealLogger';
 import { WhatCanIEatNow } from './components/WhatCanIEatNow';
 import { PantryInventory } from './components/PantryInventory';
 import { LivePlanAndMarket } from './components/LivePlanAndMarket';
+import { OnboardingModal } from './components/OnboardingModal';
 
 import { NutritionLeadSpecialist } from '@aion/agents';
 import { AionMemoryStore } from '@aion/memory';
@@ -12,12 +13,21 @@ import { AionMemoryStore } from '@aion/memory';
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'body' | 'meal' | 'eat_now' | 'pantry' | 'plan'>('body');
   const [updateKey, setUpdateKey] = useState(0);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-  const specialist = new NutritionLeadSpecialist();
   const memoryStore = AionMemoryStore.getInstance();
+  const specialist = new NutritionLeadSpecialist();
 
   const metabolicState = specialist.getCurrentMetabolicState();
   const energyBalance = specialist.getCurrentEnergyBalance();
+
+  useEffect(() => {
+    const facts = memoryStore.getFacts();
+    const isConfigured = facts.some((f) => f.key === 'user_profile_configured');
+    if (!isConfigured) {
+      setIsSettingsOpen(true);
+    }
+  }, []);
 
   const refreshData = () => {
     setUpdateKey((prev) => prev + 1);
@@ -25,7 +35,7 @@ export const App: React.FC = () => {
 
   return (
     <div>
-      <Header />
+      <Header onOpenSettings={() => setIsSettingsOpen(true)} />
 
       <main className="aion-container" key={updateKey}>
         {activeTab === 'body' && (
@@ -48,6 +58,8 @@ export const App: React.FC = () => {
           <LivePlanAndMarket />
         )}
       </main>
+
+      <OnboardingModal isOpen={isSettingsOpen} onClose={() => { setIsSettingsOpen(false); refreshData(); }} />
 
       {/* Navegación Inferior Mobile First */}
       <nav className="aion-nav">

@@ -17,7 +17,7 @@ export const PantryInventory: React.FC = () => {
       availability: 'DISPONIBLE',
       addedDate: new Date().toISOString(),
       confidence: 'ALTA',
-      source: 'user_informed',
+      source: 'USER_CONFIRMED',
     };
     memoryStore.addInventoryItem(newItem);
     setItems(memoryStore.getInventory());
