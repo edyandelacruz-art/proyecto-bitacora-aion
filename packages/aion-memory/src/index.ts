@@ -42,9 +42,6 @@ export class AionMemoryStore {
     this.coreProfile = this.createDefaultCoreProfile();
     this.aegisProfile = this.createDefaultAegisProfile();
     this.livePlan = this.createInitialPlan();
-    this.seedInitialInventory();
-    this.seedInitialMeals();
-    this.seedInitialRecipes();
     this.loadFromStorage();
   }
 
@@ -53,6 +50,18 @@ export class AionMemoryStore {
       AionMemoryStore.instance = new AionMemoryStore();
     }
     return AionMemoryStore.instance;
+  }
+
+  public resetToCleanState(): void {
+    this.meals = [];
+    this.inventory = [];
+    this.facts = [];
+    this.ledger = [];
+    this.transactions = [];
+    this.recipes = [];
+    this.preparedBatches = [];
+    this.livePlan = this.createInitialPlan();
+    this.saveToStorage();
   }
 
   private createDefaultCoreProfile(): AionUserProfile {
@@ -94,208 +103,17 @@ export class AionMemoryStore {
   private createInitialPlan(): LivePlan {
     return {
       dailyTargetKcal: 1800,
-      consumedKcal: 580,
-      remainingKcal: 1220,
+      consumedKcal: 0,
+      remainingKcal: 1800,
       macroTargets: { protein: 120, carbs: 180, fats: 60 },
-      macroConsumed: { protein: 30, carbs: 36, fats: 36 },
+      macroConsumed: { protein: 0, carbs: 0, fats: 0 },
       plannedMeals: [
         { mealType: 'Almuerzo', suggestedTime: '14:00', recipeTitle: 'Pechuga de pollo salteada con vegetales', kcal: 520 },
         { mealType: 'Cena', suggestedTime: '20:00', recipeTitle: 'Ensalada de Atún con tomate', kcal: 450 },
-        { mealType: 'Snack', suggestedTime: '17:30', recipeTitle: 'Manzana con almendras', kcal: 250 },
       ],
       lastRecalculated: new Date().toISOString(),
-      adaptiveNote: 'Plan reorganizado automáticamente tras tu desayuno.',
+      adaptiveNote: 'Plan inicial disponible.',
     };
-  }
-
-  private seedInitialInventory(): void {
-    this.inventory = [
-      {
-        id: 'inv-1',
-        name: 'Lata de Atún',
-        amount: 3,
-        unit: 'latas',
-        location: 'despensa',
-        availability: 'DISPONIBLE',
-        addedDate: new Date().toISOString(),
-        confidence: 'ALTA',
-        source: 'USER_CONFIRMED',
-      },
-      {
-        id: 'inv-2',
-        name: 'Papas sabaneras',
-        amount: 6,
-        unit: 'unidades',
-        location: 'despensa',
-        availability: 'DISPONIBLE',
-        addedDate: new Date().toISOString(),
-        confidence: 'ALTA',
-        source: 'USER_CONFIRMED',
-      },
-      {
-        id: 'inv-3',
-        name: 'Queso costeño',
-        amount: 250,
-        unit: 'g',
-        location: 'refrigerador',
-        availability: 'BAJO',
-        addedDate: new Date().toISOString(),
-        expirationDate: new Date(Date.now() + 86400000 * 2).toISOString(),
-        confidence: 'ALTA',
-        source: 'USER_CONFIRMED',
-      },
-      {
-        id: 'inv-4',
-        name: 'Pechuga de Pollo',
-        amount: 500,
-        unit: 'g',
-        location: 'congelador',
-        availability: 'DISPONIBLE',
-        addedDate: new Date().toISOString(),
-        confidence: 'ALTA',
-        source: 'USER_CONFIRMED',
-      },
-      {
-        id: 'inv-5',
-        name: 'Tomates frescos',
-        amount: 2,
-        unit: 'unidades',
-        location: 'refrigerador',
-        availability: 'PRÓXIMO A VENCER',
-        addedDate: new Date().toISOString(),
-        expirationDate: new Date(Date.now() + 86400000).toISOString(),
-        confidence: 'MEDIA',
-        source: 'VISUAL_ESTIMATE_HIGH',
-      },
-    ];
-
-    // Transacción inicial de siembra en el historial auditable
-    this.inventory.forEach((item) => {
-      this.transactions.push({
-        id: `tx-init-${item.id}`,
-        pantryItemId: item.id,
-        pantryItemName: item.name,
-        type: 'manual_add',
-        quantityDelta: item.amount,
-        unit: item.unit,
-        evidence: item.source,
-        confidence: 0.95,
-        createdAt: item.addedDate,
-        explanation: 'Registro inicial de inventario en despensa.',
-      });
-    });
-  }
-
-  private seedInitialMeals(): void {
-    this.meals = [
-      {
-        id: 'meal-1',
-        timestamp: new Date(Date.now() - 3600000 * 2).toISOString(),
-        mealType: 'Desayuno',
-        preparation: {
-          id: 'prep-1',
-          name: 'Ensalada de Atún con Papa y Queso',
-          ingredients: [
-            {
-              id: 'ing-1',
-              name: 'Atún en agua',
-              amountPreparation: 1,
-              amountConsumed: 0.2,
-              unit: 'lata',
-              kcal: 30,
-              proteinGrams: 6,
-              carbsGrams: 0,
-              fatsGrams: 0.5,
-              confidence: 'ALTA',
-              source: 'USER_CONFIRMED',
-            },
-            {
-              id: 'ing-2',
-              name: 'Papa cocida',
-              amountPreparation: 1,
-              amountConsumed: 1,
-              unit: 'unidad',
-              kcal: 160,
-              proteinGrams: 4,
-              carbsGrams: 36,
-              fatsGrams: 0.2,
-              confidence: 'ALTA',
-              source: 'VISUAL_ESTIMATE_HIGH',
-            },
-            {
-              id: 'ing-3',
-              name: 'Queso costeño',
-              amountPreparation: 100,
-              amountConsumed: 100,
-              unit: 'g',
-              kcal: 290,
-              proteinGrams: 18,
-              carbsGrams: 0,
-              fatsGrams: 24,
-              confidence: 'MEDIA',
-              source: 'USER_CONFIRMED',
-            },
-          ],
-          totalKcal: 1100,
-          totalProtein: 60,
-          totalCarbs: 60,
-          totalFats: 70,
-        },
-        consumedPortion: {
-          fractionText: '1/5 de la ensalada + 1 papa + 100g queso',
-          fractionValue: 0.2,
-          consumedItems: [],
-          actualKcal: 580,
-          actualProtein: 28,
-          actualCarbs: 36,
-          actualFats: 36,
-        },
-        confidence: 'MEDIA',
-        evidenceSummary: 'Analizado por foto y confirmado en 1/5 de la preparación.',
-        evidenceLevel: 'USER_CONFIRMED',
-        userConfirmed: true,
-      },
-    ];
-  }
-
-  private seedInitialRecipes(): void {
-    this.recipes = [
-      {
-        id: 'rec-1',
-        name: 'Pechuga de pollo salteada con vegetales y papa sabanera',
-        description: 'Receta alta en proteína utilizando ingredientes frescos de la despensa.',
-        servings: 1,
-        prepTimeMin: 15,
-        cookTimeMin: 15,
-        difficulty: 'easy',
-        ingredients: [
-          { name: 'Pechuga de Pollo', amount: 200, unit: 'g' },
-          { name: 'Papa sabanera', amount: 1, unit: 'unidad' },
-          { name: 'Tomates frescos', amount: 2, unit: 'unidades' },
-        ],
-        instructions: [
-          { stepNumber: 1, instruction: 'Corta el pollo en tiras y saltea con tomates.' },
-          { stepNumber: 2, instruction: 'Cocina la papa al vapor durante 15 minutos.' },
-        ],
-        totalNutrition: { kcal: 480, protein: 36, carbs: 35, fats: 10 },
-        source: 'aion_generated',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-    ];
-
-    this.preparedBatches = [
-      {
-        id: 'batch-1',
-        recipeId: 'rec-1',
-        recipeName: 'Pechuga de pollo con vegetales (Meal Prep 3 días)',
-        preparedAt: new Date(Date.now() - 86400000).toISOString(),
-        expiresAtEstimate: new Date(Date.now() + 86400000 * 3).toISOString(),
-        totalServings: 3,
-        servingsRemaining: 2,
-        storageLocation: 'refrigerador',
-      },
-    ];
   }
 
   private loadFromStorage(): void {
@@ -390,11 +208,15 @@ export class AionMemoryStore {
     return [...this.ledger];
   }
 
-  // API de Transacciones de Inventario Auditable
+  // API de Transacciones de Inventario Auditable (Reductor Único de Estado Materializado)
   public addInventoryTransaction(tx: InventoryTransaction): void {
     this.transactions.unshift(tx);
 
-    const matchIdx = this.inventory.findIndex((i) => i.id === tx.pantryItemId);
+    let matchIdx = this.inventory.findIndex((i) => i.id === tx.pantryItemId);
+    if (matchIdx === -1) {
+      matchIdx = this.inventory.findIndex((i) => i.name.toLowerCase() === tx.pantryItemName.toLowerCase());
+    }
+
     if (matchIdx !== -1) {
       const current = this.inventory[matchIdx];
       const delta = tx.quantityDelta || 0;
@@ -402,6 +224,19 @@ export class AionMemoryStore {
       const newAvailability = newAmount === 0 ? 'AGOTADO' : newAmount <= 1 ? 'BAJO' : 'DISPONIBLE';
 
       this.inventory[matchIdx] = { ...current, amount: newAmount, availability: newAvailability };
+    } else {
+      // Si el ítem no existe en la colección de inventario, se registra con la cantidad delta inicial
+      const newItem: InventoryItem = {
+        id: tx.pantryItemId,
+        name: tx.pantryItemName,
+        amount: Math.max(0, tx.quantityDelta || 0),
+        unit: tx.unit || 'unidad',
+        availability: (tx.quantityDelta || 0) > 0 ? 'DISPONIBLE' : 'AGOTADO',
+        addedDate: tx.createdAt,
+        confidence: tx.confidence && tx.confidence > 0.8 ? 'ALTA' : 'MEDIA',
+        source: tx.evidence,
+      };
+      this.inventory.unshift(newItem);
     }
     this.saveToStorage();
   }
@@ -423,66 +258,30 @@ export class AionMemoryStore {
       meal.consumedPortion.actualCarbs,
       meal.consumedPortion.actualFats
     );
-    this.deductInventoryFromMeal(meal);
-
-    this.addLedgerEntry({
-      id: `led-${Date.now()}`,
-      timestamp: meal.timestamp,
-      type: 'meal',
-      source: 'user',
-      payload: meal,
-      evidence: meal.evidenceLevel,
-      confidence: 0.95,
-    });
-
     this.saveToStorage();
   }
 
-  private deductInventoryFromMeal(meal: MealRecord): void {
-    meal.preparation.ingredients.forEach((ing) => {
-      const matchIdx = this.inventory.findIndex(
-        (inv) => inv.name.toLowerCase().includes(ing.name.toLowerCase()) || ing.name.toLowerCase().includes(inv.name.toLowerCase())
-      );
-      if (matchIdx !== -1) {
-        const item = this.inventory[matchIdx];
-        const consumedAmount = ing.amountConsumed || 1;
-
-        this.addInventoryTransaction({
-          id: `tx-meal-${Date.now()}-${ing.id}`,
-          pantryItemId: item.id,
-          pantryItemName: item.name,
-          type: 'meal_use',
-          quantityDelta: -consumedAmount,
-          unit: item.unit,
-          evidence: ing.source,
-          confidence: 0.9,
-          createdAt: new Date().toISOString(),
-          relatedMealId: meal.id,
-          explanation: `Consumido en preparación "${meal.preparation.name}".`,
-        });
-      }
-    });
-  }
-
-  // API Inventario
+  // API Inventario (Delegado Exclusivo a addInventoryTransaction)
   public getInventory(): InventoryItem[] {
     return [...this.inventory];
   }
 
   public addInventoryItem(item: InventoryItem): void {
-    this.inventory.unshift(item);
+    const existing = this.inventory.find((i) => i.id === item.id || i.name.toLowerCase() === item.name.toLowerCase());
+    const itemId = existing ? existing.id : item.id;
+    const itemName = existing ? existing.name : item.name;
+
     this.addInventoryTransaction({
       id: `tx-add-${Date.now()}`,
-      pantryItemId: item.id,
-      pantryItemName: item.name,
+      pantryItemId: itemId,
+      pantryItemName: itemName,
       type: 'manual_add',
       quantityDelta: item.amount,
       unit: item.unit,
       evidence: item.source,
       createdAt: item.addedDate,
-      explanation: 'Ingreso de nuevo alimento a la despensa.',
+      explanation: existing ? 'Adición de existencias a alimento existente.' : 'Ingreso de nuevo alimento a la despensa.',
     });
-    this.saveToStorage();
   }
 
   public updateInventoryItem(id: string, updates: Partial<InventoryItem>): void {
@@ -492,12 +291,13 @@ export class AionMemoryStore {
       this.inventory[idx] = { ...this.inventory[idx], ...updates };
 
       if (updates.amount !== undefined && updates.amount !== oldAmount) {
-        this.addInventoryTransaction({
+        const delta = updates.amount - oldAmount;
+        this.transactions.unshift({
           id: `tx-adj-${Date.now()}`,
           pantryItemId: id,
           pantryItemName: this.inventory[idx].name,
           type: 'manual_adjustment',
-          quantityDelta: updates.amount - oldAmount,
+          quantityDelta: delta,
           unit: this.inventory[idx].unit,
           evidence: 'USER_CONFIRMED',
           createdAt: new Date().toISOString(),
