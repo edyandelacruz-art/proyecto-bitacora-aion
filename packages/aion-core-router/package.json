@@ -2,5 +2,11 @@
   "name": "@aion/core-router",
   "version": "0.1.0",
   "main": "src/index.ts",
-  "private": true
+  "private": true,
+  "dependencies": {
+    "@aion/shared-types": "*",
+    "@aion/protocol": "*",
+    "@aion/memory": "*",
+    "@aion/agents": "*"
+  }
 }
