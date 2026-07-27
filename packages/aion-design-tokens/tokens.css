@@ -1,0 +1,47 @@
+/* AION System Master Design Tokens */
+
+:root {
+  /* Master Palette */
+  --aion-violet: #5B4B8A;
+  --aion-violet-light: #7663AA;
+  --aion-violet-dark: #3F3361;
+  
+  --aion-lavender: #A78BFA;
+  --aion-lavender-light: #C4B5FD;
+  --aion-lavender-subtle: rgba(167, 139, 250, 0.15);
+
+  --aion-sand: #F5F0E6;
+  --aion-sand-dark: #E6DEC8;
+
+  --aion-warm-white: #FAFAF9;
+  --aion-neutral: #78716C;
+  --aion-neutral-dark: #292524;
+  --aion-neutral-light: #E7E5E4;
+
+  /* Metabolic & Status Accents */
+  --aion-glucose: #F59E0B;
+  --aion-fats: #10B981;
+  --aion-protein: #3B82F6;
+  --aion-glycogen: #8B5CF6;
+  
+  --aion-status-available: #10B981;
+  --aion-status-low: #F59E0B;
+  --aion-status-expiring: #EF4444;
+  --aion-status-out: #9CA3AF;
+
+  /* Dark Glass Theme Backgrounds */
+  --aion-bg-dark: #0F0D15;
+  --aion-bg-card: rgba(26, 22, 37, 0.75);
+  --aion-border-card: rgba(167, 139, 250, 0.2);
+  --aion-shadow-glow: 0 8px 32px 0 rgba(91, 75, 138, 0.25);
+
+  /* Typography */
+  --aion-font-sans: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --aion-font-mono: 'JetBrains Mono', monospace;
+
+  /* Radius & Spacing */
+  --aion-radius-sm: 8px;
+  --aion-radius-md: 16px;
+  --aion-radius-lg: 24px;
+  --aion-radius-full: 9999px;
+}

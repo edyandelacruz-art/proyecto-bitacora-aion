@@ -1,0 +1,24 @@
+{
+  "name": "proyecto-bitacora-aion",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Ecosistema AION - Bitácora Inteligente y Sistema de Acompañamiento",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=apps/aion-aegis",
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present"
+  },
+  "keywords": [
+    "aion",
+    "aegis",
+    "bitacora-inteligente",
+    "multiagente",
+    "aion-protocol"
+  ],
+  "author": "AION System Architect",
+  "license": "MIT"
+}
