@@ -16,7 +16,7 @@ export const YourBodyNow: React.FC<YourBodyNowProps> = ({ energyBalance }) => {
 
   const [selectedBubble, setSelectedBubble] = useState<string | null>(null);
   const [simulatedHoursOffset, setSimulatedHoursOffset] = useState<number>(0);
-  const [showTechnicalDetail, setShowTechnicalDetail] = useState<boolean>(true);
+  const [showTechnicalDetail, setShowTechnicalDetail] = useState<boolean>(false);
   const [languageMode, setLanguageMode] = useState<ResponseLanguageProfile['mode']>(
     memoryStore.getCoreProfile().languageProfile?.mode || 'human'
   );
@@ -38,73 +38,40 @@ export const YourBodyNow: React.FC<YourBodyNowProps> = ({ energyBalance }) => {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
       <TechnicalGlossary />
 
-      {/* Selector de Modo de Lenguaje en Tiempo Real */}
-      <div className="aion-card" style={{ padding: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span style={{ fontSize: '0.75rem', color: 'var(--aion-lavender)', fontWeight: 700 }}>
-          💬 MODALIDAD DE LENGUAJE:
-        </span>
-        <select
-          value={languageMode}
-          onChange={(e) => handleLanguageChange(e.target.value as any)}
-          style={{
-            background: 'rgba(26,22,37,0.95)',
-            color: 'var(--aion-lavender)',
-            border: '1px solid var(--aion-border-card)',
-            borderRadius: '8px',
-            padding: '0.3rem 0.6rem',
-            fontSize: '0.75rem',
-            fontWeight: 700,
-            cursor: 'pointer',
-            outline: 'none',
-          }}
-        >
-          <option value="human">Humano (Cotidiano)</option>
-          <option value="simple">Simple (Directo)</option>
-          <option value="technical">Técnico (Fisiológico)</option>
-          <option value="biochemical">Bioquímico (Avanzado multipárrafo)</option>
-          <option value="clinical">Clínico (Evaluación Médica)</option>
-          <option value="adaptive">Adaptativo (IA)</option>
-        </select>
-      </div>
-
-      {/* Simulador Temporal Interactivo */}
-      <div className="aion-card" style={{ padding: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span style={{ fontSize: '0.75rem', color: 'var(--aion-sand)', fontWeight: 700 }}>
-          ⏱ SIMULAR PASO DEL TIEMPO:
-        </span>
-        <div style={{ display: 'flex', gap: '0.35rem' }}>
-          {[0, 3, 6, 10].map((hrs) => (
-            <button
-              key={hrs}
-              onClick={() => setSimulatedHoursOffset(hrs)}
-              style={{
-                background: simulatedHoursOffset === hrs ? 'var(--aion-lavender)' : 'rgba(255,255,255,0.08)',
-                color: simulatedHoursOffset === hrs ? '#0F0D15' : 'white',
-                border: 'none',
-                borderRadius: '6px',
-                padding: '0.3rem 0.6rem',
-                fontSize: '0.72rem',
-                fontWeight: 700,
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-              }}
-            >
-              +{hrs}h
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Banner Principal "TU CUERPO AHORA" con Profundidad Bioquímica Multipárrafo */}
+      {/* Banner Principal "TU CUERPO AHORA" con Título Siempre Humano y Selector Integrado */}
       <div className="aion-card" style={{ background: 'linear-gradient(135deg, rgba(91, 75, 138, 0.45) 0%, rgba(26, 22, 37, 0.95) 100%)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--aion-lavender)', fontWeight: 700 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+          <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--aion-lavender)', fontWeight: 800 }}>
             TU CUERPO AHORA • {hoursElapsed.toFixed(1)}h DESDE LA COMIDA
           </div>
-          <span className="badge badge-available">{languageMode.toUpperCase()}</span>
+
+          {/* Selector Elegante de Modo de Lenguaje */}
+          <select
+            value={languageMode}
+            onChange={(e) => handleLanguageChange(e.target.value as any)}
+            style={{
+              background: 'rgba(26,22,37,0.95)',
+              color: 'var(--aion-lavender)',
+              border: '1px solid var(--aion-border-card)',
+              borderRadius: '8px',
+              padding: '0.25rem 0.5rem',
+              fontSize: '0.7rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              outline: 'none',
+            }}
+          >
+            <option value="human">Modo Humano (Cotidiano)</option>
+            <option value="simple">Modo Simple (Directo)</option>
+            <option value="technical">Modo Técnico (Fisiológico)</option>
+            <option value="biochemical">Modo Bioquímico (Multipárrafo)</option>
+            <option value="clinical">Modo Clínico (Evaluación Médica)</option>
+            <option value="adaptive">Modo Adaptativo (IA)</option>
+          </select>
         </div>
 
-        <h2 style={{ fontSize: '1.2rem', fontWeight: 700, margin: '0.4rem 0', color: 'white' }}>
+        {/* Título SIEMPRE simple, limpio y humano */}
+        <h2 style={{ fontSize: '1.25rem', fontWeight: 800, margin: '0.2rem 0 0.5rem 0', color: 'white' }}>
           {currentState.phaseTitle}
         </h2>
 
@@ -112,8 +79,8 @@ export const YourBodyNow: React.FC<YourBodyNowProps> = ({ energyBalance }) => {
           {currentState.naturalExplanation}
         </div>
 
-        {/* Exposición Bioquímica / Clínica Multipárrafo Estructurada */}
-        <div style={{ marginTop: '0.75rem' }}>
+        {/* Exposición Bioquímica / Clínica Multipárrafo Desplegable */}
+        <div style={{ marginTop: '0.6rem' }}>
           <button
             onClick={() => setShowTechnicalDetail(!showTechnicalDetail)}
             style={{
@@ -121,8 +88,8 @@ export const YourBodyNow: React.FC<YourBodyNowProps> = ({ energyBalance }) => {
               border: '1px solid rgba(167, 139, 250, 0.4)',
               color: 'var(--aion-lavender)',
               borderRadius: '6px',
-              padding: '0.4rem 0.8rem',
-              fontSize: '0.75rem',
+              padding: '0.35rem 0.75rem',
+              fontSize: '0.73rem',
               fontWeight: 800,
               cursor: 'pointer',
             }}
@@ -131,8 +98,8 @@ export const YourBodyNow: React.FC<YourBodyNowProps> = ({ energyBalance }) => {
           </button>
 
           {showTechnicalDetail && (
-            <div style={{ marginTop: '0.8rem', padding: '0.9rem', background: 'rgba(15, 12, 25, 0.85)', borderRadius: '10px', borderLeft: '4px solid var(--aion-lavender)', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-              <span style={{ fontSize: '0.75rem', color: 'var(--aion-lavender)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            <div style={{ marginTop: '0.75rem', padding: '0.85rem', background: 'rgba(15, 12, 25, 0.85)', borderRadius: '10px', borderLeft: '4px solid var(--aion-lavender)', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+              <span style={{ fontSize: '0.73rem', color: 'var(--aion-lavender)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 🔬 ANÁLISIS ENZIMÁTICO Y FISIOLÓGICO DE ALTO RIGOR:
               </span>
               <div style={{ fontSize: '0.78rem', color: 'var(--aion-neutral-light)', lineHeight: 1.6, whiteSpace: 'pre-line' }}>
@@ -215,6 +182,34 @@ export const YourBodyNow: React.FC<YourBodyNowProps> = ({ energyBalance }) => {
                 {selectedBubble === b.id ? b.detail : b.simple}
               </div>
             </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Simulador Temporal Interactivo (Ubicado al Final como Herramienta de Exploración) */}
+      <div className="aion-card" style={{ padding: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(0,0,0,0.3)', border: '1px border rgba(255,255,255,0.08)' }}>
+        <span style={{ fontSize: '0.75rem', color: 'var(--aion-sand)', fontWeight: 700 }}>
+          ⏱ SIMULAR PASO DEL TIEMPO (EXPLORACIÓN):
+        </span>
+        <div style={{ display: 'flex', gap: '0.35rem' }}>
+          {[0, 3, 6, 10].map((hrs) => (
+            <button
+              key={hrs}
+              onClick={() => setSimulatedHoursOffset(hrs)}
+              style={{
+                background: simulatedHoursOffset === hrs ? 'var(--aion-lavender)' : 'rgba(255,255,255,0.08)',
+                color: simulatedHoursOffset === hrs ? '#0F0D15' : 'white',
+                border: 'none',
+                borderRadius: '6px',
+                padding: '0.3rem 0.6rem',
+                fontSize: '0.72rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              +{hrs}h
+            </button>
           ))}
         </div>
       </div>
