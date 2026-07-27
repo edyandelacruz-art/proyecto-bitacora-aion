@@ -16,7 +16,7 @@ export const YourBodyNow: React.FC<YourBodyNowProps> = ({ energyBalance }) => {
 
   const [selectedBubble, setSelectedBubble] = useState<string | null>(null);
   const [simulatedHoursOffset, setSimulatedHoursOffset] = useState<number>(0);
-  const [showTechnicalDetail, setShowTechnicalDetail] = useState<boolean>(false);
+  const [showTechnicalDetail, setShowTechnicalDetail] = useState<boolean>(true);
   const [languageMode, setLanguageMode] = useState<ResponseLanguageProfile['mode']>(
     memoryStore.getCoreProfile().languageProfile?.mode || 'human'
   );
@@ -29,7 +29,6 @@ export const YourBodyNow: React.FC<YourBodyNowProps> = ({ energyBalance }) => {
   const currentState = specialist.getCurrentMetabolicState(languageMode);
   const hoursElapsed = (currentState.hoursElapsedSinceLastMeal || 0.5) + simulatedHoursOffset;
 
-  // Burbujas dinámicas traducidas en tiempo real según el modo de lenguaje seleccionado
   const bubbles = languageEngine.getNutrientBubbles(currentState.currentPhase, languageMode);
 
   const pctConsumed = Math.min(100, Math.round((energyBalance.consumedKcal / energyBalance.targetKcal) * 100));
@@ -37,7 +36,6 @@ export const YourBodyNow: React.FC<YourBodyNowProps> = ({ energyBalance }) => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-      {/* Glosario Técnico Lateral Flotante */}
       <TechnicalGlossary />
 
       {/* Selector de Modo de Lenguaje en Tiempo Real */}
@@ -63,8 +61,8 @@ export const YourBodyNow: React.FC<YourBodyNowProps> = ({ energyBalance }) => {
           <option value="human">Humano (Cotidiano)</option>
           <option value="simple">Simple (Directo)</option>
           <option value="technical">Técnico (Fisiológico)</option>
-          <option value="biochemical">Bioquímico (Enzimas/Rutas)</option>
-          <option value="clinical">Clínico (Salud)</option>
+          <option value="biochemical">Bioquímico (Avanzado multipárrafo)</option>
+          <option value="clinical">Clínico (Evaluación Médica)</option>
           <option value="adaptive">Adaptativo (IA)</option>
         </select>
       </div>
@@ -97,7 +95,7 @@ export const YourBodyNow: React.FC<YourBodyNowProps> = ({ energyBalance }) => {
         </div>
       </div>
 
-      {/* Banner Principal "TU CUERPO AHORA" con Profundidad Progresiva */}
+      {/* Banner Principal "TU CUERPO AHORA" con Profundidad Bioquímica Multipárrafo */}
       <div className="aion-card" style={{ background: 'linear-gradient(135deg, rgba(91, 75, 138, 0.45) 0%, rgba(26, 22, 37, 0.95) 100%)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--aion-lavender)', fontWeight: 700 }}>
@@ -106,35 +104,40 @@ export const YourBodyNow: React.FC<YourBodyNowProps> = ({ energyBalance }) => {
           <span className="badge badge-available">{languageMode.toUpperCase()}</span>
         </div>
 
-        <h2 style={{ fontSize: '1.2rem', fontWeight: 700, margin: '0.3rem 0', color: 'white' }}>
+        <h2 style={{ fontSize: '1.2rem', fontWeight: 700, margin: '0.4rem 0', color: 'white' }}>
           {currentState.phaseTitle}
         </h2>
-        <p style={{ fontSize: '0.85rem', color: 'var(--aion-sand)', lineHeight: 1.45 }}>
-          {currentState.naturalExplanation}
-        </p>
 
-        {/* Profundidad Progresiva */}
+        <div style={{ fontSize: '0.88rem', color: 'var(--aion-warm-white)', lineHeight: 1.5, marginBottom: '0.6rem' }}>
+          {currentState.naturalExplanation}
+        </div>
+
+        {/* Exposición Bioquímica / Clínica Multipárrafo Estructurada */}
         <div style={{ marginTop: '0.75rem' }}>
           <button
             onClick={() => setShowTechnicalDetail(!showTechnicalDetail)}
             style={{
-              background: 'rgba(167, 139, 250, 0.12)',
-              border: '1px solid rgba(167, 139, 250, 0.3)',
+              background: 'rgba(167, 139, 250, 0.15)',
+              border: '1px solid rgba(167, 139, 250, 0.4)',
               color: 'var(--aion-lavender)',
               borderRadius: '6px',
-              padding: '0.35rem 0.75rem',
-              fontSize: '0.72rem',
-              fontWeight: 700,
+              padding: '0.4rem 0.8rem',
+              fontSize: '0.75rem',
+              fontWeight: 800,
               cursor: 'pointer',
             }}
           >
-            {showTechnicalDetail ? '▲ Ocultar Bioquímica' : '▼ [ Ver Detalle Bioquímico ]'}
+            {showTechnicalDetail ? '▲ Ocultar Desglose Bioquímico Avanzado' : '▼ [ Ver Desglose Bioquímico Multipárrafo ]'}
           </button>
 
           {showTechnicalDetail && (
-            <div style={{ marginTop: '0.6rem', padding: '0.65rem', background: 'rgba(0,0,0,0.4)', borderRadius: '8px', borderLeft: '3px solid var(--aion-lavender)' }}>
-              <span style={{ fontSize: '0.7rem', color: 'var(--aion-lavender)', fontWeight: 700, display: 'block' }}>MECANISMO BIOQUÍMICO COMPLETO:</span>
-              <span style={{ fontSize: '0.75rem', color: 'var(--aion-neutral-light)', lineHeight: 1.35 }}>{currentState.detailedTechnicalExplanation}</span>
+            <div style={{ marginTop: '0.8rem', padding: '0.9rem', background: 'rgba(15, 12, 25, 0.85)', borderRadius: '10px', borderLeft: '4px solid var(--aion-lavender)', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+              <span style={{ fontSize: '0.75rem', color: 'var(--aion-lavender)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                🔬 ANÁLISIS ENZIMÁTICO Y FISIOLÓGICO DE ALTO RIGOR:
+              </span>
+              <div style={{ fontSize: '0.78rem', color: 'var(--aion-neutral-light)', lineHeight: 1.6, whiteSpace: 'pre-line' }}>
+                {currentState.detailedTechnicalExplanation}
+              </div>
             </div>
           )}
         </div>
@@ -208,7 +211,7 @@ export const YourBodyNow: React.FC<YourBodyNowProps> = ({ energyBalance }) => {
                 <span style={{ fontSize: '0.65rem', color: 'var(--aion-neutral)' }}>Tocar</span>
               </div>
               <div className="bubble-title">{b.title}</div>
-              <div className="bubble-desc">
+              <div className="bubble-desc" style={{ lineHeight: 1.4 }}>
                 {selectedBubble === b.id ? b.detail : b.simple}
               </div>
             </div>
