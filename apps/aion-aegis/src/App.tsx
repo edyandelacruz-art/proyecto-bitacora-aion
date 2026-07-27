@@ -36,7 +36,7 @@ export const App: React.FC = () => {
 
   return (
     <div>
-      <Header onOpenSettings={() => setIsSettingsOpen(true)} />
+      <Header onOpenSettings={() => setIsSettingsOpen(true)} onRefreshAll={refreshData} />
 
       <main className="aion-container" key={updateKey}>
         {activeTab === 'body' && (

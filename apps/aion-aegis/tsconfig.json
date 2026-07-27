@@ -13,6 +13,15 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@aion/design-tokens": ["../../packages/aion-design-tokens"],
+      "@aion/shared-types": ["../../packages/shared-types/src"],
+      "@aion/protocol": ["../../packages/aion-protocol/src"],
+      "@aion/memory": ["../../packages/aion-memory/src"],
+      "@aion/agents": ["../../packages/aion-agents/src"],
+      "@aion/core-router": ["../../packages/aion-core-router/src"]
+    },
 
     /* Linting */
     "strict": false,

@@ -11,6 +11,7 @@ export default defineConfig({
       '@aion/protocol': path.resolve(__dirname, '../../packages/aion-protocol/src'),
       '@aion/memory': path.resolve(__dirname, '../../packages/aion-memory/src'),
       '@aion/agents': path.resolve(__dirname, '../../packages/aion-agents/src'),
+      '@aion/core-router': path.resolve(__dirname, '../../packages/aion-core-router/src'),
     },
   },
   server: {
