@@ -1,4 +1,4 @@
-// Contratos Base Ecosistema AION - Modelo Universal de Certeza, Perfiles & Lenguaje
+// Contratos Base Ecosistema AION - Modelo Universal de Certeza, Perfiles, Lenguaje, Drive & Informes
 
 export type EvidenceLevel =
   | 'USER_CONFIRMED'
@@ -17,16 +17,52 @@ export interface MemoryFact<T = any> {
   value: T;
   evidence: EvidenceLevel;
   source: 'user' | 'vision' | 'sensor' | 'calculation' | 'integration' | 'agent';
-  createdAt: string; // ISO 8601
+  createdAt: string;
   lastConfirmedAt?: string;
-  confidence?: number; // 0.0 - 1.0
+  confidence?: number;
   scope: 'core' | 'aegis' | string;
   sensitive?: boolean;
   expiresAt?: string;
   userEditable: boolean;
 }
 
-// Perfil de Lenguaje Adaptativo de Respuesta
+// Integración Google Drive & Exportación de Matriz
+export interface GoogleDriveIntegration {
+  connected: boolean;
+  userEmail?: string;
+  lastSyncedAt?: string;
+  autoSyncEnabled: boolean;
+}
+
+// Sistema de Plantillas y Formatos Flexibles de Informes
+export interface AionReportTemplate {
+  id: string;
+  name: string;
+  type: 'daily_technical' | 'food_matrix' | 'weekly_summary';
+  format: 'json' | 'markdown' | 'pdf' | 'csv';
+  customFields?: string[];
+}
+
+// Informe Técnico Diario del Día Anterior o Actual
+export interface DailyTechnicalReport {
+  id: string;
+  date: string; // YYYY-MM-DD
+  summaryText: string;
+  energyBalance: EnergyBalance;
+  metabolicTransitionsCount: number;
+  mealsLogged: number;
+  totalKcal: number;
+  totalProtein: number;
+  totalCarbs: number;
+  totalFats: number;
+  inventoryMovementsCount: number;
+  agentRecommendations: string[];
+  templateId: string;
+  driveSyncStatus: 'synced' | 'pending' | 'disabled';
+  createdAt: string;
+}
+
+// Perfil de Lenguaje Adaptativo
 export interface ResponseLanguageProfile {
   mode: 'adaptive' | 'human' | 'simple' | 'technical' | 'biochemical' | 'clinical';
   verbosity: 'brief' | 'balanced' | 'detailed';
@@ -68,17 +104,18 @@ export interface AionContext {
 // Perfil Transversal AION Core
 export interface AionUserProfile {
   displayName?: string;
-  language: string; // ej. 'es'
-  country?: string; // ej. 'Colombia'
-  region?: string; // ej. 'Cundinamarca'
-  city?: string; // ej. 'Bogotá'
-  timezone: string; // ej. 'America/Bogota'
-  locale: string; // ej. 'es-CO'
-  currency?: string; // ej. 'COP'
+  language: string;
+  country?: string;
+  region?: string;
+  city?: string;
+  timezone: string;
+  locale: string;
+  currency?: string;
   unitSystem: 'metric' | 'imperial';
   dateFormat?: string;
   timeFormat?: '12h' | '24h';
   languageProfile?: ResponseLanguageProfile;
+  driveIntegration?: GoogleDriveIntegration;
 }
 
 // Perfil Especializado AION Aegis
@@ -89,9 +126,9 @@ export interface NutritionGoal {
 }
 
 export interface MealWindow {
-  name: string; // ej. 'Desayuno', 'Almuerzo'
-  startHour: string; // ej. '08:00'
-  endHour: string; // ej. '10:00'
+  name: string;
+  startHour: string;
+  endHour: string;
 }
 
 export interface AegisProfile {
@@ -112,10 +149,10 @@ export interface AegisProfile {
   optionalBodyMetrics?: { weightKg?: number; heightCm?: number; age?: number; sex?: 'M' | 'F' | 'other' };
 }
 
-// Registro Transversal Universal (Aegis Ledger)
+// Aegis Ledger Universal
 export interface AegisLedgerEntry {
   id: string;
-  timestamp: string; // ISO 8601
+  timestamp: string;
   type:
     | 'meal'
     | 'ingredient_used'
@@ -132,7 +169,9 @@ export interface AegisLedgerEntry {
     | 'body_metric'
     | 'plan_change'
     | 'recommendation'
-    | 'correction';
+    | 'correction'
+    | 'report_generated'
+    | 'drive_synced';
   source: 'user' | 'vision' | 'recipe' | 'calculation' | 'integration' | 'agent';
   payload: any;
   evidence: EvidenceLevel;
@@ -142,7 +181,7 @@ export interface AegisLedgerEntry {
   correctedBy?: string;
 }
 
-// Transacciones y Movimientos de Inventario (Inventory Transaction Ledger)
+// Transacciones de Inventario
 export interface InventoryTransaction {
   id: string;
   pantryItemId: string;
@@ -171,7 +210,7 @@ export interface InventoryTransaction {
   explanation?: string;
 }
 
-// Sistema de Recetas Persistente & Lotes Preparados (Recipe Skill & Batches)
+// Recetas & Lotes Preparados
 export interface RecipeStep {
   stepNumber: number;
   instruction: string;
@@ -223,7 +262,7 @@ export interface MealPortion {
   actualNutrition: { kcal: number; protein: number; carbs: number; fats: number };
 }
 
-// Capa de Inteligencia Visual
+// Inteligencia Visual
 export type SceneType =
   | 'meal'
   | 'pantry'
@@ -275,7 +314,6 @@ export interface VisionAnalysis {
   createdAt: string;
 }
 
-// Estructura de Alimentos e Ingredientes
 export interface IngredientItem {
   id: string;
   name: string;
@@ -329,7 +367,6 @@ export interface MealRecord {
   userConfirmed: boolean;
 }
 
-// Balance Energético
 export type EnergyBalanceState = 'DÉFICIT' | 'MANTENIMIENTO' | 'SUPERÁVIT';
 
 export interface EnergyBalance {
@@ -341,7 +378,6 @@ export interface EnergyBalance {
   trend: 'estable' | 'en_progreso' | 'excedido';
 }
 
-// Estados Metabólicos Fisiológicos
 export type MetabolicPhase =
   | 'POSPRANDIAL'
   | 'POSTABSORTIVO'
@@ -365,7 +401,6 @@ export interface MetabolicState {
   hoursElapsedSinceLastMeal?: number;
 }
 
-// Timeline Metabólico
 export interface TimelineEvent {
   id: string;
   time: string;
@@ -375,7 +410,6 @@ export interface TimelineEvent {
   details?: string;
 }
 
-// Inventario / Despensa Inteligente
 export type InventoryAvailability = 'DISPONIBLE' | 'BAJO' | 'AGOTADO' | 'PRÓXIMO A VENCER';
 
 export interface InventoryItem {
@@ -392,7 +426,6 @@ export interface InventoryItem {
   source: EvidenceLevel;
 }
 
-// Motor de Recetas Contextuales
 export interface RecipeOption {
   id: string;
   title: string;
@@ -409,7 +442,6 @@ export interface RecipeOption {
   steps: string[];
 }
 
-// Plan Vivo Alimentario
 export interface LivePlan {
   dailyTargetKcal: number;
   consumedKcal: number;
@@ -421,7 +453,6 @@ export interface LivePlan {
   adaptiveNote: string;
 }
 
-// Eventos Versionados AION Protocol
 export interface AionEvent<T = any> {
   eventId: string;
   eventType: string;

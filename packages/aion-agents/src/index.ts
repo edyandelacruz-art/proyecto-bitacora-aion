@@ -18,8 +18,9 @@ import { AionMemoryStore } from '@aion/memory';
 import { VisionService } from './vision/VisionService';
 import { LanguageEngine } from './language/LanguageEngine';
 import { RecipeSkill } from './skills/RecipeSkill';
+import { DailyReportEngine } from './export/DailyReportEngine';
 
-export { VisionService, LanguageEngine, RecipeSkill };
+export { VisionService, LanguageEngine, RecipeSkill, DailyReportEngine };
 
 // Agente Especialista de Contexto y Ubicación
 export class ContextAndLocationAgent {
@@ -61,10 +62,7 @@ export class NutritionLeadSpecialist {
     missingInfoQuestion?: string;
     mealRecord?: MealRecord;
   }> {
-    // 1. Análisis por VisionService Real
     const visionAnalysis = await this.visionService.analyzeImage(imageBlobUrl, userInput);
-
-    // 2. Evaluar micro-preguntas con impacto nutricional real
     const materialQuestion = visionAnalysis.unresolvedQuestions.find((q) => q.materialImpact === 'high');
 
     if (materialQuestion && fractionConsumed === undefined && !userInput.toLowerCase().includes('confirmado')) {
@@ -78,7 +76,6 @@ export class NutritionLeadSpecialist {
     const fraction = fractionConsumed ?? 0.2;
     const fractionText = fraction === 1.0 ? '100% (Toda la comida)' : `${(fraction * 100).toFixed(0)}% de la preparación (${fraction === 0.2 ? '1/5' : fraction === 0.33 ? '1/3' : '1/2'})`;
 
-    // 3. Conversión de Rango Estimado Visual a Ingredientes Deterministas
     const ingredients = visionAnalysis.detectedItems.map((item, idx) => {
       const range = item.portionRange || { likely: 150, min: 120, max: 180, unit: 'g', confidence: 0.8, method: 'Estimación volumétrica' };
       const isChicken = item.candidateName.toLowerCase().includes('pollo');
@@ -145,10 +142,8 @@ export class NutritionLeadSpecialist {
       userConfirmed: true,
     };
 
-    // 4. Persistir episodio en AION Memory (descuenta inventario real con transacciones)
     this.memoryStore.addMeal(mealRecord);
 
-    // 5. Publicar eventos versionados en AION Protocol
     this.eventBus.publish({
       eventId: `evt-meal-${Date.now()}`,
       eventType: 'aion.aegis.nutrition.meal.logged',
@@ -224,9 +219,6 @@ export class NutritionLeadSpecialist {
     ];
   }
 
-  /**
-   * Obtiene el Estado Metabólico traducido dinámicamente mediante LanguageEngine según el modo de respuesta activo
-   */
   public getCurrentMetabolicState(requestedMode?: ResponseLanguageProfile['mode']): MetabolicState {
     const meals = this.memoryStore.getMeals();
     const coreProfile = this.memoryStore.getCoreProfile();
