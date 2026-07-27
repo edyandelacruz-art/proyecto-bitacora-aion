@@ -1,4 +1,4 @@
-// Contratos Base Ecosistema AION - Modelo Universal de Certeza & Perfiles
+// Contratos Base Ecosistema AION - Modelo Universal de Certeza, Perfiles & Lenguaje
 
 export type EvidenceLevel =
   | 'USER_CONFIRMED'
@@ -24,6 +24,15 @@ export interface MemoryFact<T = any> {
   sensitive?: boolean;
   expiresAt?: string;
   userEditable: boolean;
+}
+
+// Perfil de Lenguaje Adaptativo de Respuesta
+export interface ResponseLanguageProfile {
+  mode: 'adaptive' | 'human' | 'simple' | 'technical' | 'biochemical' | 'clinical';
+  verbosity: 'brief' | 'balanced' | 'detailed';
+  explainUnknownTerms: boolean;
+  preferredTone?: 'neutral' | 'friendly' | 'direct' | 'custom';
+  customStyleExamples?: string[];
 }
 
 // Contexto Ubicación Base vs Ubicación Actual
@@ -69,6 +78,7 @@ export interface AionUserProfile {
   unitSystem: 'metric' | 'imperial';
   dateFormat?: string;
   timeFormat?: '12h' | '24h';
+  languageProfile?: ResponseLanguageProfile;
 }
 
 // Perfil Especializado AION Aegis
@@ -102,7 +112,118 @@ export interface AegisProfile {
   optionalBodyMetrics?: { weightKg?: number; heightCm?: number; age?: number; sex?: 'M' | 'F' | 'other' };
 }
 
-// Estructura de Capa Visual (Visual Intelligence Layer)
+// Registro Transversal Universal (Aegis Ledger)
+export interface AegisLedgerEntry {
+  id: string;
+  timestamp: string; // ISO 8601
+  type:
+    | 'meal'
+    | 'ingredient_used'
+    | 'inventory_added'
+    | 'inventory_removed'
+    | 'inventory_adjusted'
+    | 'recipe_created'
+    | 'recipe_cooked'
+    | 'portion_consumed'
+    | 'food_wasted'
+    | 'food_expired'
+    | 'activity'
+    | 'hydration'
+    | 'body_metric'
+    | 'plan_change'
+    | 'recommendation'
+    | 'correction';
+  source: 'user' | 'vision' | 'recipe' | 'calculation' | 'integration' | 'agent';
+  payload: any;
+  evidence: EvidenceLevel;
+  confidence?: number;
+  relatedEntityIds?: string[];
+  reversible?: boolean;
+  correctedBy?: string;
+}
+
+// Transacciones y Movimientos de Inventario (Inventory Transaction Ledger)
+export interface InventoryTransaction {
+  id: string;
+  pantryItemId: string;
+  pantryItemName: string;
+  type:
+    | 'purchase'
+    | 'manual_add'
+    | 'recipe_use'
+    | 'meal_use'
+    | 'waste'
+    | 'expired'
+    | 'manual_adjustment'
+    | 'visual_adjustment';
+  quantityDelta?: number;
+  unit?: string;
+  quantityRangeDelta?: {
+    min: number;
+    likely: number;
+    max: number;
+  };
+  evidence: EvidenceLevel;
+  confidence?: number;
+  createdAt: string;
+  relatedMealId?: string;
+  relatedRecipeId?: string;
+  explanation?: string;
+}
+
+// Sistema de Recetas Persistente & Lotes Preparados (Recipe Skill & Batches)
+export interface RecipeStep {
+  stepNumber: number;
+  instruction: string;
+  durationMinutes?: number;
+}
+
+export interface RecipeIngredient {
+  name: string;
+  amount: number;
+  unit: string;
+  substitutions?: string[];
+}
+
+export interface Recipe {
+  id: string;
+  name: string;
+  description?: string;
+  ingredients: RecipeIngredient[];
+  instructions: RecipeStep[];
+  totalNutrition?: { kcal: number; protein: number; carbs: number; fats: number };
+  servings: number;
+  prepTimeMin?: number;
+  cookTimeMin?: number;
+  difficulty?: 'easy' | 'medium' | 'advanced';
+  equipment?: string[];
+  tags?: string[];
+  source: 'user' | 'aion_generated' | 'vision' | 'imported';
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PreparedBatch {
+  id: string;
+  recipeId: string;
+  recipeName: string;
+  preparedAt: string;
+  expiresAtEstimate?: string;
+  totalServings: number;
+  servingsRemaining: number;
+  storageLocation: 'refrigerador' | 'congelador' | 'despensa';
+}
+
+export interface MealPortion {
+  id: string;
+  batchId?: string;
+  recipeId?: string;
+  consumedAt: string;
+  servingsConsumed: number;
+  actualNutrition: { kcal: number; protein: number; carbs: number; fats: number };
+}
+
+// Capa de Inteligencia Visual
 export type SceneType =
   | 'meal'
   | 'pantry'
@@ -126,7 +247,7 @@ export interface VisionPortionRange {
 export interface VisionDetectedItem {
   id: string;
   candidateName: string;
-  confidence: number; // 0.0 - 1.0
+  confidence: number;
   cookingTechnique?: string;
   portionRange?: VisionPortionRange;
   isMaterialAmbiguity?: boolean;
@@ -186,8 +307,8 @@ export interface Preparation {
 }
 
 export interface ConsumedPortion {
-  fractionText: string; // ej. "1/5 de la preparación"
-  fractionValue: number; // ej. 0.20
+  fractionText: string;
+  fractionValue: number;
   consumedItems: IngredientItem[];
   actualKcal: number;
   actualProtein: number;
@@ -197,7 +318,7 @@ export interface ConsumedPortion {
 
 export interface MealRecord {
   id: string;
-  timestamp: string; // ISO 8601
+  timestamp: string;
   mealType: 'Desayuno' | 'Almuerzo' | 'Cena' | 'Snack';
   imageUrl?: string;
   preparation: Preparation;
@@ -303,13 +424,13 @@ export interface LivePlan {
 // Eventos Versionados AION Protocol
 export interface AionEvent<T = any> {
   eventId: string;
-  eventType: string; // ej. "aion.aegis.nutrition.meal.logged"
-  appId: string; // "aion-aegis" o "aion-core"
+  eventType: string;
+  appId: string;
   userId: string;
-  occurredAt: string; // ISO 8601
+  occurredAt: string;
   payload: T;
   confidence?: number;
   provenance?: string;
   sensitivity?: 'normal' | 'sensitive';
-  schemaVersion: string; // "1.0.0"
+  schemaVersion: string;
 }

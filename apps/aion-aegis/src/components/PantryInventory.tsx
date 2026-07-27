@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { AionMemoryStore } from '@aion/memory';
-import { InventoryItem, InventoryAvailability } from '@aion/shared-types';
+import { InventoryItem, InventoryAvailability, InventoryTransaction } from '@aion/shared-types';
 
 export const PantryInventory: React.FC = () => {
   const memoryStore = AionMemoryStore.getInstance();
   const [items, setItems] = useState<InventoryItem[]>(memoryStore.getInventory());
   const [newItemText, setNewItemText] = useState('');
+  const [expandedItemId, setExpandedItemId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const triggerToast = (msg: string) => {
@@ -60,9 +61,9 @@ export const PantryInventory: React.FC = () => {
       {toastMessage && <div className="aion-toast">{toastMessage}</div>}
 
       <div className="aion-card">
-        <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'white' }}>Despensa / Mercado Inteligente</h2>
+        <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'white' }}>Despensa e Historial Auditable</h2>
         <p style={{ fontSize: '0.8rem', color: 'var(--aion-sand)', margin: '0.2rem 0 0.8rem 0' }}>
-          Toca la disponibilidad para alternar estado o usa los botones + / - para ajustar existencias.
+          Toca cualquier alimento para ver su historial de movimientos (*¿Por qué AION cree que te queda esta cantidad?*).
         </p>
 
         <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -80,55 +81,91 @@ export const PantryInventory: React.FC = () => {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-        {items.map((item) => (
-          <div key={item.id} className="aion-card" style={{ padding: '0.85rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
-              <div style={{ fontWeight: 600, fontSize: '0.9rem', color: 'white' }}>{item.name}</div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--aion-neutral-light)' }}>
-                Ubicación: {item.location || 'despensa'}
-              </div>
-            </div>
+        {items.map((item) => {
+          const transactions: InventoryTransaction[] = memoryStore.getInventoryTransactions(item.id);
+          const isExpanded = expandedItemId === item.id;
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              {/* Modificador interactivo de cantidad */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', padding: '0.2rem 0.4rem' }}>
-                <button
-                  onClick={() => handleUpdateAmount(item.id, -1)}
-                  style={{ background: 'transparent', border: 'none', color: 'var(--aion-sand)', fontWeight: 700, cursor: 'pointer', padding: '0 0.3rem' }}
+          return (
+            <div key={item.id} className="aion-card" style={{ padding: '0.85rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div
+                  style={{ display: 'flex', flexDirection: 'column', gap: '0.1rem', cursor: 'pointer' }}
+                  onClick={() => setExpandedItemId(isExpanded ? null : item.id)}
                 >
-                  -
-                </button>
-                <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'white' }}>
-                  {item.amount} {item.unit}
-                </span>
-                <button
-                  onClick={() => handleUpdateAmount(item.id, 1)}
-                  style={{ background: 'transparent', border: 'none', color: 'var(--aion-sand)', fontWeight: 700, cursor: 'pointer', padding: '0 0.3rem' }}
-                >
-                  +
-                </button>
+                  <div style={{ fontWeight: 600, fontSize: '0.9rem', color: 'white', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <span>{item.name}</span>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--aion-lavender)' }}>{isExpanded ? '▲ Ocultar Historial' : '▼ ¿Por qué AION cree esto?'}</span>
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--aion-neutral-light)' }}>
+                    Ubicación: {item.location || 'despensa'} • Certeza: {item.source}
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', padding: '0.2rem 0.4rem' }}>
+                    <button
+                      onClick={() => handleUpdateAmount(item.id, -1)}
+                      style={{ background: 'transparent', border: 'none', color: 'var(--aion-sand)', fontWeight: 700, cursor: 'pointer', padding: '0 0.3rem' }}
+                    >
+                      -
+                    </button>
+                    <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'white' }}>
+                      ≈{item.amount} {item.unit}
+                    </span>
+                    <button
+                      onClick={() => handleUpdateAmount(item.id, 1)}
+                      style={{ background: 'transparent', border: 'none', color: 'var(--aion-sand)', fontWeight: 700, cursor: 'pointer', padding: '0 0.3rem' }}
+                    >
+                      +
+                    </button>
+                  </div>
+
+                  <button
+                    onClick={() => handleCycleStatus(item.id)}
+                    className={`badge badge-${
+                      item.availability === 'DISPONIBLE'
+                        ? 'available'
+                        : item.availability === 'BAJO'
+                        ? 'low'
+                        : item.availability === 'PRÓXIMO A VENCER'
+                        ? 'expiring'
+                        : 'expiring'
+                    }`}
+                    style={{ cursor: 'pointer', border: 'none' }}
+                  >
+                    {item.availability}
+                  </button>
+                </div>
               </div>
 
-              {/* Botón de estado interactivo */}
-              <button
-                onClick={() => handleCycleStatus(item.id)}
-                className={`badge badge-${
-                  item.availability === 'DISPONIBLE'
-                    ? 'available'
-                    : item.availability === 'BAJO'
-                    ? 'low'
-                    : item.availability === 'PRÓXIMO A VENCER'
-                    ? 'expiring'
-                    : 'expiring'
-                }`}
-                style={{ cursor: 'pointer', border: 'none' }}
-                title="Tocar para cambiar estado"
-              >
-                {item.availability}
-              </button>
+              {/* Historial de Movimientos Explicables (Audit Trail) */}
+              {isExpanded && (
+                <div style={{ marginTop: '0.5rem', paddingTop: '0.5rem', borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                  <span style={{ fontSize: '0.7rem', color: 'var(--aion-lavender)', fontWeight: 700 }}>
+                    📜 HISTORIAL DE MOVIMIENTOS RECONSTRUIDO:
+                  </span>
+                  {transactions.length === 0 ? (
+                    <span style={{ fontSize: '0.75rem', color: 'var(--aion-sand)' }}>No hay movimientos registrados previamente.</span>
+                  ) : (
+                    transactions.map((tx) => (
+                      <div key={tx.id} style={{ background: 'rgba(0,0,0,0.3)', padding: '0.4rem 0.6rem', borderRadius: '6px', fontSize: '0.75rem', display: 'flex', justifyContent: 'space-between' }}>
+                        <div>
+                          <span style={{ fontWeight: 700, color: tx.quantityDelta && tx.quantityDelta > 0 ? '#34D399' : '#F87171' }}>
+                            {tx.quantityDelta && tx.quantityDelta > 0 ? `+${tx.quantityDelta}` : tx.quantityDelta} {tx.unit || item.unit}
+                          </span>
+                          <span style={{ color: 'var(--aion-sand)', marginLeft: '0.4rem' }}>{tx.explanation || tx.type}</span>
+                        </div>
+                        <span style={{ color: 'var(--aion-neutral)', fontSize: '0.68rem' }}>
+                          {new Date(tx.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

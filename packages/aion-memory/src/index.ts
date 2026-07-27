@@ -5,6 +5,11 @@ import {
   AionUserProfile,
   AegisProfile,
   MemoryFact,
+  ResponseLanguageProfile,
+  AegisLedgerEntry,
+  InventoryTransaction,
+  Recipe,
+  PreparedBatch,
   EvidenceLevel,
 } from '@aion/shared-types';
 
@@ -14,6 +19,10 @@ const STORAGE_KEY_PLAN = 'aion_memory_live_plan';
 const STORAGE_KEY_CORE_PROFILE = 'aion_memory_core_profile';
 const STORAGE_KEY_AEGIS_PROFILE = 'aion_memory_aegis_profile';
 const STORAGE_KEY_FACTS = 'aion_memory_facts';
+const STORAGE_KEY_LEDGER = 'aion_memory_ledger';
+const STORAGE_KEY_TRANSACTIONS = 'aion_memory_transactions';
+const STORAGE_KEY_RECIPES = 'aion_memory_recipes';
+const STORAGE_KEY_BATCHES = 'aion_memory_batches';
 
 export class AionMemoryStore {
   private static instance: AionMemoryStore;
@@ -24,6 +33,10 @@ export class AionMemoryStore {
   private coreProfile: AionUserProfile;
   private aegisProfile: AegisProfile;
   private facts: MemoryFact[] = [];
+  private ledger: AegisLedgerEntry[] = [];
+  private transactions: InventoryTransaction[] = [];
+  private recipes: Recipe[] = [];
+  private preparedBatches: PreparedBatch[] = [];
 
   private constructor() {
     this.coreProfile = this.createDefaultCoreProfile();
@@ -31,6 +44,7 @@ export class AionMemoryStore {
     this.livePlan = this.createInitialPlan();
     this.seedInitialInventory();
     this.seedInitialMeals();
+    this.seedInitialRecipes();
     this.loadFromStorage();
   }
 
@@ -54,6 +68,12 @@ export class AionMemoryStore {
       unitSystem: 'metric',
       dateFormat: 'DD/MM/YYYY',
       timeFormat: '12h',
+      languageProfile: {
+        mode: 'human',
+        verbosity: 'balanced',
+        explainUnknownTerms: true,
+        preferredTone: 'friendly',
+      },
     };
   }
 
@@ -148,6 +168,22 @@ export class AionMemoryStore {
         source: 'VISUAL_ESTIMATE_HIGH',
       },
     ];
+
+    // Transacción inicial de siembra en el historial auditable
+    this.inventory.forEach((item) => {
+      this.transactions.push({
+        id: `tx-init-${item.id}`,
+        pantryItemId: item.id,
+        pantryItemName: item.name,
+        type: 'manual_add',
+        quantityDelta: item.amount,
+        unit: item.unit,
+        evidence: item.source,
+        confidence: 0.95,
+        createdAt: item.addedDate,
+        explanation: 'Registro inicial de inventario en despensa.',
+      });
+    });
   }
 
   private seedInitialMeals(): void {
@@ -222,6 +258,46 @@ export class AionMemoryStore {
     ];
   }
 
+  private seedInitialRecipes(): void {
+    this.recipes = [
+      {
+        id: 'rec-1',
+        name: 'Pechuga de pollo salteada con vegetales y papa sabanera',
+        description: 'Receta alta en proteína utilizando ingredientes frescos de la despensa.',
+        servings: 1,
+        prepTimeMin: 15,
+        cookTimeMin: 15,
+        difficulty: 'easy',
+        ingredients: [
+          { name: 'Pechuga de Pollo', amount: 200, unit: 'g' },
+          { name: 'Papa sabanera', amount: 1, unit: 'unidad' },
+          { name: 'Tomates frescos', amount: 2, unit: 'unidades' },
+        ],
+        instructions: [
+          { stepNumber: 1, instruction: 'Corta el pollo en tiras y saltea con tomates.' },
+          { stepNumber: 2, instruction: 'Cocina la papa al vapor durante 15 minutos.' },
+        ],
+        totalNutrition: { kcal: 480, protein: 36, carbs: 35, fats: 10 },
+        source: 'aion_generated',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+    ];
+
+    this.preparedBatches = [
+      {
+        id: 'batch-1',
+        recipeId: 'rec-1',
+        recipeName: 'Pechuga de pollo con vegetales (Meal Prep 3 días)',
+        preparedAt: new Date(Date.now() - 86400000).toISOString(),
+        expiresAtEstimate: new Date(Date.now() + 86400000 * 3).toISOString(),
+        totalServings: 3,
+        servingsRemaining: 2,
+        storageLocation: 'refrigerador',
+      },
+    ];
+  }
+
   private loadFromStorage(): void {
     if (typeof window === 'undefined' || !window.localStorage) return;
     try {
@@ -242,6 +318,18 @@ export class AionMemoryStore {
 
       const savedFacts = localStorage.getItem(STORAGE_KEY_FACTS);
       if (savedFacts) this.facts = JSON.parse(savedFacts);
+
+      const savedLedger = localStorage.getItem(STORAGE_KEY_LEDGER);
+      if (savedLedger) this.ledger = JSON.parse(savedLedger);
+
+      const savedTx = localStorage.getItem(STORAGE_KEY_TRANSACTIONS);
+      if (savedTx) this.transactions = JSON.parse(savedTx);
+
+      const savedRecipes = localStorage.getItem(STORAGE_KEY_RECIPES);
+      if (savedRecipes) this.recipes = JSON.parse(savedRecipes);
+
+      const savedBatches = localStorage.getItem(STORAGE_KEY_BATCHES);
+      if (savedBatches) this.preparedBatches = JSON.parse(savedBatches);
     } catch (e) {
       console.warn('[AION Memory] Usando memoria de tiempo de ejecución.');
     }
@@ -256,12 +344,16 @@ export class AionMemoryStore {
       localStorage.setItem(STORAGE_KEY_INVENTORY, JSON.stringify(this.inventory));
       localStorage.setItem(STORAGE_KEY_PLAN, JSON.stringify(this.livePlan));
       localStorage.setItem(STORAGE_KEY_FACTS, JSON.stringify(this.facts));
+      localStorage.setItem(STORAGE_KEY_LEDGER, JSON.stringify(this.ledger));
+      localStorage.setItem(STORAGE_KEY_TRANSACTIONS, JSON.stringify(this.transactions));
+      localStorage.setItem(STORAGE_KEY_RECIPES, JSON.stringify(this.recipes));
+      localStorage.setItem(STORAGE_KEY_BATCHES, JSON.stringify(this.preparedBatches));
     } catch (e) {
       console.warn('[AION Memory] Error guardando en localStorage');
     }
   }
 
-  // API de Perfiles
+  // API de Perfiles y Lenguaje
   public getCoreProfile(): AionUserProfile {
     return { ...this.coreProfile };
   }
@@ -280,14 +372,42 @@ export class AionMemoryStore {
     this.saveToStorage();
   }
 
-  // API de Hechos de Memoria (MemoryFact)
-  public addFact(fact: MemoryFact): void {
-    this.facts.unshift(fact);
+  public setLanguageMode(mode: ResponseLanguageProfile['mode']): void {
+    if (!this.coreProfile.languageProfile) {
+      this.coreProfile.languageProfile = { mode: 'human', verbosity: 'balanced', explainUnknownTerms: true };
+    }
+    this.coreProfile.languageProfile.mode = mode;
     this.saveToStorage();
   }
 
-  public getFacts(): MemoryFact[] {
-    return [...this.facts];
+  // API de Aegis Ledger Universal
+  public addLedgerEntry(entry: AegisLedgerEntry): void {
+    this.ledger.unshift(entry);
+    this.saveToStorage();
+  }
+
+  public getLedgerEntries(): AegisLedgerEntry[] {
+    return [...this.ledger];
+  }
+
+  // API de Transacciones de Inventario Auditable
+  public addInventoryTransaction(tx: InventoryTransaction): void {
+    this.transactions.unshift(tx);
+
+    const matchIdx = this.inventory.findIndex((i) => i.id === tx.pantryItemId);
+    if (matchIdx !== -1) {
+      const current = this.inventory[matchIdx];
+      const delta = tx.quantityDelta || 0;
+      const newAmount = Math.max(0, current.amount + delta);
+      const newAvailability = newAmount === 0 ? 'AGOTADO' : newAmount <= 1 ? 'BAJO' : 'DISPONIBLE';
+
+      this.inventory[matchIdx] = { ...current, amount: newAmount, availability: newAvailability };
+    }
+    this.saveToStorage();
+  }
+
+  public getInventoryTransactions(pantryItemId: string): InventoryTransaction[] {
+    return this.transactions.filter((tx) => tx.pantryItemId === pantryItemId);
   }
 
   // API Comidas
@@ -304,6 +424,17 @@ export class AionMemoryStore {
       meal.consumedPortion.actualFats
     );
     this.deductInventoryFromMeal(meal);
+
+    this.addLedgerEntry({
+      id: `led-${Date.now()}`,
+      timestamp: meal.timestamp,
+      type: 'meal',
+      source: 'user',
+      payload: meal,
+      evidence: meal.evidenceLevel,
+      confidence: 0.95,
+    });
+
     this.saveToStorage();
   }
 
@@ -313,10 +444,22 @@ export class AionMemoryStore {
         (inv) => inv.name.toLowerCase().includes(ing.name.toLowerCase()) || ing.name.toLowerCase().includes(inv.name.toLowerCase())
       );
       if (matchIdx !== -1) {
-        const current = this.inventory[matchIdx];
-        const newAmount = Math.max(0, current.amount - (ing.amountConsumed || 1));
-        const newAvailability = newAmount === 0 ? 'AGOTADO' : newAmount <= 1 ? 'BAJO' : 'DISPONIBLE';
-        this.inventory[matchIdx] = { ...current, amount: newAmount, availability: newAvailability };
+        const item = this.inventory[matchIdx];
+        const consumedAmount = ing.amountConsumed || 1;
+
+        this.addInventoryTransaction({
+          id: `tx-meal-${Date.now()}-${ing.id}`,
+          pantryItemId: item.id,
+          pantryItemName: item.name,
+          type: 'meal_use',
+          quantityDelta: -consumedAmount,
+          unit: item.unit,
+          evidence: ing.source,
+          confidence: 0.9,
+          createdAt: new Date().toISOString(),
+          relatedMealId: meal.id,
+          explanation: `Consumido en preparación "${meal.preparation.name}".`,
+        });
       }
     });
   }
@@ -328,15 +471,71 @@ export class AionMemoryStore {
 
   public addInventoryItem(item: InventoryItem): void {
     this.inventory.unshift(item);
+    this.addInventoryTransaction({
+      id: `tx-add-${Date.now()}`,
+      pantryItemId: item.id,
+      pantryItemName: item.name,
+      type: 'manual_add',
+      quantityDelta: item.amount,
+      unit: item.unit,
+      evidence: item.source,
+      createdAt: item.addedDate,
+      explanation: 'Ingreso de nuevo alimento a la despensa.',
+    });
     this.saveToStorage();
   }
 
   public updateInventoryItem(id: string, updates: Partial<InventoryItem>): void {
     const idx = this.inventory.findIndex((i) => i.id === id);
     if (idx !== -1) {
+      const oldAmount = this.inventory[idx].amount;
       this.inventory[idx] = { ...this.inventory[idx], ...updates };
+
+      if (updates.amount !== undefined && updates.amount !== oldAmount) {
+        this.addInventoryTransaction({
+          id: `tx-adj-${Date.now()}`,
+          pantryItemId: id,
+          pantryItemName: this.inventory[idx].name,
+          type: 'manual_adjustment',
+          quantityDelta: updates.amount - oldAmount,
+          unit: this.inventory[idx].unit,
+          evidence: 'USER_CONFIRMED',
+          createdAt: new Date().toISOString(),
+          explanation: `Ajuste manual de existencias de ${oldAmount} a ${updates.amount}.`,
+        });
+      }
+
       this.saveToStorage();
     }
+  }
+
+  // API de Recetas & Meal Prep
+  public getRecipes(): Recipe[] {
+    return [...this.recipes];
+  }
+
+  public addRecipe(recipe: Recipe): void {
+    this.recipes.unshift(recipe);
+    this.saveToStorage();
+  }
+
+  public getPreparedBatches(): PreparedBatch[] {
+    return [...this.preparedBatches];
+  }
+
+  public addPreparedBatch(batch: PreparedBatch): void {
+    this.preparedBatches.unshift(batch);
+    this.saveToStorage();
+  }
+
+  // API Facts
+  public addFact(fact: MemoryFact): void {
+    this.facts.unshift(fact);
+    this.saveToStorage();
+  }
+
+  public getFacts(): MemoryFact[] {
+    return [...this.facts];
   }
 
   // API Plan Vivo

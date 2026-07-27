@@ -11,12 +11,15 @@ import {
   AegisProfile,
   EvidenceLevel,
   VisionAnalysis,
+  ResponseLanguageProfile,
 } from '@aion/shared-types';
 import { AionEventBus } from '@aion/protocol';
 import { AionMemoryStore } from '@aion/memory';
 import { VisionService } from './vision/VisionService';
+import { LanguageEngine } from './language/LanguageEngine';
+import { RecipeSkill } from './skills/RecipeSkill';
 
-export { VisionService };
+export { VisionService, LanguageEngine, RecipeSkill };
 
 // Agente Especialista de Contexto y Ubicación
 export class ContextAndLocationAgent {
@@ -43,12 +46,9 @@ export class NutritionLeadSpecialist {
   private memoryStore = AionMemoryStore.getInstance();
   private eventBus = AionEventBus.getInstance();
   private visionService = VisionService.getInstance();
+  private languageEngine = LanguageEngine.getInstance();
   private contextAgent = new ContextAndLocationAgent();
 
-  /**
-   * Vertical Slice Completo de Extremo a Extremo (P2):
-   * Foto -> Vision Service -> Scene & Foods -> Confidence & Microquestion -> Portion Range (min-max) -> Kcal/Macros -> Memory -> Events
-   */
   public async processMealInput(
     userInput: string,
     imageBlobUrl?: string,
@@ -145,7 +145,7 @@ export class NutritionLeadSpecialist {
       userConfirmed: true,
     };
 
-    // 4. Persistir episodio en AION Memory (descuenta inventario real)
+    // 4. Persistir episodio en AION Memory (descuenta inventario real con transacciones)
     this.memoryStore.addMeal(mealRecord);
 
     // 5. Publicar eventos versionados en AION Protocol
@@ -160,24 +160,12 @@ export class NutritionLeadSpecialist {
       schemaVersion: '1.0.0',
     });
 
-    this.eventBus.publish({
-      eventId: `evt-vis-${Date.now()}`,
-      eventType: 'aion.aegis.nutrition.vision.analyzed',
-      appId: 'aion-aegis',
-      userId: 'user-default',
-      occurredAt: new Date().toISOString(),
-      payload: visionAnalysis,
-      confidence: visionAnalysis.scene.confidence,
-      schemaVersion: '1.0.0',
-    });
-
-    // Formatear texto de porción en rango (ej. "aprox. 130-190g")
     const portionSummary = ingredients
       .map((i) => `${i.name} (aprox. ${i.portionRange?.min || i.gramsEstimated}-${i.portionRange?.max || i.gramsEstimated}g)`)
       .join(', ');
 
     return {
-      agentReply: `He procesado el análisis visual de tu plato (${portionSummary}). Registrado: ${actualKcal} kcal (${actualProtein}g prot, ${actualCarbs}g carbs, ${actualFats}g grasas). Tu estado metabólico posprandial ha sido actualizado.`,
+      agentReply: `He procesado el análisis visual de tu plato (${portionSummary}). Registrado: ${actualKcal} kcal (${actualProtein}g prot, ${actualCarbs}g carbs, ${actualFats}g grasas). Tu estado metabólico posprandial ha sido actualizado y se descontaron los ingredientes de tu despensa.`,
       visionAnalysis,
       mealRecord,
     };
@@ -233,33 +221,25 @@ export class NutritionLeadSpecialist {
         ],
         steps: ['Mezcla el atún drenado con trozos de queso costeño y sirve fresco.'],
       },
-      {
-        id: 'rec-3',
-        title: 'Tortilla de papa sabanera con verduras',
-        subtitle: 'Alta saciedad y liberación sostenida de glucosa.',
-        kcal: 410,
-        proteinGrams: 18,
-        carbsGrams: 48,
-        fatsGrams: 12,
-        prepTimeMinutes: 15,
-        category: 'MÁS SACIANTE',
-        reasonToRecommend: 'Los carbohidratos complejos de la papa y la fibra vegetal prolongan la sensación de saciedad durante más de 4 horas.',
-        ingredientsNeeded: [{ name: 'Papa sabanera', amount: '2 unidades', availableInPantry: true }],
-        steps: ['Ralla la papa, dora en una sartén antiadherente y sirve caliente.'],
-      },
     ];
   }
 
-  public getCurrentMetabolicState(): MetabolicState {
+  /**
+   * Obtiene el Estado Metabólico traducido dinámicamente mediante LanguageEngine según el modo de respuesta activo
+   */
+  public getCurrentMetabolicState(requestedMode?: ResponseLanguageProfile['mode']): MetabolicState {
     const meals = this.memoryStore.getMeals();
+    const coreProfile = this.memoryStore.getCoreProfile();
+    const mode = requestedMode || coreProfile.languageProfile?.mode || 'human';
     const lastMeal = meals[0];
 
     if (!lastMeal) {
+      const exp = this.languageEngine.translateMetabolicExplanation('POSTABSORTIVO', 8, undefined, mode);
       return {
         currentPhase: 'POSTABSORTIVO',
-        phaseTitle: 'Estado Postabsortivo Inicial',
-        naturalExplanation: 'No hay ingesta reciente registrada. Tu cuerpo mantiene la glucosa plasmática mediante la descomposición del glucógeno hepático.',
-        detailedTechnicalExplanation: 'Glucemia basal. Cociente de insulina/glucagón bajo que estimula la glucogenólisis hepática.',
+        phaseTitle: exp.title,
+        naturalExplanation: exp.naturalExplanation,
+        detailedTechnicalExplanation: exp.technicalExplanation,
         glucoseStatus: 'Estable en rango basal (70-99 mg/dL)',
         fatsStatus: 'Iniciando lipólisis progresiva en tejido adiposo',
         proteinsStatus: 'Equilibrio de síntesis y degradación proteica',
@@ -272,49 +252,22 @@ export class NutritionLeadSpecialist {
     const nowTime = new Date().getTime();
     const hoursElapsed = Math.max(0, (nowTime - lastMealTime) / (1000 * 3600));
 
-    if (hoursElapsed < 3.5) {
-      return {
-        currentPhase: 'POSPRANDIAL',
-        phaseTitle: 'Estado Posprandial (Absorción Nutricional Activa)',
-        naturalExplanation: `Han pasado aproximadamente ${hoursElapsed.toFixed(1)} horas desde tu última comida (${lastMeal.preparation.name}). Tu cuerpo está absorbiendo los carbohidratos como glucosa y usando la proteína para recambio muscular.`,
-        detailedTechnicalExplanation: 'Absorción intestinal de macronutrientes. Insulina elevada estimulando la captación celular de glucosa vía GLUT4, síntesis de glucógeno y transporte de lípidos en quilomicrones.',
-        glucoseStatus: '↑ Elevada y disponible para energía',
-        fatsStatus: '→ En tránsito linfático y vascular (quilomicrones)',
-        proteinsStatus: '→ Captación de aminoácidos para síntesis muscular',
-        glycogenStatus: '→ Almacenamiento activo en hígado y músculo',
-        fatBurnRate: 'menor_temporalmente',
-        lastMealTime: lastMeal.timestamp,
-        hoursElapsedSinceLastMeal: hoursElapsed,
-      };
-    } else if (hoursElapsed < 7) {
-      return {
-        currentPhase: 'POSTABSORTIVO',
-        phaseTitle: 'Estado Postabsortivo (Transición Energética)',
-        naturalExplanation: `Han pasado ${hoursElapsed.toFixed(1)} horas desde tu última ingesta. La absorción de alimentos ha finalizado y tu cuerpo ha comenzado a liberar reservas de glucógeno.`,
-        detailedTechnicalExplanation: 'Nivel de insulina descendiendo y glucagón aumentando. Activación de la glucogenólisis hepática para sostener la glucemia en reposo.',
-        glucoseStatus: 'Normalizando hacia rango basal',
-        fatsStatus: '↑ Activación paulatina de beta-oxidación de grasas',
-        proteinsStatus: 'Preservación de masa magra',
-        glycogenStatus: 'Liberación progresiva desde depósitos hepáticos',
-        fatBurnRate: 'moderada',
-        lastMealTime: lastMeal.timestamp,
-        hoursElapsedSinceLastMeal: hoursElapsed,
-      };
-    } else {
-      return {
-        currentPhase: 'AYUNO_INICIAL',
-        phaseTitle: 'Ayuno Inicial (Mayor Oxidación de Grasas)',
-        naturalExplanation: `Han pasado ${hoursElapsed.toFixed(1)} horas sin ingesta. Tu cuerpo ha cambiado su fuente primaria de energía hacia los ácidos grasos almacenados.`,
-        detailedTechnicalExplanation: 'Glucogenólisis hepática reducida. Activación de lipasa sensible a hormonas (HSL), movilización de ácidos grasos libres e inicio de gluconeogénesis.',
-        glucoseStatus: 'Estable mantenida por gluconeogénesis',
-        fatsStatus: '↑ Oxidación principal de grasas (beta-oxidación)',
-        proteinsStatus: 'Uso menor de aminoácidos para gluconeogénesis',
-        glycogenStatus: 'Reservas hepáticas disminuidas',
-        fatBurnRate: 'alta',
-        lastMealTime: lastMeal.timestamp,
-        hoursElapsedSinceLastMeal: hoursElapsed,
-      };
-    }
+    const phase = hoursElapsed < 3.5 ? 'POSPRANDIAL' : hoursElapsed < 7 ? 'POSTABSORTIVO' : 'AYUNO_INICIAL';
+    const exp = this.languageEngine.translateMetabolicExplanation(phase, hoursElapsed, lastMeal.preparation.name, mode);
+
+    return {
+      currentPhase: phase,
+      phaseTitle: exp.title,
+      naturalExplanation: exp.naturalExplanation,
+      detailedTechnicalExplanation: exp.technicalExplanation,
+      glucoseStatus: phase === 'POSPRANDIAL' ? '↑ Disponible tras la ingesta' : 'Normalizando hacia rango basal',
+      fatsStatus: phase === 'POSPRANDIAL' ? '→ Transportadas en quilomicrones' : '↑ Oxidación lipídica en tejido adiposo',
+      proteinsStatus: '→ Aminoácidos en recambio y reparación proteica',
+      glycogenStatus: phase === 'POSPRANDIAL' ? '→ Reposición activa' : '↓ Liberación desde depósitos hepáticos',
+      fatBurnRate: phase === 'POSPRANDIAL' ? 'menor_temporalmente' : phase === 'POSTABSORTIVO' ? 'moderada' : 'alta',
+      lastMealTime: lastMeal.timestamp,
+      hoursElapsedSinceLastMeal: hoursElapsed,
+    };
   }
 
   public getCurrentEnergyBalance(): EnergyBalance {
