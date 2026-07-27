@@ -26,6 +26,36 @@ export interface MemoryFact<T = any> {
   userEditable: boolean;
 }
 
+// Contexto Ubicación Base vs Ubicación Actual
+export interface AionContext {
+  baseLocation?: {
+    country?: string;
+    region?: string;
+    city?: string;
+    timezone?: string;
+  };
+  currentLocation?: {
+    country?: string;
+    region?: string;
+    city?: string;
+    latitude?: number;
+    longitude?: number;
+    source: 'user' | 'device' | 'integration' | 'inference';
+    confidence?: number;
+    temporary?: boolean;
+  };
+  currentEnvironment?:
+    | 'home'
+    | 'work'
+    | 'restaurant'
+    | 'supermarket'
+    | 'travel'
+    | 'gym'
+    | 'outdoors'
+    | 'unknown';
+  updatedAt: string;
+}
+
 // Perfil Transversal AION Core
 export interface AionUserProfile {
   displayName?: string;
@@ -72,6 +102,58 @@ export interface AegisProfile {
   optionalBodyMetrics?: { weightKg?: number; heightCm?: number; age?: number; sex?: 'M' | 'F' | 'other' };
 }
 
+// Estructura de Capa Visual (Visual Intelligence Layer)
+export type SceneType =
+  | 'meal'
+  | 'pantry'
+  | 'fridge'
+  | 'grocery'
+  | 'restaurant'
+  | 'menu'
+  | 'nutrition_label'
+  | 'receipt'
+  | 'unknown';
+
+export interface VisionPortionRange {
+  likely: number;
+  min: number;
+  max: number;
+  unit: 'g' | 'ml' | 'unit' | 'tbsp' | 'cup' | 'portion';
+  confidence: number;
+  method: string;
+}
+
+export interface VisionDetectedItem {
+  id: string;
+  candidateName: string;
+  confidence: number; // 0.0 - 1.0
+  cookingTechnique?: string;
+  portionRange?: VisionPortionRange;
+  isMaterialAmbiguity?: boolean;
+}
+
+export interface VisionQuestion {
+  id: string;
+  question: string;
+  options?: string[];
+  materialImpact: 'high' | 'medium' | 'low';
+  reason: string;
+}
+
+export interface VisionAnalysis {
+  id: string;
+  imageUrl?: string;
+  scene: {
+    type: SceneType;
+    confidence: number;
+  };
+  detectedItems: VisionDetectedItem[];
+  assumptions: string[];
+  unresolvedQuestions: VisionQuestion[];
+  evidenceLevel: EvidenceLevel;
+  createdAt: string;
+}
+
 // Estructura de Alimentos e Ingredientes
 export interface IngredientItem {
   id: string;
@@ -80,6 +162,7 @@ export interface IngredientItem {
   amountConsumed: number;
   unit: string;
   gramsEstimated?: number;
+  portionRange?: VisionPortionRange;
   preparationMethod?: string;
   kcal: number;
   proteinGrams: number;

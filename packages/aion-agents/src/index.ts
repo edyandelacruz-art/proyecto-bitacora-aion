@@ -10,9 +10,13 @@ import {
   AionUserProfile,
   AegisProfile,
   EvidenceLevel,
+  VisionAnalysis,
 } from '@aion/shared-types';
 import { AionEventBus } from '@aion/protocol';
 import { AionMemoryStore } from '@aion/memory';
+import { VisionService } from './vision/VisionService';
+
+export { VisionService };
 
 // Agente Especialista de Contexto y Ubicación
 export class ContextAndLocationAgent {
@@ -34,118 +38,76 @@ export class ContextAndLocationAgent {
   }
 }
 
-// Agente Especialista de Reconocimiento Visual y Escenas
-export class VisionAndMealRecognitionAgent {
-  public async analyzeFoodInput(
-    userInput: string,
-    imageBlobUrl?: string
-  ): Promise<{
-    detectedFoodName: string;
-    candidateIngredients: { name: string; estimatedGrams: number; confidence: 'ALTA' | 'MEDIA' | 'BAJA' }[];
-    cookingTechnique: string;
-    requiresPortionConfirmation: boolean;
-    ambiguityQuestion?: string;
-  }> {
-    const textLower = userInput.toLowerCase();
-
-    // Detección contextual enriquecida basada en el texto o imagen introducida
-    if (textLower.includes('pollo') || textLower.includes('pechuga')) {
-      return {
-        detectedFoodName: 'Pechuga de pollo con vegetales y papa',
-        candidateIngredients: [
-          { name: 'Pechuga de Pollo', estimatedGrams: 200, confidence: 'ALTA' },
-          { name: 'Papa sabanera', estimatedGrams: 150, confidence: 'ALTA' },
-          { name: 'Tomate fresco', estimatedGrams: 80, confidence: 'MEDIA' },
-        ],
-        cookingTechnique: 'A la plancha / salteado',
-        requiresPortionConfirmation: false,
-      };
-    }
-
-    if (textLower.includes('huevos') || textLower.includes('desayuno')) {
-      return {
-        detectedFoodName: 'Huevos revueltos con queso y arepa',
-        candidateIngredients: [
-          { name: 'Huevos campesinos', estimatedGrams: 100, confidence: 'ALTA' },
-          { name: 'Queso costeño', estimatedGrams: 50, confidence: 'ALTA' },
-          { name: 'Arepa de maíz', estimatedGrams: 80, confidence: 'ALTA' },
-        ],
-        cookingTechnique: 'Revueltos en sartén',
-        requiresPortionConfirmation: false,
-      };
-    }
-
-    // Caso general (Atún con papa y queso):
-    return {
-      detectedFoodName: 'Ensalada de Atún con Papa y Queso',
-      candidateIngredients: [
-        { name: 'Atún en agua', estimatedGrams: 120, confidence: 'ALTA' },
-        { name: 'Papa cocida', estimatedGrams: 150, confidence: 'ALTA' },
-        { name: 'Queso costeño', estimatedGrams: 100, confidence: 'MEDIA' },
-        { name: 'Margarina / Aderezo', estimatedGrams: 15, confidence: 'MEDIA' },
-      ],
-      cookingTechnique: 'Mezclado / Cocido al vapor',
-      requiresPortionConfirmation: true,
-      ambiguityQuestion: 'He detectado atún, papa y queso en la preparación. Para calcular exactamente lo que comiste, ¿qué fracción de toda la preparación serviste o terminaste comiendo?',
-    };
-  }
-}
-
 // Orquestador Principal: Especialista de Nutrición AION
 export class NutritionLeadSpecialist {
   private memoryStore = AionMemoryStore.getInstance();
   private eventBus = AionEventBus.getInstance();
-  private visionAgent = new VisionAndMealRecognitionAgent();
+  private visionService = VisionService.getInstance();
   private contextAgent = new ContextAndLocationAgent();
 
+  /**
+   * Vertical Slice Completo de Extremo a Extremo (P2):
+   * Foto -> Vision Service -> Scene & Foods -> Confidence & Microquestion -> Portion Range (min-max) -> Kcal/Macros -> Memory -> Events
+   */
   public async processMealInput(
     userInput: string,
     imageBlobUrl?: string,
     fractionConsumed?: number
   ): Promise<{
     agentReply: string;
+    visionAnalysis?: VisionAnalysis;
     detectedPreparation?: Preparation;
     consumedPortion?: ConsumedPortion;
     missingInfoQuestion?: string;
     mealRecord?: MealRecord;
   }> {
-    const visionResult = await this.visionAgent.analyzeFoodInput(userInput, imageBlobUrl);
+    // 1. Análisis por VisionService Real
+    const visionAnalysis = await this.visionService.analyzeImage(imageBlobUrl, userInput);
 
-    // Si requiere confirmación de porción y el usuario aún no la ha especificado:
-    if (visionResult.requiresPortionConfirmation && fractionConsumed === undefined && !userInput.toLowerCase().includes('confirmado')) {
+    // 2. Evaluar micro-preguntas con impacto nutricional real
+    const materialQuestion = visionAnalysis.unresolvedQuestions.find((q) => q.materialImpact === 'high');
+
+    if (materialQuestion && fractionConsumed === undefined && !userInput.toLowerCase().includes('confirmado')) {
       return {
-        agentReply: visionResult.ambiguityQuestion!,
-        missingInfoQuestion: visionResult.ambiguityQuestion,
+        agentReply: materialQuestion.question,
+        visionAnalysis,
+        missingInfoQuestion: materialQuestion.question,
       };
     }
 
     const fraction = fractionConsumed ?? 0.2;
     const fractionText = fraction === 1.0 ? '100% (Toda la comida)' : `${(fraction * 100).toFixed(0)}% de la preparación (${fraction === 0.2 ? '1/5' : fraction === 0.33 ? '1/3' : '1/2'})`;
 
-    // Cálculo Nutricional Determinista por Ingrediente
-    const ingredients = visionResult.candidateIngredients.map((ing, idx) => {
-      const isChicken = ing.name.toLowerCase().includes('pollo');
-      const isPotato = ing.name.toLowerCase().includes('papa');
-      const isCheese = ing.name.toLowerCase().includes('queso');
+    // 3. Conversión de Rango Estimado Visual a Ingredientes Deterministas
+    const ingredients = visionAnalysis.detectedItems.map((item, idx) => {
+      const range = item.portionRange || { likely: 150, min: 120, max: 180, unit: 'g', confidence: 0.8, method: 'Estimación volumétrica' };
+      const isChicken = item.candidateName.toLowerCase().includes('pollo');
+      const isPotato = item.candidateName.toLowerCase().includes('papa');
 
-      const kcalBase = isChicken ? 220 : isPotato ? 150 : isCheese ? 240 : 120;
-      const protBase = isChicken ? 32 : isPotato ? 3 : isCheese ? 16 : 18;
-      const carbsBase = isChicken ? 0 : isPotato ? 33 : isCheese ? 1 : 4;
-      const fatsBase = isChicken ? 5 : isPotato ? 0.2 : isCheese ? 18 : 2;
+      const kcalBase = isChicken ? 220 : isPotato ? 150 : 240;
+      const protBase = isChicken ? 32 : isPotato ? 3 : 16;
+      const carbsBase = isChicken ? 0 : isPotato ? 33 : 1;
+      const fatsBase = isChicken ? 5 : isPotato ? 0.2 : 18;
 
       return {
         id: `ing-${idx}-${Date.now()}`,
-        name: ing.name,
+        name: item.candidateName,
         amountPreparation: 1,
         amountConsumed: fraction,
-        unit: 'porción',
-        gramsEstimated: ing.estimatedGrams * fraction,
+        unit: range.unit,
+        gramsEstimated: Math.round(range.likely * fraction),
+        portionRange: {
+          ...range,
+          min: Math.round(range.min * fraction),
+          max: Math.round(range.max * fraction),
+          likely: Math.round(range.likely * fraction),
+        },
         kcal: Math.round(kcalBase * fraction),
         proteinGrams: Math.round(protBase * fraction),
         carbsGrams: Math.round(carbsBase * fraction),
         fatsGrams: Math.round(fatsBase * fraction),
-        confidence: ing.confidence,
-        source: 'DETERMINISTIC_CALCULATION' as EvidenceLevel,
+        confidence: item.confidence > 0.85 ? ('ALTA' as const) : ('MEDIA' as const),
+        source: visionAnalysis.evidenceLevel,
       };
     });
 
@@ -161,7 +123,7 @@ export class NutritionLeadSpecialist {
       imageUrl: imageBlobUrl,
       preparation: {
         id: `prep-${Date.now()}`,
-        name: visionResult.detectedFoodName,
+        name: visionAnalysis.detectedItems.map((i) => i.candidateName).join(', ') || 'Comida Registrada',
         ingredients,
         totalKcal: Math.round(actualKcal / fraction),
         totalProtein: Math.round(actualProtein / fraction),
@@ -177,18 +139,18 @@ export class NutritionLeadSpecialist {
         actualCarbs,
         actualFats,
       },
-      confidence: 'MEDIA',
-      evidenceSummary: `Identificado en ${visionResult.cookingTechnique} y confirmado en ${fractionText}.`,
-      evidenceLevel: fractionConsumed ? 'USER_CONFIRMED' : 'VISUAL_ESTIMATE_HIGH',
+      confidence: visionAnalysis.evidenceLevel === 'VISUAL_ESTIMATE_HIGH' ? 'ALTA' : 'MEDIA',
+      evidenceSummary: `Análisis visual (${visionAnalysis.scene.type}) con certeza ${visionAnalysis.evidenceLevel}.`,
+      evidenceLevel: fractionConsumed ? 'USER_CONFIRMED' : visionAnalysis.evidenceLevel,
       userConfirmed: true,
     };
 
-    // Guardar en AION Memory (persistencia + descuento automático de despensa)
+    // 4. Persistir episodio en AION Memory (descuenta inventario real)
     this.memoryStore.addMeal(mealRecord);
 
-    // Publicar evento en AION Protocol
+    // 5. Publicar eventos versionados en AION Protocol
     this.eventBus.publish({
-      eventId: `evt-${Date.now()}`,
+      eventId: `evt-meal-${Date.now()}`,
       eventType: 'aion.aegis.nutrition.meal.logged',
       appId: 'aion-aegis',
       userId: 'user-default',
@@ -198,15 +160,29 @@ export class NutritionLeadSpecialist {
       schemaVersion: '1.0.0',
     });
 
+    this.eventBus.publish({
+      eventId: `evt-vis-${Date.now()}`,
+      eventType: 'aion.aegis.nutrition.vision.analyzed',
+      appId: 'aion-aegis',
+      userId: 'user-default',
+      occurredAt: new Date().toISOString(),
+      payload: visionAnalysis,
+      confidence: visionAnalysis.scene.confidence,
+      schemaVersion: '1.0.0',
+    });
+
+    // Formatear texto de porción en rango (ej. "aprox. 130-190g")
+    const portionSummary = ingredients
+      .map((i) => `${i.name} (aprox. ${i.portionRange?.min || i.gramsEstimated}-${i.portionRange?.max || i.gramsEstimated}g)`)
+      .join(', ');
+
     return {
-      agentReply: `He registrado tu ${mealRecord.mealType.toLowerCase()} (${actualKcal} kcal, ${actualProtein}g proteína, ${actualCarbs}g carbohidratos, ${actualFats}g grasas). He actualizado tu estado metabólico posprandial, descontado ingredientes de tu despensa y recalculado tu Plan Vivo.`,
+      agentReply: `He procesado el análisis visual de tu plato (${portionSummary}). Registrado: ${actualKcal} kcal (${actualProtein}g prot, ${actualCarbs}g carbs, ${actualFats}g grasas). Tu estado metabólico posprandial ha sido actualizado.`,
+      visionAnalysis,
       mealRecord,
     };
   }
 
-  /**
-   * Generación dinámica de "¿Qué puedo comer ahora?" cruzando el inventario actual real y calorías restantes
-   */
   public getWhatCanIEatNowOptions(): RecipeOption[] {
     const plan = this.memoryStore.getLivePlan();
     const inventory = this.memoryStore.getInventory();
@@ -255,7 +231,7 @@ export class NutritionLeadSpecialist {
           { name: 'Lata de Atún', amount: '1 lata', availableInPantry: hasTuna },
           { name: 'Queso costeño', amount: '50g', availableInPantry: true },
         ],
-        steps: ['Mezcla el atún drenado con trozos de queso costeño y serve fresco.'],
+        steps: ['Mezcla el atún drenado con trozos de queso costeño y sirve fresco.'],
       },
       {
         id: 'rec-3',
@@ -274,9 +250,6 @@ export class NutritionLeadSpecialist {
     ];
   }
 
-  /**
-   * Cálculo Fisiológico Real del Estado Metabólico basado en el tiempo transcurrido desde la última ingesta
-   */
   public getCurrentMetabolicState(): MetabolicState {
     const meals = this.memoryStore.getMeals();
     const lastMeal = meals[0];

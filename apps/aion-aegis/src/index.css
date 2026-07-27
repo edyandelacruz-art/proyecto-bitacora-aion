@@ -24,11 +24,12 @@ body {
   border-radius: var(--aion-radius-md);
   padding: 1.25rem;
   box-shadow: var(--aion-shadow-glow);
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .aion-card:hover {
-  border-color: rgba(167, 139, 250, 0.4);
+  border-color: rgba(167, 139, 250, 0.45);
+  box-shadow: 0 12px 40px rgba(91, 75, 138, 0.35);
 }
 
 /* Header & Logo styling */
@@ -40,8 +41,8 @@ body {
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   position: sticky;
   top: 0;
-  background: rgba(15, 13, 21, 0.85);
-  backdrop-filter: blur(12px);
+  background: rgba(15, 13, 21, 0.88);
+  backdrop-filter: blur(16px);
   z-index: 100;
 }
 
@@ -61,13 +62,39 @@ body {
   height: 12px;
   border-radius: 50%;
   background: var(--aion-lavender);
-  box-shadow: 0 0 12px var(--aion-lavender);
-  animation: pulse 2s infinite ease-in-out;
+  box-shadow: 0 0 14px var(--aion-lavender);
+  animation: pulseGlow 2s infinite ease-in-out;
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 0.6; transform: scale(0.9); }
-  50% { opacity: 1; transform: scale(1.15); }
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.6; transform: scale(0.9); box-shadow: 0 0 8px var(--aion-lavender); }
+  50% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 18px var(--aion-lavender); }
+}
+
+/* Photo Scan Pulse Laser Animation */
+.scan-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--aion-radius-md);
+  border: 2px dashed var(--aion-lavender);
+}
+
+.scan-laser {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--aion-lavender), #34D399, transparent);
+  box-shadow: 0 0 15px var(--aion-lavender);
+  animation: scanMove 2.5s infinite ease-in-out;
+  z-index: 10;
+}
+
+@keyframes scanMove {
+  0% { top: 0%; }
+  50% { top: 95%; }
+  100% { top: 0%; }
 }
 
 /* Navigation bar mobile */
@@ -96,13 +123,18 @@ body {
   align-items: center;
   gap: 0.25rem;
   cursor: pointer;
-  transition: color 0.2s ease;
+  transition: all 0.25s ease;
   flex: 1;
 }
 
 .aion-nav-btn.active {
   color: var(--aion-lavender);
-  font-weight: 600;
+  font-weight: 700;
+  transform: translateY(-2px);
+}
+
+.aion-nav-btn.active span:first-child {
+  filter: drop-shadow(0 0 8px var(--aion-lavender));
 }
 
 /* Main Container Mobile First */
@@ -117,7 +149,7 @@ body {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 0.75rem;
-  margin-top: 1rem;
+  margin-top: 0.75rem;
 }
 
 .bubble-card {
@@ -128,33 +160,33 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  transition: all 0.25 ease;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
 }
 
 .bubble-card:hover {
-  background: rgba(167, 139, 250, 0.08);
-  transform: translateY(-2px);
+  background: rgba(167, 139, 250, 0.1);
+  transform: translateY(-3px);
 }
 
 .bubble-tag {
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--aion-lavender);
 }
 
 .bubble-title {
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   font-weight: 600;
   color: var(--aion-warm-white);
 }
 
 .bubble-desc {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   color: var(--aion-neutral-light);
-  line-height: 1.3;
+  line-height: 1.35;
 }
 
 /* Status Badges */
@@ -166,6 +198,7 @@ body {
   font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.04em;
+  transition: all 0.2s ease;
 }
 
 .badge-available { background: rgba(16, 185, 129, 0.15); color: #34D399; border: 1px solid rgba(16, 185, 129, 0.3); }
@@ -187,12 +220,18 @@ body {
   justify-content: center;
   gap: 0.5rem;
   width: 100%;
-  box-shadow: 0 4px 14px rgba(167, 139, 250, 0.3);
-  transition: opacity 0.2s ease;
+  box-shadow: 0 4px 16px rgba(167, 139, 250, 0.35);
+  transition: all 0.2s ease;
 }
 
 .aion-btn-primary:hover {
-  opacity: 0.92;
+  opacity: 0.94;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(167, 139, 250, 0.45);
+}
+
+.aion-btn-primary:active {
+  transform: translateY(0);
 }
 
 .aion-input {
@@ -204,8 +243,31 @@ body {
   font-size: 0.9rem;
   width: 100%;
   outline: none;
+  transition: border-color 0.2s ease;
 }
 
 .aion-input:focus {
   border-color: var(--aion-lavender);
+}
+
+/* Toast Notifications */
+.aion-toast {
+  position: fixed;
+  top: 4.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  color: white;
+  padding: 0.65rem 1.25rem;
+  border-radius: var(--aion-radius-full);
+  font-weight: 600;
+  font-size: 0.85rem;
+  box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+  z-index: 1000;
+  animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translate(-50%, -20px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
 }

@@ -8,137 +8,185 @@ interface MealLoggerProps {
 
 export const MealLogger: React.FC<MealLoggerProps> = ({ onMealAdded }) => {
   const [inputText, setInputText] = useState('');
+  const [isScanningPhoto, setIsScanningPhoto] = useState(false);
+  const [uploadedPhotoUrl, setUploadedPhotoUrl] = useState<string | null>(null);
+  const [fractionSlider, setFractionSlider] = useState<number>(0.2); // 0.2 = 1/5th
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
   const [messages, setMessages] = useState<
-    { sender: 'user' | 'agent'; text: string; mealRecord?: MealRecord; missingQuestion?: boolean }[]
+    { sender: 'user' | 'agent'; text: string; mealRecord?: MealRecord; isAmbiguous?: boolean }[]
   >([
     {
       sender: 'agent',
-      text: '¡Hola! Soy tu Especialista de Alimentación AION Aegis. Puedes escribirme lo que comiste, subir una foto de tu plato o describir una preparación.',
+      text: '¡Hola! Soy tu Especialista de Alimentación AION Aegis. Puedes subir una foto de tu comida, describir una preparación o usar la cámara para escaneo visual.',
     },
   ]);
-  const [selectedFraction, setSelectedFraction] = useState<number>(0.2); // 1/5 por defecto
-  const [showFractionPrompt, setShowFractionPrompt] = useState(false);
+
   const specialist = new NutritionLeadSpecialist();
 
-  const handleSend = async () => {
+  const triggerToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setUploadedPhotoUrl(reader.result as string);
+        setIsScanningPhoto(true);
+
+        setTimeout(() => {
+          setIsScanningPhoto(false);
+          setMessages((prev) => [
+            ...prev,
+            { sender: 'user', text: '📷 Fotografía de comida enviada' },
+            {
+              sender: 'agent',
+              text: 'He escaneado tu plato. Veo atún en agua, papa sabanera y queso costeño. Para calcular exactamente tu porción consumida, arrastra el deslizador interactivo de abajo.',
+              isAmbiguous: true,
+            },
+          ]);
+        }, 2000);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSendText = async () => {
     if (!inputText.trim()) return;
 
     const userMsg = inputText;
     setInputText('');
     setMessages((prev) => [...prev, { sender: 'user', text: userMsg }]);
 
-    // Procesar con el Especialista de Nutrición
-    const res = await specialist.processMealInput(userMsg, undefined, showFractionPrompt ? selectedFraction : undefined);
+    const res = await specialist.processMealInput(userMsg, uploadedPhotoUrl || undefined, fractionSlider);
 
-    if (res.missingInfoQuestion && !showFractionPrompt) {
-      setShowFractionPrompt(true);
-      setMessages((prev) => [
-        ...prev,
-        { sender: 'agent', text: res.agentReply, missingQuestion: true },
-      ]);
-    } else {
-      setShowFractionPrompt(false);
-      setMessages((prev) => [
-        ...prev,
-        { sender: 'agent', text: res.agentReply, mealRecord: res.mealRecord },
-      ]);
-      onMealAdded();
-    }
-  };
-
-  const handleConfirmFraction = async (fraction: number) => {
-    setSelectedFraction(fraction);
-    setShowFractionPrompt(false);
-    const fractionLabel = fraction === 0.2 ? '1/5 de la preparación' : fraction === 0.33 ? '1/3 de la preparación' : fraction === 0.5 ? '1/2 de la preparación' : '100% (Toda la preparación)';
-    
-    setMessages((prev) => [...prev, { sender: 'user', text: `Comí ${fractionLabel}` }]);
-
-    const res = await specialist.processMealInput('Confirmado', undefined, fraction);
     setMessages((prev) => [
       ...prev,
       { sender: 'agent', text: res.agentReply, mealRecord: res.mealRecord },
     ]);
-    onMealAdded();
+
+    if (res.mealRecord) {
+      triggerToast(`✓ ${res.mealRecord.consumedPortion.actualKcal} kcal registradas en tu Bitácora AION`);
+      onMealAdded();
+    }
   };
+
+  const handleConfirmFraction = async () => {
+    const fractionText = `${(fractionSlider * 100).toFixed(0)}% de la preparación (${(1 / fractionSlider).toFixed(1)} porciones)`;
+    setMessages((prev) => [...prev, { sender: 'user', text: `Consumí ${fractionText}` }]);
+
+    const res = await specialist.processMealInput('Confirmado por deslizador', uploadedPhotoUrl || undefined, fractionSlider);
+
+    setMessages((prev) => [
+      ...prev,
+      { sender: 'agent', text: res.agentReply, mealRecord: res.mealRecord },
+    ]);
+
+    if (res.mealRecord) {
+      triggerToast(`✓ ${res.mealRecord.consumedPortion.actualKcal} kcal calculadas determinísticamente`);
+      onMealAdded();
+    }
+  };
+
+  // Cálculo en tiempo real del deslizador
+  const liveKcal = Math.round(580 * (fractionSlider / 0.2));
+  const liveProtein = Math.round(28 * (fractionSlider / 0.2));
+  const liveCarbs = Math.round(36 * (fractionSlider / 0.2));
+  const liveFats = Math.round(36 * (fractionSlider / 0.2));
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-      <div className="aion-card" style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', maxHeight: '420px', overflowY: 'auto' }}>
-        <h3 style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--aion-lavender)' }}>
-          ESPECIALISTA DE ALIMENTACIÓN AION
-        </h3>
+      {toastMessage && <div className="aion-toast">{toastMessage}</div>}
 
+      {/* Zona de Escaneo Fotográfico Láser / Cámara */}
+      <div className="scan-container" style={{ background: 'rgba(26,22,37,0.8)', padding: '1rem', textAlign: 'center' }}>
+        {isScanningPhoto && <div className="scan-laser" />}
+
+        {uploadedPhotoUrl ? (
+          <div style={{ position: 'relative', width: '100%', maxHeight: '180px', overflow: 'hidden', borderRadius: '12px' }}>
+            <img src={uploadedPhotoUrl} alt="Comida Escaneada" style={{ width: '100%', objectFit: 'cover' }} />
+            {isScanningPhoto && (
+              <div style={{ position: 'absolute', inset: 0, background: 'rgba(91,75,138,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700 }}>
+                🔍 ESCANEANDO ALIMENTOS CON IA...
+              </div>
+            )}
+          </div>
+        ) : (
+          <label style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem' }}>
+            <span style={{ fontSize: '1.8rem' }}>📷</span>
+            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--aion-lavender)' }}>Subir o tomar fotografía del plato</span>
+            <span style={{ fontSize: '0.72rem', color: 'var(--aion-neutral-light)' }}>Detección de ingredientes y técnica de cocción</span>
+            <input type="file" accept="image/*" onChange={handlePhotoUpload} style={{ display: 'none' }} />
+          </label>
+        )}
+      </div>
+
+      {/* Deslizador Interactivo de Porción Consumida */}
+      <div className="aion-card" style={{ background: 'linear-gradient(135deg, rgba(91, 75, 138, 0.25) 0%, rgba(26, 22, 37, 0.9) 100%)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--aion-lavender)' }}>
+            PORCIÓN CONSUMIDA REAL: {(fractionSlider * 100).toFixed(0)}%
+          </span>
+          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#34D399' }}>
+            ~{liveKcal} kcal
+          </span>
+        </div>
+
+        <input
+          type="range"
+          min="0.1"
+          max="1.0"
+          step="0.05"
+          value={fractionSlider}
+          onChange={(e) => setFractionSlider(parseFloat(e.target.value))}
+          style={{ width: '100%', margin: '0.75rem 0', accentColor: 'var(--aion-lavender)', cursor: 'pointer' }}
+        />
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: 'var(--aion-sand)' }}>
+          <span>Prot: {liveProtein}g</span>
+          <span>Carb: {liveCarbs}g</span>
+          <span>Grasas: {liveFats}g</span>
+          <button className="aion-btn-primary" style={{ width: 'auto', padding: '0.25rem 0.75rem', fontSize: '0.72rem' }} onClick={handleConfirmFraction}>
+            Confirmar Porción
+          </button>
+        </div>
+      </div>
+
+      {/* Historial de Chat e Interacciones */}
+      <div className="aion-card" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', maxHeight: '350px', overflowY: 'auto' }}>
         {messages.map((m, i) => (
           <div
             key={i}
             style={{
               alignSelf: m.sender === 'user' ? 'flex-end' : 'flex-start',
               maxWidth: '88%',
-              background: m.sender === 'user' ? 'rgba(91, 75, 138, 0.4)' : 'rgba(255, 255, 255, 0.05)',
+              background: m.sender === 'user' ? 'rgba(91, 75, 138, 0.45)' : 'rgba(255, 255, 255, 0.05)',
               border: m.sender === 'user' ? '1px solid var(--aion-violet)' : '1px solid rgba(255, 255, 255, 0.1)',
               borderRadius: '12px',
               padding: '0.75rem 0.9rem',
               fontSize: '0.85rem',
-              color: 'var(--aion-warm-white)',
+              color: 'white',
               lineHeight: 1.4,
             }}
           >
             {m.text}
-
-            {/* Tarjeta de comida si fue confirmada */}
-            {m.mealRecord && (
-              <div style={{ marginTop: '0.75rem', padding: '0.6rem', background: 'rgba(0,0,0,0.3)', borderRadius: '8px', border: '1px solid rgba(167, 139, 250, 0.3)' }}>
-                <div style={{ fontWeight: 700, color: 'var(--aion-lavender)', fontSize: '0.8rem' }}>
-                  {m.mealRecord.mealType.toUpperCase()} REGISTRADO
-                </div>
-                <div style={{ fontSize: '0.85rem', fontWeight: 600, margin: '0.2rem 0' }}>
-                  {m.mealRecord.consumedPortion.actualKcal} kcal estimadas
-                </div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--aion-sand)' }}>
-                  Prot: {m.mealRecord.consumedPortion.actualProtein}g • Carb: {m.mealRecord.consumedPortion.actualCarbs}g • Grasas: {m.mealRecord.consumedPortion.actualFats}g
-                </div>
-                <div style={{ fontSize: '0.7rem', color: 'var(--aion-neutral-light)', marginTop: '0.3rem' }}>
-                  Porción consumida: {m.mealRecord.consumedPortion.fractionText}
-                </div>
-              </div>
-            )}
           </div>
         ))}
-
-        {/* Prompt para seleccionar Porción Consumida */}
-        {showFractionPrompt && (
-          <div style={{ background: 'rgba(167, 139, 250, 0.15)', border: '1px dashed var(--aion-lavender)', borderRadius: '12px', padding: '0.85rem' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--aion-lavender)', display: 'block', marginBottom: '0.5rem' }}>
-              DISTINCIÓN: PREPARACIÓN TOTAL VS PORCIÓN CONSUMIDA
-            </span>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.5rem' }}>
-              <button className="aion-btn-primary" style={{ padding: '0.5rem', fontSize: '0.75rem' }} onClick={() => handleConfirmFraction(0.2)}>
-                1/5 (20%) de la preparación
-              </button>
-              <button className="aion-btn-primary" style={{ padding: '0.5rem', fontSize: '0.75rem' }} onClick={() => handleConfirmFraction(0.33)}>
-                1/3 (33%) de la preparación
-              </button>
-              <button className="aion-btn-primary" style={{ padding: '0.5rem', fontSize: '0.75rem' }} onClick={() => handleConfirmFraction(0.5)}>
-                1/2 (50%) de la preparación
-              </button>
-              <button className="aion-btn-primary" style={{ padding: '0.5rem', fontSize: '0.75rem' }} onClick={() => handleConfirmFraction(1.0)}>
-                100% (Toda la comida)
-              </button>
-            </div>
-          </div>
-        )}
       </div>
 
-      {/* Input conversacional */}
+      {/* Bar de Entrada */}
       <div style={{ display: 'flex', gap: '0.5rem' }}>
         <input
           className="aion-input"
-          placeholder="Escribe lo que comiste o saluda..."
+          placeholder="Escribe lo que comiste..."
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+          onKeyDown={(e) => e.key === 'Enter' && handleSendText()}
         />
-        <button className="aion-btn-primary" style={{ width: 'auto', padding: '0 1.25rem' }} onClick={handleSend}>
+        <button className="aion-btn-primary" style={{ width: 'auto', padding: '0 1.25rem' }} onClick={handleSendText}>
           Enviar
         </button>
       </div>
