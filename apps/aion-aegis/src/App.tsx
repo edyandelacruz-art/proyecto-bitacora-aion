@@ -5,13 +5,14 @@ import { MealLogger } from './components/MealLogger';
 import { WhatCanIEatNow } from './components/WhatCanIEatNow';
 import { PantryInventory } from './components/PantryInventory';
 import { LivePlanAndMarket } from './components/LivePlanAndMarket';
+import { MyDayLedgerTimeline } from './components/MyDayLedgerTimeline';
 import { OnboardingModal } from './components/OnboardingModal';
 
 import { NutritionLeadSpecialist } from '@aion/agents';
 import { AionMemoryStore } from '@aion/memory';
 
 export const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'body' | 'meal' | 'eat_now' | 'pantry' | 'plan'>('body');
+  const [activeTab, setActiveTab] = useState<'body' | 'meal' | 'eat_now' | 'pantry' | 'plan' | 'ledger'>('body');
   const [updateKey, setUpdateKey] = useState(0);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
@@ -57,6 +58,10 @@ export const App: React.FC = () => {
         {activeTab === 'plan' && (
           <LivePlanAndMarket />
         )}
+
+        {activeTab === 'ledger' && (
+          <MyDayLedgerTimeline onDataChanged={refreshData} />
+        )}
       </main>
 
       <OnboardingModal isOpen={isSettingsOpen} onClose={() => { setIsSettingsOpen(false); refreshData(); }} />
@@ -101,6 +106,14 @@ export const App: React.FC = () => {
         >
           <span>📅</span>
           <span>Plan Vivo</span>
+        </button>
+
+        <button
+          className={`aion-nav-btn ${activeTab === 'ledger' ? 'active' : ''}`}
+          onClick={() => setActiveTab('ledger')}
+        >
+          <span>📜</span>
+          <span>Mi Día</span>
         </button>
       </nav>
     </div>
