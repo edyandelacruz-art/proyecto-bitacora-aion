@@ -1,273 +1,175 @@
-@import '../../../packages/aion-design-tokens/tokens.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+:root {
+  --aion-bg: #070709;
+  --aion-surface: #131316;
+  --aion-surface-container: #111017;
+  --aion-surface-container-high: #1C1B1E;
+  --aion-surface-variant: #17131F;
+  --aion-violet: #7C3AED;
+  --aion-violet-tint: #D2BBFF;
+  --aion-lavender: #C4B5FD;
+  --aion-gold: #D6B36A;
+  --aion-sand: #958DA1;
+  --aion-text-on-surface: #E5E1E5;
 }
 
 body {
-  background-color: var(--aion-bg-dark);
-  color: var(--aion-warm-white);
-  font-family: var(--aion-font-sans);
-  min-height: 100vh;
-  overflow-x: hidden;
+  background-color: var(--aion-bg);
+  color: var(--aion-text-on-surface);
+  font-family: 'Manrope', sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Glassmorphism Card Style */
-.aion-card {
-  background: var(--aion-bg-card);
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Hanken Grotesk', sans-serif;
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+  vertical-align: middle;
+}
+
+/* GLASSMORPHISM & STITCH SURFACES */
+.glass-surface {
+  background: rgba(23, 19, 31, 0.5);
   backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--aion-border-card);
-  border-radius: var(--aion-radius-md);
-  padding: 1.25rem;
-  box-shadow: var(--aion-shadow-glow);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(149, 141, 161, 0.12);
 }
 
-.aion-card:hover {
-  border-color: rgba(167, 139, 250, 0.45);
-  box-shadow: 0 12px 40px rgba(91, 75, 138, 0.35);
+.dashboard-card {
+  background: linear-gradient(145deg, #111017 0%, #070709 100%);
+  border: 1px solid rgba(255, 255, 255, 0.04);
 }
 
-/* Header & Logo styling */
-.aion-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.25rem 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  position: sticky;
-  top: 0;
-  background: rgba(15, 13, 21, 0.88);
-  backdrop-filter: blur(16px);
-  z-index: 100;
+.sidebar-transition {
+  transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.aion-brand-badge {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-family: 'Outfit', sans-serif;
-  font-weight: 700;
-  font-size: 1.25rem;
-  letter-spacing: 0.1em;
-  color: var(--aion-warm-white);
+.drawer-transition {
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.aion-logo-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: var(--aion-lavender);
-  box-shadow: 0 0 14px var(--aion-lavender);
-  animation: pulseGlow 2s infinite ease-in-out;
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
-@keyframes pulseGlow {
-  0%, 100% { opacity: 0.6; transform: scale(0.9); box-shadow: 0 0 8px var(--aion-lavender); }
-  50% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 18px var(--aion-lavender); }
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
-/* Photo Scan Pulse Laser Animation */
-.scan-container {
-  position: relative;
-  overflow: hidden;
-  border-radius: var(--aion-radius-md);
-  border: 2px dashed var(--aion-lavender);
-}
-
-.scan-laser {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, transparent, var(--aion-lavender), #34D399, transparent);
-  box-shadow: 0 0 15px var(--aion-lavender);
-  animation: scanMove 2.5s infinite ease-in-out;
-  z-index: 10;
-}
-
-@keyframes scanMove {
-  0% { top: 0%; }
-  50% { top: 95%; }
-  100% { top: 0%; }
-}
-
-/* Navigation bar mobile */
-.aion-nav {
-  display: flex;
-  justify-content: space-around;
-  background: rgba(26, 22, 37, 0.95);
-  backdrop-filter: blur(20px);
-  border-top: 1px solid var(--aion-border-card);
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 100;
-  padding: 0.75rem 0.25rem;
-}
-
-.aion-nav-btn {
-  background: transparent;
-  border: none;
-  color: var(--aion-neutral);
-  font-size: 0.75rem;
-  font-weight: 500;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.25rem;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  flex: 1;
-}
-
-.aion-nav-btn.active {
-  color: var(--aion-lavender);
-  font-weight: 700;
-  transform: translateY(-2px);
-}
-
-.aion-nav-btn.active span:first-child {
-  filter: drop-shadow(0 0 8px var(--aion-lavender));
-}
-
-/* Main Container Mobile First */
+/* UI UTILITIES & BUTTONS */
 .aion-container {
-  max-width: 480px;
+  max-width: 1440px;
   margin: 0 auto;
-  padding: 1rem 1rem 5.5rem 1rem;
+  padding: 1rem 1.5rem;
 }
 
-/* Dynamic Bubbles for "Tu cuerpo ahora" */
-.bubbles-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.75rem;
-  margin-top: 0.75rem;
-}
-
-.bubble-card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--aion-radius-md);
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
-}
-
-.bubble-card:hover {
-  background: rgba(167, 139, 250, 0.1);
-  transform: translateY(-3px);
-}
-
-.bubble-tag {
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-weight: 700;
-  color: var(--aion-lavender);
-}
-
-.bubble-title {
-  font-size: 0.92rem;
-  font-weight: 600;
-  color: var(--aion-warm-white);
-}
-
-.bubble-desc {
-  font-size: 0.78rem;
-  color: var(--aion-neutral-light);
-  line-height: 1.35;
-}
-
-/* Status Badges */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.25rem 0.6rem;
-  border-radius: var(--aion-radius-full);
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  transition: all 0.2s ease;
-}
-
-.badge-available { background: rgba(16, 185, 129, 0.15); color: #34D399; border: 1px solid rgba(16, 185, 129, 0.3); }
-.badge-low { background: rgba(245, 158, 11, 0.15); color: #FBBF24; border: 1px solid rgba(245, 158, 11, 0.3); }
-.badge-expiring { background: rgba(239, 68, 68, 0.15); color: #F87171; border: 1px solid rgba(239, 68, 68, 0.3); }
-
-/* Buttons & Inputs */
-.aion-btn-primary {
-  background: linear-gradient(135deg, var(--aion-violet) 0%, var(--aion-lavender) 100%);
-  color: white;
-  border: none;
-  border-radius: var(--aion-radius-md);
-  padding: 0.85rem 1.25rem;
-  font-weight: 600;
-  font-size: 0.95rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  width: 100%;
-  box-shadow: 0 4px 16px rgba(167, 139, 250, 0.35);
-  transition: all 0.2s ease;
-}
-
-.aion-btn-primary:hover {
-  opacity: 0.94;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(167, 139, 250, 0.45);
-}
-
-.aion-btn-primary:active {
-  transform: translateY(0);
+.aion-card {
+  background: #111017;
+  border: 1px solid #2B2338;
+  border-radius: 20px;
+  padding: 1.25rem;
 }
 
 .aion-input {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: var(--aion-radius-sm);
-  padding: 0.75rem 1rem;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(196, 181, 253, 0.25);
+  border-radius: 12px;
+  padding: 0.65rem 0.9rem;
   color: white;
-  font-size: 0.9rem;
-  width: 100%;
+  font-size: 0.85rem;
   outline: none;
   transition: border-color 0.2s ease;
 }
 
 .aion-input:focus {
-  border-color: var(--aion-lavender);
+  border-color: #7C3AED;
+  box-shadow: 0 0 12px rgba(124, 58, 237, 0.3);
 }
 
-/* Toast Notifications */
-.aion-toast {
-  position: fixed;
-  top: 4.5rem;
-  left: 50%;
-  transform: translateX(-50%);
-  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+.aion-btn-primary {
+  background: #7C3AED;
   color: white;
-  padding: 0.65rem 1.25rem;
-  border-radius: var(--aion-radius-full);
-  font-weight: 600;
-  font-size: 0.85rem;
-  box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
-  z-index: 1000;
-  animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(214, 179, 106, 0.3);
+  border-radius: 20px;
+  padding: 0.5rem 1.2rem;
+  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-@keyframes slideDown {
-  from { opacity: 0; transform: translate(-50%, -20px); }
-  to { opacity: 1; transform: translate(-50%, 0); }
+.aion-btn-primary:hover {
+  background: #6D28D9;
+  box-shadow: 0 0 15px rgba(124, 58, 237, 0.4);
+}
+
+.aion-btn-secondary {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid #2B2338;
+  color: var(--aion-lavender);
+  border-radius: 16px;
+  padding: 0.45rem 1rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.aion-btn-secondary:hover {
+  background: rgba(124, 58, 237, 0.15);
+  border-color: #7C3AED;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 12px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.badge-available {
+  background: rgba(52, 211, 153, 0.15);
+  color: #34D399;
+  border: 1px solid rgba(52, 211, 153, 0.3);
+}
+
+/* NAVEGACIÓN INFERIOR MÓVIL */
+.aion-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: rgba(13, 11, 18, 0.95);
+  backdrop-filter: blur(16px);
+  border-top: 1px solid #2B2338;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 90;
+}
+
+.aion-nav-btn {
+  background: transparent;
+  border: none;
+  color: var(--aion-sand);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.68rem;
+  cursor: pointer;
+}
+
+.aion-nav-btn.active {
+  color: #C4B5FD;
+  font-weight: 800;
 }
