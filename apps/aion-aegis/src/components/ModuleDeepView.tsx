@@ -33,52 +33,58 @@ export const ModuleDeepView: React.FC<ModuleDeepViewProps> = ({
   const metabolicState = specialist.getCurrentMetabolicState();
   const energyBalance = specialist.getCurrentEnergyBalance();
 
-  const getTitle = () => {
+  const getModuleHeader = () => {
     switch (activeModuleId) {
-      case 'metabolism': return '🧬 Metabolismo & Fisiología';
-      case 'nutrition': return '🍎 Alimentación & Nutrición';
-      case 'recipes': return '💡 Recetas & Preparaciones';
-      case 'pantry': return '📦 Despensa, Compras & Inventario';
-      case 'sleep': return '😴 Sueño & Recuperación';
-      case 'activity': return '🏃 Actividad & Ejercicio';
-      case 'hydration': return '💧 Hidratación';
-      case 'state': return '⚡ Energía, Ánimo & Foco';
-      case 'medication': return '💊 Medicación & Suplementos';
-      case 'symptoms': return '🩺 Dolor & Síntomas';
-      case 'body': return '📐 Peso & Medidas';
-      case 'habits': return '🔄 Hábitos & Rutinas';
-      case 'plan': return '📅 Plan Vivo';
+      case 'metabolism': return { title: 'Metabolismo & Fisiología', icon: 'bolt', subtitle: 'Fase Metabólica & Sustratos Bioquímicos' };
+      case 'nutrition': return { title: 'Nutrición & Balance Ingesta', icon: 'restaurant', subtitle: 'Conteo de Calorías, Macros & Micronutrientes' };
+      case 'recipes': return { title: 'Recetas & Preparaciones', icon: 'auto_awesome', subtitle: 'Sugerencias Inteligentes según Despensa' };
+      case 'pantry': return { title: 'Despensa, Compras & Inventario', icon: 'inventory_2', subtitle: 'Control de Existencias & Alimentos Críticos' };
+      case 'sleep': return { title: 'Sueño & Recuperación', icon: 'nights_stay', subtitle: 'Eficiencia Circadiana & Fases REM/Profundo' };
+      case 'activity': return { title: 'Actividad & Esfuerzo Físico', icon: 'directions_run', subtitle: 'RPE, Calorías Quemadas & Ejercicio' };
+      case 'hydration': return { title: 'Hidratación & Electrolitos', icon: 'water_drop', subtitle: 'Volumen Hídrico & Estado de Hidratación' };
+      case 'state': return { title: 'Energía, Ánimo & Foco', icon: 'psychology', subtitle: 'Estado Bioenergético & Salud Mental' };
+      case 'medication': return { title: 'Medicación & Suplementos', icon: 'medication', subtitle: 'Posología, Fármacos & Vitaminas' };
+      case 'symptoms': return { title: 'Dolor & Síntomas', icon: 'medical_services', subtitle: 'Registro Clínico & Alertas Agudas' };
+      case 'body': return { title: 'Peso & Medidas Corporal', icon: 'straighten', subtitle: 'Antropometría & Composición Magra' };
+      case 'habits': return { title: 'Hábitos & Rutinas', icon: 'published_with_changes', subtitle: 'Seguimiento de Racha & Objetivos' };
+      case 'plan': return { title: 'Plan Vivo Interactivo', icon: 'event_repeat', subtitle: 'Programación Inteligente del Día' };
       case 'day':
-      case 'audit': return '📜 Mi Día (Bitácora & Ledger)';
-      case 'reports': return '📊 Reportes & Exportaciones';
-      default: return '⚙️ Módulo';
+      case 'audit': return { title: 'Mi Día & Ledger Inmutable', icon: 'terminal', subtitle: 'Trazabilidad Universal Raw Stream' };
+      case 'reports': return { title: 'Reportes & Exportaciones', icon: 'summarize', subtitle: 'Generador de Libro Excel & Informes PDF' };
+      default: return { title: 'Módulo Canónico', icon: 'grid_view', subtitle: 'Panel de Control Interactivo' };
     }
   };
 
+  const header = getModuleHeader();
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', paddingBottom: '2rem' }}>
-      {/* HEADER NAVEGACIÓN PROFUNDA */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #2B2338', paddingBottom: '0.6rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+    <div className="space-y-6 max-w-[1400px] mx-auto pb-16">
+      {/* HEADER DE NAVEGACIÓN PROFUNDA STITCH 1:1 */}
+      <div className="flex justify-between items-center bg-[#111017] p-6 rounded-3xl border border-white/10 shadow-2xl">
+        <div className="flex items-center gap-4">
           <button
             onClick={onBackToCore}
-            style={{
-              background: 'rgba(255,255,255,0.06)',
-              border: '1px solid #2B2338',
-              color: '#C4B5FD',
-              borderRadius: '6px',
-              padding: '0.3rem 0.6rem',
-              fontSize: '0.75rem',
-              cursor: 'pointer',
-            }}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-[#C4B5FD] text-xs font-bold hover:bg-[#7C3AED]/20 transition-all"
           >
-            ← Volver a Aegis Core
+            <span className="material-symbols-outlined text-sm">arrow_back</span>
+            Volver a Aegis Core
           </button>
-          <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'white', margin: 0 }}>{getTitle()}</h2>
+          <div className="h-6 w-px bg-white/10"></div>
+          <div className="flex items-center gap-3">
+            <span className="material-symbols-outlined text-[#7C3AED] text-2xl">{header.icon}</span>
+            <div>
+              <h2 className="text-lg font-bold text-white tracking-tight">{header.title}</h2>
+              <p className="text-xs text-[#CCC3D8]/60">{header.subtitle}</p>
+            </div>
+          </div>
         </div>
+
+        <span className="px-3 py-1 rounded-full bg-[#7C3AED]/15 text-[#C4B5FD] text-xs font-bold border border-[#7C3AED]/30 uppercase">
+          MODULO ACTIVO
+        </span>
       </div>
 
-      {/* RENDERIZADO DEL MÓDULO PROFUNDO */}
+      {/* RENDERIZADO DEL DASHBOARD PROFUNDO */}
       {(activeModuleId === 'metabolism' || activeModuleId === 'body_met') && (
         <YourBodyNow metabolicState={metabolicState} energyBalance={energyBalance} />
       )}
