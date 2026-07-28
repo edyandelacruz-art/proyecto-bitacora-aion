@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { NutritionLeadSpecialist, AionCoreSuperAgent, OmniDispatchResult } from '@aion/agents';
 import { AionMemoryStore } from '@aion/memory';
 
+import { AegisTransversalExplainer } from './AegisTransversalExplainer';
+
 interface AegisCoreFeedProps {
   onRefreshAll: () => void;
   onOpenModuleDeepView: (moduleId: string) => void;
@@ -134,6 +136,12 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
               <p className="text-sm text-white">{lastDispatch.coreReply}</p>
             </div>
           )}
+
+          {/* CAPACIDAD TRANSVERSAL DE EXPLICACIÓN EN LENGUAJE NATURAL */}
+          <AegisTransversalExplainer
+            contextName="Aegis Core Feed & Metabolismo General"
+            domain="metabolism"
+          />
         </section>
 
         {/* SÍNTESIS DEL DÍA CARD STITCH 1:1 WITH SVG GRAPH */}

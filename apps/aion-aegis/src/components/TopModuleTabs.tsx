@@ -1,4 +1,5 @@
 import React from 'react';
+import { AegisTransversalExplainer } from './AegisTransversalExplainer';
 
 export interface ModuleTabItem {
   id: string;
@@ -66,10 +67,11 @@ export const TopModuleTabs: React.FC<TopModuleTabsProps> = ({
   onSelectModule,
   onBackToCore,
 }) => {
-  // Encontrar a qué grupo pertenece el módulo activo actual
   const currentGroup = MODULE_GROUPS.find((g) =>
     g.tabs.some((t) => t.id === activeModuleId)
   ) || MODULE_GROUPS[0];
+
+  const currentTab = currentGroup.tabs.find((t) => t.id === activeModuleId) || currentGroup.tabs[0];
 
   return (
     <div className="bg-[#111017] p-4 lg:p-6 rounded-[32px] border border-white/10 shadow-2xl space-y-4 mb-6">
@@ -129,6 +131,15 @@ export const TopModuleTabs: React.FC<TopModuleTabsProps> = ({
             </button>
           );
         })}
+      </div>
+
+      {/* ACCIONES TRANSVERSALES DE EXPLICACIÓN EN LENGUAJE NATURAL */}
+      <div className="pt-2 border-t border-white/5">
+        <AegisTransversalExplainer
+          contextName={currentTab.label}
+          domain={activeModuleId}
+          compact={true}
+        />
       </div>
     </div>
   );
