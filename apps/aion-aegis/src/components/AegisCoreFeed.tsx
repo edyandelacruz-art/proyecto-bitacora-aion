@@ -32,10 +32,6 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
   const [isRecordingVoice, setIsRecordingVoice] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-  // Modal para edición inline de metas
-  const [editingTarget, setEditingTarget] = useState<string | null>(null);
-  const [tempTargetValue, setTempTargetValue] = useState<number>(2500);
-
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
@@ -108,20 +104,6 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
     }
   };
 
-  const handleSaveInlineTarget = () => {
-    if (editingTarget === 'hydration') {
-      const current = store.getLivePlan();
-      store.setLivePlan({
-        ...current,
-        macroTargets: { ...current.macroTargets, protein: current.macroTargets.protein },
-      });
-    } else if (editingTarget === 'finances') {
-      store.setFinanceConfig({ monthlyBudgetCop: tempTargetValue });
-    }
-    setEditingTarget(null);
-    onRefreshAll();
-  };
-
   return (
     <div className="space-y-8 w-full max-w-[1400px] mx-auto px-4 lg:px-6 pt-4 pb-16">
       
@@ -150,7 +132,7 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
           </div>
         </div>
 
-        {/* FEED DE MENSAJES CON FORMATO DE TEXTO Y BADGES */}
+        {/* FEED DE MENSAJES */}
         <div className="space-y-4 max-h-[380px] overflow-y-auto hide-scrollbar p-2">
           {chatMessages.map((msg) => (
             <div
@@ -243,19 +225,12 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
         </div>
       </div>
 
-      {/* 2. MÓDULOS DE ESTADO CON EDICIÓN INLINE DE METAS */}
+      {/* 2. MÓDULOS DE ESTADO */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        
-        {/* CARD SUEÑO */}
-        <div className="dashboard-card p-6 rounded-[32px] bg-[#111017] border border-white/10 space-y-3 relative group">
+        <div className="dashboard-card p-6 rounded-[32px] bg-[#111017] border border-white/10 space-y-3">
           <div className="flex justify-between items-center">
             <span className="text-[10px] font-bold text-[#C4B5FD] uppercase tracking-widest">Sueño Circadiano</span>
-            <button
-              onClick={() => onOpenDrawer('SUEÑO')}
-              className="text-xs text-[#CCC3D8]/60 hover:text-white cursor-pointer"
-            >
-              ✏️ Ver / Editar
-            </button>
+            <button onClick={() => onOpenDrawer('SUEÑO')} className="text-xs text-[#CCC3D8]/60 hover:text-white cursor-pointer">✏️ Ver / Editar</button>
           </div>
           <p className="text-2xl font-extrabold text-white">7.5 h <span className="text-xs font-normal text-emerald-400">/ 8.0 h target</span></p>
           <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden">
@@ -263,16 +238,10 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
           </div>
         </div>
 
-        {/* CARD ACTIVIDAD */}
         <div className="dashboard-card p-6 rounded-[32px] bg-[#111017] border border-white/10 space-y-3">
           <div className="flex justify-between items-center">
             <span className="text-[10px] font-bold text-[#D6B36A] uppercase tracking-widest">Actividad Física</span>
-            <button
-              onClick={() => onOpenDrawer('ACTIVIDAD')}
-              className="text-xs text-[#CCC3D8]/60 hover:text-white cursor-pointer"
-            >
-              ✏️ Ver / Editar
-            </button>
+            <button onClick={() => onOpenDrawer('ACTIVIDAD')} className="text-xs text-[#CCC3D8]/60 hover:text-white cursor-pointer">✏️ Ver / Editar</button>
           </div>
           <p className="text-2xl font-extrabold text-white">45 min <span className="text-xs font-normal text-[#D6B36A]">/ 320 kcal</span></p>
           <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden">
@@ -280,16 +249,10 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
           </div>
         </div>
 
-        {/* CARD HIDRATACIÓN */}
         <div className="dashboard-card p-6 rounded-[32px] bg-[#111017] border border-white/10 space-y-3">
           <div className="flex justify-between items-center">
             <span className="text-[10px] font-bold text-sky-400 uppercase tracking-widest">Hidratación</span>
-            <button
-              onClick={() => onOpenDrawer('HIDRATACIÓN')}
-              className="text-xs text-[#CCC3D8]/60 hover:text-white cursor-pointer"
-            >
-              ✏️ Ver / Editar
-            </button>
+            <button onClick={() => onOpenDrawer('HIDRATACIÓN')} className="text-xs text-[#CCC3D8]/60 hover:text-white cursor-pointer">✏️ Ver / Editar</button>
           </div>
           <p className="text-2xl font-extrabold text-white">1,850 ml <span className="text-xs font-normal text-sky-400">/ 2,500 ml</span></p>
           <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden">
@@ -297,55 +260,102 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
           </div>
         </div>
 
-        {/* CARD FINANZAS */}
         <div className="dashboard-card p-6 rounded-[32px] bg-[#111017] border border-white/10 space-y-3">
           <div className="flex justify-between items-center">
             <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Finanzas ($ COP)</span>
-            <button
-              onClick={() => onOpenModuleDeepView('finances')}
-              className="text-xs text-[#CCC3D8]/60 hover:text-white cursor-pointer"
-            >
-              ✏️ Módulo
-            </button>
+            <button onClick={() => onOpenModuleDeepView('finances')} className="text-xs text-[#CCC3D8]/60 hover:text-white cursor-pointer">✏️ Submódulos</button>
           </div>
           <p className="text-xl font-extrabold text-white">${(finConfig.monthlyBudgetCop || 2500000).toLocaleString()} <span className="text-xs font-normal text-emerald-400">COP</span></p>
           <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden">
             <div className="bg-emerald-400 h-full w-[40%] rounded-full"></div>
           </div>
         </div>
-
       </div>
 
-      {/* 3. CURVA BIOENERGÉTICA CON MEDIAS Y GASTO BASAL BMR */}
+      {/* 3. CURVA BIOENERGÉTICA CON RÓTULOS COMPLETOS DE EJES (X: HORAS 00:00 - 24:00 | Y: GLUCOSA mg/dL & BMR kcal) */}
       <div className="dashboard-card rounded-[36px] p-6 lg:p-8 bg-[#111017] border border-white/10 space-y-6">
         <div className="flex justify-between items-center flex-wrap gap-4 border-b border-white/10 pb-4">
           <div>
             <span className="text-[10px] font-bold text-[#D6B36A] uppercase tracking-[0.25em] block">
-              DINÁMICA BIOLÓGICA & CURVA BIOENERGÉTICA
+              MONITOR DE DINÁMICA METABÓLICA & BIOENERGÉTICA
             </span>
-            <h3 className="text-lg font-bold text-white mt-0.5">Glucosa, Lipólisis & Gasto Energético Basal (BMR)</h3>
+            <h3 className="text-lg font-bold text-white mt-0.5">Glucemia Fisiológica, Lipólisis & Gasto Basal BMR (24 Horas)</h3>
           </div>
 
-          <div className="flex gap-4 text-xs font-bold">
-            <span className="text-[#C4B5FD]">Gasto Basal (BMR): 1,780 kcal</span>
-            <span className="text-[#D6B36A]">Media Bioenergética: 2,150 kcal</span>
+          <div className="flex gap-4 text-xs font-bold flex-wrap">
+            <span className="text-[#C4B5FD] flex items-center gap-1.5">
+              <span className="w-3 h-0.5 bg-[#C4B5FD] inline-block"></span> Gasto Basal (BMR: 1,780 kcal)
+            </span>
+            <span className="text-[#D6B36A] flex items-center gap-1.5">
+              <span className="w-3 h-0.5 bg-[#D6B36A] border-b border-dashed inline-block"></span> Media Bioenergética (2,150 kcal)
+            </span>
+            <span className="text-emerald-400 flex items-center gap-1.5">
+              <span className="w-3 h-0.5 bg-emerald-400 inline-block"></span> Rango Euglucémico (70-120 mg/dL)
+            </span>
           </div>
         </div>
 
-        <div className="w-full h-48 bg-[#070709] rounded-3xl p-4 border border-white/10 relative overflow-hidden flex items-center justify-center">
-          <svg className="w-full h-full" viewBox="0 0 800 160">
-            {/* Línea de referencia de la media bioenergética */}
-            <line x1="0" y1="80" x2="800" y2="80" stroke="#D6B36A" strokeWidth="1" strokeDasharray="4,4" />
-            <text x="700" y="75" fill="#D6B36A" fontSize="10" fontWeight="bold">Media: 2,150 kcal</text>
+        {/* GRÁFICO SVG VECTORIAL COMPLETO CON EJES Y ETICADAS DE VALOR */}
+        <div className="w-full bg-[#070709] rounded-3xl p-6 border border-white/10 space-y-4">
+          <div className="relative w-full h-64">
+            
+            {/* EJE Y (ETIQUETAS IZQUIERDA DE VALORES) */}
+            <div className="absolute left-0 top-0 bottom-8 w-16 flex flex-col justify-between text-[10px] font-mono text-[#CCC3D8]/70 border-r border-white/10 pr-2 text-right">
+              <span>150 mg/dL</span>
+              <span className="text-amber-400 font-bold">120 mg/dL</span>
+              <span className="text-[#D6B36A] font-bold">100 mg/dL</span>
+              <span className="text-emerald-400 font-bold">80 mg/dL</span>
+              <span>50 mg/dL</span>
+            </div>
 
-            {/* Curva de onda bioenergética */}
-            <path
-              d="M0,100 C150,20 300,140 450,50 C600,130 700,40 800,90"
-              fill="none"
-              stroke="#7C3AED"
-              strokeWidth="3"
-            />
-          </svg>
+            {/* ÁREA SVG DEL GRÁFICO CON MARCAS Y PUNTOS */}
+            <div className="absolute left-16 right-0 top-0 bottom-8 pl-4">
+              <svg className="w-full h-full overflow-visible" viewBox="0 0 700 200" preserveAspectRatio="none">
+                
+                {/* LÍNEAS DE CUADRÍCULA HORIZONTALES */}
+                <line x1="0" y1="20" x2="700" y2="20" stroke="rgba(255,255,255,0.05)" strokeDasharray="2,2" />
+                <line x1="0" y1="60" x2="700" y2="60" stroke="rgba(251,191,36,0.3)" strokeDasharray="4,4" /> {/* 120 mg/dL */}
+                <line x1="0" y1="100" x2="700" y2="100" stroke="rgba(214,179,106,0.5)" strokeDasharray="2,2" /> {/* 100 mg/dL Media */}
+                <line x1="0" y1="140" x2="700" y2="140" stroke="rgba(52,211,153,0.3)" strokeDasharray="4,4" /> {/* 80 mg/dL */}
+
+                {/* ZONA SOMBREADA EUGLUCÉMICA (70 - 120 mg/dL) */}
+                <rect x="0" y="60" width="700" height="80" fill="rgba(52,211,153,0.05)" />
+
+                {/* CURVA DE ONDA BIOENERGÉTICA */}
+                <path
+                  d="M0,120 C100,50 200,160 300,70 C400,130 500,40 600,110 L700,90"
+                  fill="none"
+                  stroke="#7C3AED"
+                  strokeWidth="3.5"
+                />
+
+                {/* PUNTOS INTERACTIVOS CON VALORES NUMÉRICOS */}
+                {/* Desayuno (08:00 AM) */}
+                <circle cx="100" cy="50" r="5" fill="#D6B36A" />
+                <text x="100" y="35" textAnchor="middle" fill="#D6B36A" fontSize="10" fontWeight="bold">135 mg/dL (Desayuno)</text>
+
+                {/* Almuerzo (01:00 PM) */}
+                <circle cx="300" cy="70" r="5" fill="#7C3AED" />
+                <text x="300" y="55" textAnchor="middle" fill="#C4B5FD" fontSize="10" fontWeight="bold">122 mg/dL (Almuerzo)</text>
+
+                {/* Gimnasio / Depleción (05:30 PM) */}
+                <circle cx="500" cy="40" r="5" fill="#34D399" />
+                <text x="500" y="25" textAnchor="middle" fill="#34D399" fontSize="10" fontWeight="bold">140 mg/dL (Pico Entreno)</text>
+              </svg>
+            </div>
+
+            {/* EJE X (ETIQUETAS DE TIEMPO 00:00 - 24:00) */}
+            <div className="absolute left-16 right-0 bottom-0 h-6 flex justify-between text-[10px] font-mono text-[#CCC3D8]/60 border-t border-white/10 pt-1 pl-4">
+              <span>00:00</span>
+              <span>04:00</span>
+              <span className="text-[#D6B36A] font-bold">08:00</span>
+              <span>12:00</span>
+              <span className="text-[#7C3AED] font-bold">16:00</span>
+              <span className="text-emerald-400 font-bold">20:00</span>
+              <span>24:00</span>
+            </div>
+
+          </div>
         </div>
       </div>
 
