@@ -5,7 +5,7 @@ import { VisionService } from '../vision/VisionService';
 
 export interface OmniDispatchResult {
   coreReply: string;
-  detectedDomains: ('NUTRITION' | 'FINANCES' | 'SLEEP' | 'HYDRATION' | 'ACTIVITY' | 'MEDICATION')[];
+  detectedDomains: ('NUTRITION' | 'FINANCES' | 'SLEEP' | 'HYDRATION' | 'ACTIVITY' | 'MEDICATION' | 'CONVERSATIONAL')[];
   dispatchedEvents: string[];
   actionsSummary: string[];
 }
@@ -30,10 +30,52 @@ export class AionCoreSuperAgent {
     inputText: string,
     imageUrl?: string
   ): Promise<OmniDispatchResult> {
-    const textLower = (inputText || '').toLowerCase();
-    const detectedDomains: ('NUTRITION' | 'FINANCES' | 'SLEEP' | 'HYDRATION' | 'ACTIVITY' | 'MEDICATION')[] = [];
+    const textLower = (inputText || '').toLowerCase().trim();
+    const detectedDomains: ('NUTRITION' | 'FINANCES' | 'SLEEP' | 'HYDRATION' | 'ACTIVITY' | 'MEDICATION' | 'CONVERSATIONAL')[] = [];
     const dispatchedEvents: string[] = [];
     const actionsSummary: string[] = [];
+
+    // 0. DETECCIÓN DE CONVERSACIÓN / SALUDO / ESTADO GENERAL (ej. "estas vivo", "hola", "quien eres", "como estas")
+    const isGeneralChat =
+      textLower.includes('estas vivo') ||
+      textLower.includes('estás vivo') ||
+      textLower.includes('hola') ||
+      textLower.includes('buenas') ||
+      textLower.includes('quien eres') ||
+      textLower.includes('quién eres') ||
+      textLower.includes('como estas') ||
+      textLower.includes('cómo estás') ||
+      textLower.includes('funcionas') ||
+      textLower.includes('sirves');
+
+    if (isGeneralChat && !imageUrl) {
+      detectedDomains.push('CONVERSATIONAL');
+      const profile = this.memoryStore.getCoreProfile();
+      const userName = profile.displayName || 'Edyan';
+
+      let coreReply = `¡100% activo, consciente y operativo, ${userName}! Soy AION Aegis, tu prótesis ejecutiva soberana. Mis 16 supervisores multiagente monitorean tu biometría, descanso circadiano, glucemia, hidratación, gastos y metas en tiempo real.\n\nPuedes dictarme o escribirme cualquier síntoma, ingesta, gasto o compromiso libremente.`;
+      
+      if (textLower.includes('estas vivo') || textLower.includes('estás vivo')) {
+        coreReply = `¡100% vivo, activo y operativo! Todo el ecosistema AION Aegis está escuchando y sincronizando tus datos en la Bitácora Soberana. ¿Qué deseas registrar o auditar ahora?`;
+      }
+
+      this.memoryStore.addLedgerEntry({
+        id: `led_chat_${Date.now()}`,
+        timestamp: new Date().toISOString(),
+        type: 'recommendation',
+        source: 'agent',
+        payload: { inputText, reply: coreReply },
+        evidence: 'USER_CONFIRMED',
+        confidence: 1.0,
+      });
+
+      return {
+        coreReply,
+        detectedDomains: ['CONVERSATIONAL'],
+        dispatchedEvents: ['aion.core.chat.responded'],
+        actionsSummary: ['Respuesta conversacional natural generada.'],
+      };
+    }
 
     // 1. DOMINIO FINANZAS (ej. "gasté 30.000", "ingreso de 1.500.000", "compré", "pesos")
     const moneyMatch = textLower.match(/(\d+[\d\.]*)\s*(pesos|cop|\$|lucas)/) || textLower.match(/(gasté|compré|pagué|ingreso|recibí)\s*(\d+[\d\.]*)/);
@@ -62,7 +104,7 @@ export class AionCoreSuperAgent {
       actionsSummary.push(`${isIncome ? 'Ingreso' : 'Gasto'} registrado: $${amountClean.toLocaleString('es-CO')} COP en Finanzas.`);
     }
 
-    // 2. DOMINIO SUEÑO (ej. "dormí 7 horas", "sueño rem", "me desperté")
+    // 2. DOMINIO SUEÑO
     const sleepMatch = textLower.match(/(\d+)\s*(horas|hrs|h)/);
     if (textLower.includes('dormí') || textLower.includes('sueño') || textLower.includes('desperté')) {
       detectedDomains.push('SLEEP');
@@ -80,7 +122,7 @@ export class AionCoreSuperAgent {
       actionsSummary.push(`Registro de Sueño: ${hours}h con eficiencia del 92%.`);
     }
 
-    // 3. DOMINIO HIDRATACIÓN (ej. "tomé 500ml", "vaso de agua")
+    // 3. DOMINIO HIDRATACIÓN
     const waterMatch = textLower.match(/(\d+)\s*(ml|litros|l|vasos)/);
     if (textLower.includes('agua') || textLower.includes('tomé') || textLower.includes('hidratación')) {
       detectedDomains.push('HYDRATION');
@@ -95,7 +137,7 @@ export class AionCoreSuperAgent {
       actionsSummary.push(`Hidratación actualizada: +${ml} ml de agua.`);
     }
 
-    // 4. DOMINIO ACTIVIDAD FÍSICA (ej. "hice 45 min de gimnasio", "corrí 5km")
+    // 4. DOMINIO ACTIVIDAD FÍSICA
     if (textLower.includes('gimnasio') || textLower.includes('pesas') || textLower.includes('corrí') || textLower.includes('ejercicio')) {
       detectedDomains.push('ACTIVITY');
       this.memoryStore.addActivityRecord({
@@ -117,10 +159,13 @@ export class AionCoreSuperAgent {
       textLower.includes('almuerzo') ||
       textLower.includes('desayuno') ||
       textLower.includes('cena') ||
-      textLower.includes('comí');
+      textLower.includes('comí') ||
+      textLower.includes('queso') ||
+      textLower.includes('carne') ||
+      textLower.includes('arroz');
 
     let nutritionReply = '';
-    if (isFood || detectedDomains.length === 0) {
+    if (isFood) {
       detectedDomains.push('NUTRITION');
       const aegisResult = await this.aegisSpecialist.processMealInput(inputText, imageUrl);
       nutritionReply = aegisResult.agentReply;
@@ -130,8 +175,10 @@ export class AionCoreSuperAgent {
     let coreReply = '';
     if (actionsSummary.length > 0) {
       coreReply = `¡Recibido y procesado por la Red Multiagente AION Aegis!\n\n• ${actionsSummary.join('\n• ')}\n\n${nutritionReply || 'Tus métricas fisiológicas han sido actualizadas.'}`;
+    } else if (nutritionReply) {
+      coreReply = nutritionReply;
     } else {
-      coreReply = nutritionReply || `AION Core ha registrado tu reporte en la bitácora transversal.`;
+      coreReply = `Entendido. He procesado tu mensaje ("${inputText}") y lo he sincronizado en el Ledger Universal.`;
     }
 
     this.memoryStore.addLedgerEntry({
@@ -146,7 +193,7 @@ export class AionCoreSuperAgent {
 
     return {
       coreReply,
-      detectedDomains,
+      detectedDomains: detectedDomains.length ? detectedDomains : ['CONVERSATIONAL'],
       dispatchedEvents,
       actionsSummary,
     };
