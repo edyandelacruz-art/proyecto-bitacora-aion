@@ -5,11 +5,39 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AION Aegis — Organic Intelligence Core</title>
-    <!-- Google Fonts & Material Symbols Outlined -->
+    <!-- Tailwind CSS CDN Fallback + Google Fonts & Material Symbols -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "background": "#070709",
+              "surface": "#131316",
+              "surface-container": "#111017",
+              "surface-container-high": "#1c1b1e",
+              "surface-container-low": "#111017",
+              "surface-container-lowest": "#070709",
+              "surface-variant": "#17131F",
+              "primary": "#7c3aed",
+              "primary-container": "#7c3aed",
+              "secondary": "#D6B36A",
+              "on-surface": "#e5e1e5",
+              "on-surface-variant": "#ccc3d8"
+            },
+            fontFamily: {
+              "display": ["Hanken Grotesk", "sans-serif"],
+              "body": ["Manrope", "sans-serif"]
+            }
+          }
+        }
+      }
+    </script>
   </head>
   <body class="bg-[#070709] text-[#e5e1e5] font-['Manrope',sans-serif] antialiased overflow-hidden">
     <div id="root"></div>

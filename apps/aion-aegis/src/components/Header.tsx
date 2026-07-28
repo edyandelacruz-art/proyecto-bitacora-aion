@@ -6,86 +6,85 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ onOpenSettings }) => {
-  const [showPurposeInfo, setShowPurposeInfo] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
 
   return (
-    <header className="flex justify-between items-center w-full px-6 h-20 sticky top-0 bg-[#070709]/90 backdrop-blur-2xl z-40 border-b border-white/5">
-      {/* BRAND / LOGO */}
+    <header className="flex justify-between items-center w-full px-8 h-20 sticky top-0 bg-[#070709]/90 backdrop-blur-2xl z-40 border-b border-white/5">
+      {/* LEFT SECTION STITCH 1:1 */}
       <div className="flex items-center gap-6">
-        <div
-          className="flex items-center gap-2 cursor-pointer"
-          onClick={() => setShowPurposeInfo(!showPurposeInfo)}
-        >
-          <span className="material-symbols-outlined text-[#7C3AED] text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>
+        <div className="flex items-center gap-2">
+          <span className="material-symbols-outlined text-[#7C3AED] text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>
             shield
           </span>
-          <h2 className="font-['Hanken_Grotesk'] text-[13px] text-white font-bold tracking-[0.2em] uppercase">
-            AION AEGIS CORE
+          <h2 className="font-['Manrope'] text-[12px] text-[#E5E1E5] font-bold tracking-[0.2em] uppercase">
+            AEGIS CORE
           </h2>
-          <span className="text-[10px] text-[#C4B5FD] font-bold">ℹ️</span>
         </div>
+        <div className="h-4 w-px bg-white/10"></div>
+        <nav className="flex gap-6">
+          <span className="font-['Manrope'] text-[11px] text-[#7C3AED] border-b-2 border-[#7C3AED] py-1 px-1 font-bold">
+            Control Central
+          </span>
+          <span
+            onClick={() => setIsReportModalOpen(true)}
+            className="font-['Manrope'] text-[11px] text-[#CCC3D8]/60 hover:text-white transition-colors cursor-pointer px-1"
+          >
+            Reportes & Raw Stream
+          </span>
+        </nav>
       </div>
 
-      {/* RIGHT TOP ACTIONS */}
-      <div className="flex items-center gap-4">
-        <button
-          onClick={() => setIsReportModalOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#7C3AED]/40 bg-[#7C3AED]/15 text-[#C4B5FD] font-['Manrope'] text-xs font-bold hover:bg-[#7C3AED]/30 transition-all"
-        >
-          <span className="material-symbols-outlined text-sm">summarize</span> Informes & Exportar
-        </button>
+      {/* RIGHT SECTION STITCH 1:1 */}
+      <div className="flex items-center gap-6">
+        {/* SEARCH INPUT */}
+        <div className="relative flex items-center group/search">
+          <input
+            className="bg-[#111017]/80 border-none rounded-full h-10 w-10 group-hover/search:w-64 transition-all duration-500 pl-10 pr-4 text-sm focus:ring-1 focus:ring-[#7C3AED]/40 placeholder:text-transparent group-hover/search:placeholder:text-[#CCC3D8]/30 outline-none"
+            placeholder="Buscar en Aegis..."
+            type="text"
+          />
+          <span className="material-symbols-outlined absolute left-3 text-[#CCC3D8] cursor-pointer">search</span>
+        </div>
 
-        <button
-          onClick={onOpenSettings}
-          className="p-2.5 rounded-full bg-white/5 text-white/70 hover:text-[#7C3AED] hover:bg-[#7C3AED]/10 transition-all"
-          title="Ajustes"
-        >
-          <span className="material-symbols-outlined text-xl">settings</span>
-        </button>
+        {/* NOTIFICATIONS */}
+        <div className="relative group">
+          <div className="p-2.5 rounded-full bg-[#111017]/80 text-[#CCC3D8] hover:text-[#7C3AED] hover:bg-[#7C3AED]/10 transition-all cursor-pointer">
+            <span className="material-symbols-outlined text-2xl">notifications</span>
+          </div>
+          <span className="absolute top-2 right-2 w-2 h-2 bg-[#D6B36A] rounded-full ring-2 ring-[#070709] animate-pulse"></span>
+        </div>
 
-        {/* PROFILE POPOVER */}
-        <div className="relative">
-          <button
+        {/* PROFILE BUTTON STITCH 1:1 */}
+        <div className="relative group/profile">
+          <div
             onClick={() => setShowProfileMenu(!showProfileMenu)}
-            className="flex items-center gap-2 p-1.5 pr-3 rounded-full bg-white/5 border border-white/10 hover:border-[#7C3AED]/50 transition-all"
+            className="flex items-center gap-3 p-1 pr-3 rounded-full bg-[#111017]/80 border border-white/5 hover:border-[#7C3AED]/50 transition-all cursor-pointer"
           >
-            <div className="h-7 w-7 rounded-full bg-[#7C3AED]/30 flex items-center justify-center text-xs font-bold text-white">
+            <div className="h-8 w-8 rounded-full overflow-hidden ring-2 ring-[#7C3AED]/20 bg-[#7C3AED] flex items-center justify-center text-xs font-bold text-white">
               EA
             </div>
-            <span className="text-xs font-semibold text-white">Edyan</span>
-            <span className="material-symbols-outlined text-sm text-white/40">expand_more</span>
-          </button>
+            <span className="material-symbols-outlined text-sm text-[#CCC3D8]">expand_more</span>
+          </div>
 
-          {showProfileMenu && (
-            <div className="absolute right-0 top-full mt-2 w-56 bg-[#111017] border border-white/10 rounded-2xl shadow-2xl p-3 z-50 space-y-1">
-              <div className="px-3 py-2 border-b border-white/5 mb-1">
-                <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest">Edyan de la Cruz</p>
-                <p className="text-xs font-semibold text-white">AION Aegis Sovereign</p>
-              </div>
-              <button onClick={onOpenSettings} className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-white/5 text-xs text-left">
-                <span className="material-symbols-outlined text-base">person</span> Perfil & Objetivos
-              </button>
-              <button onClick={() => setIsReportModalOpen(true)} className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-white/5 text-xs text-left">
-                <span className="material-symbols-outlined text-base">download</span> Exportar (.xlsx 24p)
-              </button>
+          {/* POPOVER MENU STITCH 1:1 */}
+          <div className="absolute right-0 top-full mt-3 w-64 bg-[#111017] border border-white/10 rounded-[32px] shadow-2xl opacity-0 invisible group-hover/profile:opacity-100 group-hover/profile:visible transition-all duration-300 z-50 p-3 translate-y-2 group-hover/profile:translate-y-0 origin-top-right">
+            <div className="px-5 py-4 mb-2 border-b border-white/5">
+              <p className="text-[10px] text-[#CCC3D8] font-bold uppercase tracking-widest mb-1">Usuario Soberano</p>
+              <p className="text-sm font-semibold text-[#E5E1E5]">Edyan de la Cruz</p>
             </div>
-          )}
+            <div className="space-y-0.5">
+              <div onClick={onOpenSettings} className="flex items-center gap-3 px-4 py-2.5 rounded-2xl hover:bg-white/5 text-[11px] font-medium transition-colors cursor-pointer">
+                <span className="material-symbols-outlined text-lg">person</span> Perfil y Objetivos
+              </div>
+              <div onClick={() => setIsReportModalOpen(true)} className="flex items-center gap-3 px-4 py-2.5 rounded-2xl hover:bg-white/5 text-[11px] font-medium transition-colors cursor-pointer">
+                <span className="material-symbols-outlined text-lg">download</span> Exportar (.xlsx 24p)
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* POPUP PROPÓSITO AION AEGIS */}
-      {showPurposeInfo && (
-        <div className="absolute top-20 left-6 max-w-md bg-[#111017] border border-[#7C3AED] rounded-2xl p-4 shadow-2xl z-50 space-y-2">
-          <p className="text-xs font-bold text-[#C4B5FD] uppercase tracking-widest">📌 AION AEGIS — CENTRO DE MANDO ORGANICO</p>
-          <p className="text-xs text-white/80 leading-relaxed">
-            Tu Bitácora Inteligente Multidominio. Aegis monitorea tu estado metabólico en vivo, gestiona tu alimentación, sueñó, actividad, despensa e informes diarios.
-          </p>
-        </div>
-      )}
-
-      {/* MODAL INFORME TÉCNICO DIARIO */}
       <DailyReportModal isOpen={isReportModalOpen} onClose={() => setIsReportModalOpen(false)} />
     </header>
   );

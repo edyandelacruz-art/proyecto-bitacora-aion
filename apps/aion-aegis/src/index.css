@@ -2,6 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
+/* GLOBAL RESET FOR ALL BUTTONS, INPUTS & CONTROLS TO PREVENT BROWSER DEFAULT UNSTYLED BUTTONS */
+*, ::before, ::after {
+  box-sizing: border-box;
+}
+
+button {
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  outline: none;
+  padding: 0;
+  margin: 0;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input, select, textarea {
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  outline: none;
+  border: none;
+}
+
 :root {
   --aion-bg: #070709;
   --aion-surface: #131316;
@@ -21,6 +49,9 @@ body {
   color: var(--aion-text-on-surface);
   font-family: 'Manrope', sans-serif;
   -webkit-font-smoothing: antialiased;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -59,117 +90,4 @@ h1, h2, h3, h4, h5, h6 {
 .hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
-}
-
-/* UI UTILITIES & BUTTONS */
-.aion-container {
-  max-width: 1440px;
-  margin: 0 auto;
-  padding: 1rem 1.5rem;
-}
-
-.aion-card {
-  background: #111017;
-  border: 1px solid #2B2338;
-  border-radius: 20px;
-  padding: 1.25rem;
-}
-
-.aion-input {
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(196, 181, 253, 0.25);
-  border-radius: 12px;
-  padding: 0.65rem 0.9rem;
-  color: white;
-  font-size: 0.85rem;
-  outline: none;
-  transition: border-color 0.2s ease;
-}
-
-.aion-input:focus {
-  border-color: #7C3AED;
-  box-shadow: 0 0 12px rgba(124, 58, 237, 0.3);
-}
-
-.aion-btn-primary {
-  background: #7C3AED;
-  color: white;
-  border: 1px solid rgba(214, 179, 106, 0.3);
-  border-radius: 20px;
-  padding: 0.5rem 1.2rem;
-  font-weight: 700;
-  font-size: 0.8rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.aion-btn-primary:hover {
-  background: #6D28D9;
-  box-shadow: 0 0 15px rgba(124, 58, 237, 0.4);
-}
-
-.aion-btn-secondary {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid #2B2338;
-  color: var(--aion-lavender);
-  border-radius: 16px;
-  padding: 0.45rem 1rem;
-  font-size: 0.78rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.aion-btn-secondary:hover {
-  background: rgba(124, 58, 237, 0.15);
-  border-color: #7C3AED;
-}
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  padding: 0.2rem 0.55rem;
-  border-radius: 12px;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-}
-
-.badge-available {
-  background: rgba(52, 211, 153, 0.15);
-  color: #34D399;
-  border: 1px solid rgba(52, 211, 153, 0.3);
-}
-
-/* NAVEGACIÓN INFERIOR MÓVIL */
-.aion-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 64px;
-  background: rgba(13, 11, 18, 0.95);
-  backdrop-filter: blur(16px);
-  border-top: 1px solid #2B2338;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  z-index: 90;
-}
-
-.aion-nav-btn {
-  background: transparent;
-  border: none;
-  color: var(--aion-sand);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.2rem;
-  font-size: 0.68rem;
-  cursor: pointer;
-}
-
-.aion-nav-btn.active {
-  color: #C4B5FD;
-  font-weight: 800;
 }

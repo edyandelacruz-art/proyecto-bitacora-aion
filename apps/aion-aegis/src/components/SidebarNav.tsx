@@ -7,13 +7,6 @@ export interface SidebarNavProps {
   onToggleCollapse: () => void;
 }
 
-interface NavGroup {
-  id: string;
-  title: string;
-  iconSymbol: string;
-  items: { id: string; label: string }[];
-}
-
 export const SidebarNav: React.FC<SidebarNavProps> = ({
   currentActive,
   onSelectNav,
@@ -23,7 +16,7 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
     estado: true,
     cuidado: false,
-    alimentacion: true,
+    alimentacion: false,
     planificacion: false,
     informacion: false,
     sistema: false,
@@ -33,180 +26,163 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
     setOpenGroups((prev) => ({ ...prev, [groupId]: !prev[groupId] }));
   };
 
-  const navGroups: NavGroup[] = [
+  const navGroups = [
     {
       id: 'estado',
       title: 'Mi Estado',
-      iconSymbol: 'monitoring',
+      icon: 'monitoring',
       items: [
-        { id: 'metabolism', label: 'Metabolismo & Fisiología' },
-        { id: 'state', label: 'Energía, Ánimo & Foco' },
-        { id: 'symptoms', label: 'Dolor & Síntomas' },
-        { id: 'body', label: 'Peso & Medidas' },
+        { id: 'body', label: 'Cuerpo y peso' },
+        { id: 'metabolism', label: 'Metabolismo' },
+        { id: 'state', label: 'Energía / Ánimo / Hambre' },
+        { id: 'symptoms', label: 'Dolor y síntomas' },
       ],
     },
     {
       id: 'cuidado',
-      title: 'CUIDADO DIARIO',
-      iconSymbol: 'vital_signs',
+      title: 'Cuidado Diario',
+      icon: 'vital_signs',
       items: [
-        { id: 'sleep', label: 'Sueño & Recuperación' },
-        { id: 'activity', label: 'Actividad & Ejercicio' },
+        { id: 'sleep', label: 'Sueño y recuperación' },
+        { id: 'activity', label: 'Actividad y ejercicio' },
         { id: 'hydration', label: 'Hidratación' },
-        { id: 'habits', label: 'Hábitos & Rutinas' },
-        { id: 'medication', label: 'Medicación' },
+        { id: 'habits', label: 'Hábitos y rutinas' },
+        { id: 'medication', label: 'Medicación y suplementos' },
       ],
     },
     {
       id: 'alimentacion',
-      title: 'ALIMENTACIÓN & HOGAR',
-      iconSymbol: 'restaurant',
+      title: 'Alimentación',
+      icon: 'restaurant',
       items: [
-        { id: 'nutrition', label: 'Alimentación / Nutrición' },
+        { id: 'nutrition', label: 'Nutrición' },
         { id: 'pantry', label: 'Despensa / Compras' },
-        { id: 'recipes', label: 'Recetas / Preparaciones' },
+        { id: 'recipes', label: 'Recetas' },
       ],
     },
     {
       id: 'planificacion',
-      title: 'PLANIFICACIÓN',
-      iconSymbol: 'event_note',
+      title: 'Planificación',
+      icon: 'event_note',
       items: [
         { id: 'plan', label: 'Plan Vivo' },
-        { id: 'alerts', label: 'Alertas & Seguimiento' },
+        { id: 'alerts', label: 'Alertas / Seguimiento' },
       ],
     },
     {
       id: 'informacion',
-      title: 'INFORMACIÓN',
-      iconSymbol: 'summarize',
+      title: 'Información',
+      icon: 'summarize',
       items: [
-        { id: 'reports', label: 'Reportes & Exportaciones' },
-        { id: 'audit', label: 'Auditoría Aegis Ledger' },
+        { id: 'reports', label: 'Reportes' },
+        { id: 'reports', label: 'Exportaciones' },
+        { id: 'audit', label: 'Auditoría Aegis' },
       ],
-    },
-    {
-      id: 'sistema',
-      title: 'SISTEMA',
-      iconSymbol: 'settings_suggest',
-      items: [{ id: 'settings', label: 'Perfil & Configuración' }],
     },
   ];
 
   return (
     <aside
-      className={`sidebar-transition flex flex-col h-screen bg-[#070709] border-r border-white/5 z-50 fixed lg:relative ${
-        isCollapsed ? 'w-[72px]' : 'w-[260px]'
+      id="sidebar"
+      className={`sidebar-transition group flex flex-col h-screen bg-[#070709] border-r border-white/10 z-50 fixed lg:relative ${
+        isCollapsed ? 'w-[80px] hover:w-[280px]' : 'w-[280px]'
       }`}
       style={{ position: 'sticky', top: 0 }}
     >
-      {/* HEADER LOGO & BRAND */}
-      <div className="h-20 flex items-center justify-between px-5 border-b border-white/5 whitespace-nowrap">
-        <div className="flex items-center gap-3 overflow-hidden" onClick={() => onSelectNav('core')} style={{ cursor: 'pointer' }}>
+      {/* BRAND HEADER */}
+      <div className="h-20 flex items-center px-6 overflow-hidden whitespace-nowrap justify-between">
+        <div className="flex items-center gap-4 min-w-[40px] cursor-pointer" onClick={() => onSelectNav('core')}>
           <span className="material-symbols-outlined text-[#7C3AED] text-2xl shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>
             shield
           </span>
-          {!isCollapsed && (
-            <span className="font-['Hanken_Grotesk'] text-base text-[#7C3AED] font-bold tracking-tight uppercase">
-              AION Aegis
-            </span>
-          )}
+          <span className="font-['Hanken_Grotesk'] text-lg text-[#7C3AED] tracking-tight opacity-0 group-hover:opacity-100 transition-opacity duration-300 font-bold uppercase">
+            AION Aegis
+          </span>
         </div>
         <button
           onClick={onToggleCollapse}
-          className="text-[#C4B5FD] hover:text-white transition-colors p-1"
+          className="text-[#CCC3D8]/50 hover:text-white transition-colors opacity-0 group-hover:opacity-100"
           title={isCollapsed ? 'Expandir' : 'Colapsar'}
         >
           <span className="material-symbols-outlined text-sm">
-            {isCollapsed ? 'arrow_forward_ios' : 'arrow_back_ios'}
+            {isCollapsed ? 'chevron_right' : 'chevron_left'}
           </span>
         </button>
       </div>
 
-      {/* NAVIGATION ITEMS */}
-      <nav className="flex-1 px-3 space-y-2 overflow-y-auto hide-scrollbar py-4">
-        {/* AEGIS CORE PRINCIPAL */}
-        <button
+      {/* NAV LIST */}
+      <nav className="flex-1 px-4 space-y-2 overflow-y-auto hide-scrollbar py-4">
+        {/* AEGIS CORE ROOT */}
+        <div
           onClick={() => onSelectNav('core')}
-          className={`flex items-center h-11 w-full rounded-2xl px-4 gap-3.5 transition-all text-left ${
+          className={`flex items-center h-12 rounded-2xl px-4 gap-4 transition-all mb-4 cursor-pointer ${
             currentActive === 'core'
-              ? 'bg-[#7C3AED]/20 text-[#C4B5FD] border border-[#7C3AED]/40 font-bold'
-              : 'text-white/80 hover:bg-white/5 hover:text-white'
+              ? 'text-[#7C3AED] bg-[#7C3AED]/10 border border-[#7C3AED]/30 font-bold'
+              : 'text-[#E5E1E5]/80 hover:bg-white/5 hover:text-white'
           }`}
         >
           <span className="material-symbols-outlined shrink-0 text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>
             shield
           </span>
-          {!isCollapsed && (
-            <span className="font-['Manrope'] text-[12px] font-bold uppercase tracking-wider">Aegis Core</span>
-          )}
-        </button>
+          <span className="font-['Manrope'] text-[11px] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap font-bold uppercase tracking-wider">
+            Aegis Core
+          </span>
+        </div>
 
-        {/* MI DÍA BITÁCORA */}
-        <button
-          onClick={() => onSelectNav('day')}
-          className={`flex items-center h-11 w-full rounded-2xl px-4 gap-3.5 transition-all text-left ${
-            currentActive === 'day'
-              ? 'bg-[#7C3AED]/20 text-[#C4B5FD] border border-[#7C3AED]/40 font-bold'
-              : 'text-white/80 hover:bg-white/5 hover:text-white'
-          }`}
-        >
-          <span className="material-symbols-outlined shrink-0 text-xl">receipt_long</span>
-          {!isCollapsed && (
-            <span className="font-['Manrope'] text-[12px] font-bold uppercase tracking-wider">Mi Día (Bitácora)</span>
-          )}
-        </button>
-
-        {!isCollapsed && <div className="h-px bg-white/5 my-3" />}
-
-        {/* GRUPOS ACCORDION */}
-        {navGroups.map((group) => {
-          const isOpen = !!openGroups[group.id];
-          return (
-            <div key={group.id} className="space-y-1">
-              <button
-                onClick={() => toggleGroup(group.id)}
-                className="flex items-center justify-between w-full h-8 px-3 gap-3 text-white/40 hover:text-white transition-colors text-left"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="material-symbols-outlined shrink-0 text-base">{group.iconSymbol}</span>
-                  {!isCollapsed && (
-                    <span className="font-['Manrope'] text-[10px] font-bold uppercase tracking-[0.15em] whitespace-nowrap">
-                      {group.title}
-                    </span>
-                  )}
-                </div>
-                {!isCollapsed && (
-                  <span className="material-symbols-outlined text-xs text-white/30">
-                    {isOpen ? 'expand_less' : 'expand_more'}
+        {/* ACCORDION GROUPS STITCH 1:1 */}
+        <div className="space-y-4">
+          {navGroups.map((group) => {
+            const isOpen = !!openGroups[group.id];
+            return (
+              <div key={group.id} className="nav-group">
+                <div
+                  onClick={() => toggleGroup(group.id)}
+                  className="flex items-center h-8 px-4 gap-4 text-[#CCC3D8]/60 cursor-pointer hover:text-white transition-colors"
+                >
+                  <span className="material-symbols-outlined shrink-0 text-sm">{group.icon}</span>
+                  <span className="font-['Manrope'] text-[10px] uppercase tracking-[0.15em] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap font-bold">
+                    {group.title}
                   </span>
-                )}
-              </button>
-
-              {(isOpen || isCollapsed) && (
-                <div className={`${isCollapsed ? 'pl-0' : 'pl-9'} space-y-0.5`}>
-                  {group.items.map((item) => {
-                    const isActive = currentActive === item.id;
-                    return (
-                      <button
-                        key={item.id}
-                        onClick={() => onSelectNav(item.id)}
-                        className={`block w-full py-1.5 px-2 text-left rounded-lg text-[11px] transition-colors ${
-                          isActive
-                            ? 'text-[#C4B5FD] font-bold bg-[#7C3AED]/15'
-                            : 'text-white/70 hover:text-[#7C3AED]'
-                        }`}
-                      >
-                        {item.label}
-                      </button>
-                    );
-                  })}
                 </div>
-              )}
-            </div>
-          );
-        })}
+
+                {isOpen && (
+                  <div className="space-y-1 pl-12 pt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    {group.items.map((item) => {
+                      const isActive = currentActive === item.id;
+                      return (
+                        <div
+                          key={item.id}
+                          onClick={() => onSelectNav(item.id)}
+                          className={`block py-1.5 text-[11px] cursor-pointer transition-colors ${
+                            isActive ? 'text-[#7C3AED] font-bold' : 'text-[#CCC3D8]/80 hover:text-[#7C3AED]'
+                          }`}
+                        >
+                          {item.label}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </nav>
+
+      {/* SYSTEM BOTTOM ITEM */}
+      <div className="px-4 pb-8 space-y-1 border-t border-white/5 pt-4">
+        <div className="nav-group">
+          <div
+            onClick={() => onSelectNav('settings')}
+            className="flex items-center h-10 px-4 gap-4 text-[#CCC3D8]/60 cursor-pointer hover:text-white transition-colors"
+          >
+            <span className="material-symbols-outlined shrink-0 text-sm">settings_suggest</span>
+            <span className="font-['Manrope'] text-[10px] uppercase tracking-[0.15em] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap font-bold">
+              Sistema
+            </span>
+          </div>
+        </div>
+      </div>
     </aside>
   );
 };
