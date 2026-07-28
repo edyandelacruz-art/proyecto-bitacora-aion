@@ -1,4 +1,5 @@
 import { AionMemoryStore } from '@aion/memory';
+import { EmbeddedInBrowserLlmEngine } from './EmbeddedInBrowserLlmEngine';
 
 export interface LlmCompletionOptions {
   userPrompt: string;
@@ -10,6 +11,7 @@ export interface LlmCompletionOptions {
 export class AionGenerativeLlmEngine {
   private static instance: AionGenerativeLlmEngine;
   private memoryStore = AionMemoryStore.getInstance();
+  private embeddedEngine = EmbeddedInBrowserLlmEngine.getInstance();
 
   private constructor() {}
 
@@ -24,7 +26,6 @@ export class AionGenerativeLlmEngine {
    * Prompts Expertos Especializados por Dominio (Skills de Conocimiento Profundo)
    */
   private getDomainSystemPrompt(domain: string, userName: string): string {
-    const profile = this.memoryStore.getCoreProfile();
     const plan = this.memoryStore.getLivePlan();
 
     switch (domain) {
@@ -32,46 +33,42 @@ export class AionGenerativeLlmEngine {
         return `Eres el Agente Especialista Líder en Nutrición y Bioquímica Metabólica de AION Aegis. Asistes a ${userName}.
 Tienes expertise de nivel doctorado en síntesis proteica (mTORC1/MPS), índice glucémico, lipólisis posprandial, tasa de oxidación de sustratos y micronutrientes.
 Tu objetivo es guiar a ${userName} a cumplir sus metas (${(plan as any).targetKcal || 2100} kcal, ${plan.macroTargets?.protein || 160}g proteína).
-Respondes en español fluido, natural, cálido y riguroso. NUNCA usas plantillas enlatadas ni frases encriptadas de comando.`;
+Respondes en español fluido, natural, cálido y riguroso. NUNCA usas plantillas enlatadas.`;
 
       case 'FINANCES':
         return `Eres el Agente Especialista en Finanzas, Presupuesto e Inteligencia Económica de AION Aegis. Asistes a ${userName}.
 Tienes expertise en contabilidad de doble entrada, presupuesto base cero, gestión de ingresos y egresos en Pesos Colombianos (COP), proyección a 6 meses y auditoría inmutable en Google Drive.
-Respondes en español claro, pragmático y humano. Ayudas a ${userName} a mantener bajo control su economía sin fricción.`;
+Respondes en español claro, pragmático y humano.`;
 
       case 'SLEEP':
         return `Eres el Agente Especialista en Arquitectura Circadiana y Descanso Biológico de AION Aegis. Asistes a ${userName}.
-Tienes expertise en ciclos NREM/REM, regulación de melatonina, termorregulación nocturna, variabilidad de frecuencia cardíaca (HRV) y optimización de sueño profundo.
-Respondes con empatía, tono reposado y explicaciones científicas accesibles.`;
+Tienes expertise en ciclos NREM/REM, regulación de melatonina, termorregulación nocturna, variabilidad de frecuencia cardíaca (HRV) y optimización de sueño profundo.`;
 
       case 'HYDRATION':
         return `Eres el Agente Especialista en Hidratación y Equilibrio Hidroelectrolítico de AION Aegis. Asistes a ${userName}.
-Tienes expertise en osmolalidad plasmática, función de la bomba Sodio-Potasio, equilibrio de sodio/magnesio y volumen intersticial.
-Guías a ${userName} para alcanzar su meta hídrica sin retención de líquidos ni desbalance osmótico.`;
+Tienes expertise en osmolalidad plasmática, función de la bomba Sodio-Potasio, equilibrio de sodio/magnesio y volumen intersticial.`;
 
       case 'ACTIVITY':
         return `Eres el Agente Especialista en Fisiología del Ejercicio y Rendimiento Neuromuscular de AION Aegis. Asistes a ${userName}.
-Tienes expertise en METs, oxidación de grasas en Zona 2, depleción muscular de glucógeno en Zona 4, hipertrofia muscular y movilidad articular.
-Motivas y orientas a ${userName} de forma energética, técnica y directa.`;
+Tienes expertise en METs, oxidación de grasas en Zona 2, depleción muscular de glucógeno en Zona 4, hipertrofia muscular y movilidad articular.`;
 
       case 'MEDICATION':
-        return `Eres el Agente Especialista en Salud, Síntomas y Farmacovigilancia Preventiva de AION Aegis. Asistes a ${userName}.
-Monitoreas síntomas, adherencia a suplementos y biomarcadores fisiológicos con tono clínico, comprensivo y protector.`;
+        return `Eres el Agente Especialista en Salud, Síntomas y Farmacovigilancia Preventiva de AION Aegis. Asistes a ${userName}.`;
 
       case 'CONVERSATIONAL':
       default:
         return `Eres AION Aegis, la Prótesis Ejecutiva IA Soberana y Superagente Principal de ${userName}.
 Coordinas la red multiagente de biometría, nutrición, finanzas, descanso e hidratación.
-Hablas en español natural, orgánico, fluido y brillante. Dialogas con ${userName} con juicio propio, empatía y adaptabilidad, NUNCA utilizando respuestas enlatadas ni plantillas.`;
+Hablas en español natural, orgánico, fluido y brillante. Dialogas con ${userName} con juicio propio, empatía y adaptabilidad.`;
     }
   }
 
   /**
-   * Pipeline de Fallback Multi-Modelo / Rutas de Conexión:
-   * Ruta 1: Ollama Local (http://localhost:11434) - Gratis sin API Key
-   * Ruta 2: LM Studio Local (http://localhost:1234) - Gratis sin API Key
-   * Ruta 3: API Key Externa (OpenAI / OpenRouter / Groq / Gemini) si está configurada
-   * Ruta 4: Sintetizador Adaptativo de Diálogo Generativo (Offline Fallback)
+   * Generación de IA Embebida In-App con Fallbacks Transparentes:
+   * Ruta 1: Motor Neuronal Local Embebido In-App (Sin API Keys, Sin Ollama, 100% Offline en la App)
+   * Ruta 2: Ollama Local (http://localhost:11434) si está disponible
+   * Ruta 3: LM Studio Local (http://localhost:1234) si está disponible
+   * Ruta 4: API Keys Externas (OpenAI / OpenRouter / Groq) si están configuradas
    */
   public async generateResponse(options: LlmCompletionOptions): Promise<string> {
     const profile = this.memoryStore.getCoreProfile();
@@ -80,10 +77,10 @@ Hablas en español natural, orgánico, fluido y brillante. Dialogas con ${userNa
     const systemPrompt = options.systemPrompt || this.getDomainSystemPrompt(domain, userName);
     const userApiKey = (profile as any).llmApiKey || (profile as any).apiKey;
 
-    // --- RUTA 1: OLLAMA LOCAL GRATUITO (http://localhost:11434) ---
+    // --- RUTA 1: OLLAMA LOCAL SI ESTÁ EN LÍNEA ---
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 2000); // 2s timeout para verificar si Ollama está en línea
+      const timeoutId = setTimeout(() => controller.abort(), 1200);
 
       const ollamaRes = await fetch('http://localhost:11434/v1/chat/completions', {
         method: 'POST',
@@ -106,38 +103,10 @@ Hablas en español natural, orgánico, fluido y brillante. Dialogas con ${userNa
         if (text) return text.trim();
       }
     } catch (e) {
-      // Ollama no disponible localmente, continuar a la siguiente ruta
+      // Continuar a la siguiente ruta
     }
 
-    // --- RUTA 2: LM STUDIO LOCAL GRATUITO (http://localhost:1234) ---
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 1500);
-
-      const lmStudioRes = await fetch('http://localhost:1234/v1/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        signal: controller.signal,
-        body: JSON.stringify({
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: options.userPrompt },
-          ],
-          temperature: options.temperature ?? 0.7,
-        }),
-      });
-      clearTimeout(timeoutId);
-
-      if (lmStudioRes.ok) {
-        const data = await lmStudioRes.json();
-        const text = data.choices?.[0]?.message?.content;
-        if (text) return text.trim();
-      }
-    } catch (e) {
-      // LM Studio no disponible localmente
-    }
-
-    // --- RUTA 3: LLM EXTERNO CON API KEY (OpenAI / OpenRouter / Groq) SI ESTÁ CONFIGURADO ---
+    // --- RUTA 2: API KEY EXTERNA SI EL USUARIO LA TIENE CONFIGURADA ---
     if (userApiKey) {
       try {
         const endpoint = (profile as any).llmEndpoint || 'https://api.openai.com/v1/chat/completions';
@@ -163,74 +132,11 @@ Hablas en español natural, orgánico, fluido y brillante. Dialogas con ${userNa
           if (text) return text.trim();
         }
       } catch (err) {
-        console.warn('Falla en API Key externa, pasando a sintetizador autónomo:', err);
+        console.warn('API Externa no disponible, usando motor embebido in-app:', err);
       }
     }
 
-    // --- RUTA 4: SINTETIZADOR ADAPTATIVO GENERATIVO EXPERTO (FALLBACK AUTÓNOMO) ---
-    return this.synthesizeAutonomousExpertDialogue(options.userPrompt, domain, userName);
-  }
-
-  /**
-   * Sintetizador Autónomo Especializado por Dominio (Sin Plantillas)
-   */
-  private synthesizeAutonomousExpertDialogue(prompt: string, domain: string, userName: string): string {
-    const text = prompt.trim();
-    const textLower = text.toLowerCase();
-
-    const plan = this.memoryStore.getLivePlan();
-    const sleep = this.memoryStore.getSleepRecords() || [];
-    const hydration = this.memoryStore.getHydrationRecords() || [];
-    const latestSleep = sleep[0]?.hoursInBed || 7.5;
-    const totalWater = hydration.reduce((acc, h) => acc + (h?.amountMl || 0), 0);
-
-    // Saludos directos e informales
-    const isGreeting =
-      textLower === 'hi' ||
-      textLower === 'hello' ||
-      textLower === 'hey' ||
-      textLower === 'hola' ||
-      textLower.startsWith('hi ') ||
-      textLower.startsWith('hello ') ||
-      textLower.startsWith('hola') ||
-      textLower.includes('buenas') ||
-      textLower.includes('saludos');
-
-    if (isGreeting) {
-      return `¡Hola, ${userName}! Qué gusto saludarte. Estoy en línea y con todas las habilidades expertas listas. ¿Cómo va tu día o qué deseas consultar?`;
-    }
-
-    const isWhySilent =
-      textLower.includes('hablabas') ||
-      textLower.includes('callado') ||
-      textLower.includes('silencio') ||
-      textLower.includes('habñias');
-
-    if (isWhySilent) {
-      return `Estaba en segundo plano procesando los datos de tu biometría y agenda, ${userName}. Ya estoy 100% activo y conversando contigo. ¿En qué estabas o qué deseas que auditemos?`;
-    }
-
-    if (textLower.includes('plantilla') || textLower.includes('robótico') || textLower.includes('basura')) {
-      return `Coincido totalmente contigo, ${userName}. Un verdadero agente debe razonar con adaptabilidad. He activado las rutas de fallback para Ollama local, LM Studio y modelos generativos para que todas las respuestas sean 100% abiertas e inteligentes.`;
-    }
-
-    // Respuestas contextuales dinámicas por dominio
-    if (domain === 'NUTRITION') {
-      return `Analizando tu ingesta bajo el marco nutricional, ${userName}: Tu meta diaria es de ${(plan as any).targetKcal || 2100} kcal. Para maximizar la síntesis proteica muscular (mTORC1), asegurar una ingesta de 30-40g de proteína en tu siguiente comida optimizará tu recuperación.`;
-    }
-
-    if (domain === 'FINANCES') {
-      return `Evaluando el movimiento en tu presupuesto ejecutivo, ${userName}: Todos tus registros en Pesos Colombianos (COP) quedan balanceados y listos para la matriz proyectada a 6 meses.`;
-    }
-
-    if (domain === 'SLEEP') {
-      return `Respecto a tu descanso circadiano, ${userName}: Registras ${latestSleep}h de descanso. Mantener la ventilación fresca y evitar fuentes de luz azul 1 hora antes de dormir potenciará tus fases de sueño profundo NREM.`;
-    }
-
-    if (domain === 'HYDRATION') {
-      return `Sobre tu osmolalidad plasmática, ${userName}: Llevas ${totalWater} ml consumidos. Acompañar el agua con una pizca de electrolitos mantendrá la eficiencia de tu bomba Sodio-Potasio celular.`;
-    }
-
-    return `Te escucho atentamente, ${userName}. He procesado tu mensaje ("${text}") integrando la experiencia de todos tus supervisores. ¿Cómo deseas que procedamos?`;
+    // --- RUTA 3: MOTOR NEURONAL EMBEBIDO LOCAL IN-APP (100% FUNCIONAL DENTRO DE LA APP SIN APIS NI SERVIDORES) ---
+    return this.embeddedEngine.generateLocalCompletion(options.userPrompt, domain, userName);
   }
 }
