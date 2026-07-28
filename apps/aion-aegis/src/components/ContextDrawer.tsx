@@ -4,110 +4,157 @@ import { AionMemoryStore } from '@aion/memory';
 
 interface ContextDrawerProps {
   isOpen: boolean;
-  topic: string;
+  context: string;
   onClose: () => void;
 }
 
-export const ContextDrawer: React.FC<ContextDrawerProps> = ({ isOpen, topic, onClose }) => {
+export const ContextDrawer: React.FC<ContextDrawerProps> = ({ isOpen, context, onClose }) => {
   if (!isOpen) return null;
 
   const store = AionMemoryStore.getInstance();
   const specialist = new NutritionLeadSpecialist();
 
   const metabolicState = specialist.getCurrentMetabolicState('biochemical');
-  const ledgerEntries = store.getLedgerEntries().slice(0, 10);
+  const plan = store.getLivePlan();
   const meals = store.getMeals();
 
+  const getDrawerDetails = () => {
+    switch (context) {
+      case 'METABOLISMO':
+        return {
+          title: 'ESTADO METABÓLICO',
+          subtitle: 'BIOMARKER TRACKING • LIVE',
+          mainValue: metabolicState.currentPhase || 'Lipólisis',
+          mainLabel: 'Estado actual',
+        };
+      case 'SUEÑO':
+        return {
+          title: 'RECUPERACIÓN & SUEÑO',
+          subtitle: 'SLEEP ARCHITECTURE',
+          mainValue: '92%',
+          mainLabel: 'Calidad global',
+        };
+      case 'NUTRICIONAL':
+      default:
+        return {
+          title: 'ANÁLISIS NUTRICIONAL',
+          subtitle: 'AEGIS ANALYTICS • LIVE',
+          mainValue: `${plan.macroConsumed.protein}g`,
+          mainLabel: 'Proteína hoy',
+        };
+    }
+  };
+
+  const details = getDrawerDetails();
+
   return (
-    <div
-      style={{
-        position: 'fixed',
-        top: 0,
-        right: 0,
-        bottom: 0,
-        width: '380px',
-        maxWidth: '90vw',
-        background: 'rgba(13, 11, 18, 0.98)',
-        borderLeft: '1px solid #7C3AED',
-        boxShadow: '-4px 0 30px rgba(0,0,0,0.8)',
-        zIndex: 1000,
-        display: 'flex',
-        flexDirection: 'column',
-        padding: '1.2rem',
-        overflowY: 'auto',
-      }}
-    >
-      {/* HEADER DRAWER */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid #2B2338', paddingBottom: '0.6rem' }}>
-        <div style={{ fontWeight: 800, color: '#C4B5FD', fontSize: '0.95rem' }}>
-          🔍 INSPECTOR CONTEXTUAL & EVIDENCIA
+    <aside className="fixed inset-y-0 right-0 w-[420px] max-w-[90vw] bg-[#111017] border-l border-white/10 z-[100] drawer-transition shadow-[-20px_0_60px_rgba(0,0,0,0.85)] flex flex-col p-6 lg:p-8">
+      {/* DRAWER HEADER STITCH 1:1 */}
+      <div className="flex justify-between items-start mb-8 border-b border-white/5 pb-4">
+        <div>
+          <span className="text-[10px] font-bold text-[#D6B36A] uppercase tracking-[0.3em]">
+            {details.subtitle}
+          </span>
+          <h2 className="text-xl lg:text-2xl font-bold text-[#E5E1E5] mt-1">{details.title}</h2>
         </div>
-        <button onClick={onClose} style={{ background: 'transparent', border: 'none', color: 'white', fontSize: '1.2rem', cursor: 'pointer' }}>
-          ✕
+        <button className="p-2 rounded-full hover:bg-white/5 transition-colors text-white" onClick={onClose}>
+          <span className="material-symbols-outlined text-xl">close</span>
         </button>
       </div>
 
-      {/* CONTENIDO SEGÚN TEMA */}
-      {topic === 'biochemistry' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-          <div style={{ fontSize: '0.82rem', fontWeight: 800, color: 'white' }}>
-            🔬 DESGLOSE BIOQUÍMICO & RUTAS ENZIMÁTICAS
-          </div>
-          <div style={{ fontSize: '0.75rem', color: '#DDD6FE', background: '#111017', padding: '0.8rem', borderRadius: '8px', border: '1px solid #2B2338', lineHeight: 1.5 }}>
-            {metabolicState.detailedTechnicalExplanation}
+      {/* DRAWER BODY STITCH 1:1 */}
+      <div className="flex-1 overflow-y-auto hide-scrollbar space-y-6">
+        <div className="p-6 rounded-[32px] bg-white/5 border border-white/5 space-y-4">
+          <div className="flex justify-between items-center">
+            <p className="text-sm font-semibold text-[#E5E1E5]">Resumen Detallado</p>
+            <span className="material-symbols-outlined text-[#D6B36A]">check_circle</span>
           </div>
 
-          <div style={{ fontSize: '0.78rem', color: 'white', fontWeight: 700, marginTop: '0.4rem' }}>
-            ESTADO DE SUSTRATOS & REGULACIÓN HORMONAL:
+          <div className="flex items-end gap-3">
+            <span className="text-3xl font-bold text-white">{details.mainValue}</span>
+            <span className="text-sm text-[#CCC3D8]/60 mb-1">{details.mainLabel}</span>
           </div>
-          <div style={{ fontSize: '0.72rem', color: 'var(--aion-sand)', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-            <div>• <strong>Glucosa:</strong> {metabolicState.glucoseStatus}</div>
-            <div>• <strong>Lipólisis:</strong> {metabolicState.fatsStatus}</div>
-            <div>• <strong>Síntesis Proteica:</strong> {metabolicState.proteinsStatus}</div>
-            <div>• <strong>Glucógeno:</strong> {metabolicState.glycogenStatus}</div>
-          </div>
-        </div>
-      )}
 
-      {topic === 'evidence' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-          <div style={{ fontSize: '0.82rem', fontWeight: 800, color: 'white' }}>
-            📸 EVIDENCIA VISUAL & FOTOGRAFÍAS
-          </div>
-          {meals.filter((m) => m.imageUrl).length === 0 ? (
-            <div style={{ fontSize: '0.75rem', color: 'var(--aion-sand)' }}>No hay fotografías de alimentos en el registro actual.</div>
-          ) : (
-            meals
-              .filter((m) => m.imageUrl)
-              .map((m) => (
-                <div key={m.id} style={{ background: '#111017', padding: '0.6rem', borderRadius: '8px', border: '1px solid #2B2338' }}>
-                  <img src={m.imageUrl} alt={m.preparation.name} style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: '6px', marginBottom: '0.4rem' }} />
-                  <div style={{ fontSize: '0.75rem', color: 'white', fontWeight: 700 }}>{m.preparation.name}</div>
-                  <div style={{ fontSize: '0.68rem', color: 'var(--aion-sand)' }}>{m.evidenceSummary} • Confiabilidad: {m.confidence}</div>
-                </div>
-              ))
-          )}
-        </div>
-      )}
-
-      {topic === 'audit' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-          <div style={{ fontSize: '0.82rem', fontWeight: 800, color: 'white' }}>
-            📜 TRAZABILIDAD DEL AEGIS LEDGER
-          </div>
-          {ledgerEntries.map((lg) => (
-            <div key={lg.id} style={{ background: '#111017', padding: '0.55rem', borderRadius: '6px', border: '1px solid #2B2338', fontSize: '0.7rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', color: '#C4B5FD', fontWeight: 700 }}>
-                <span>{lg.type}</span>
-                <span>{new Date(lg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+          <div className="space-y-4 pt-4">
+            {/* PROTEÍNA */}
+            <div className="space-y-2">
+              <div className="flex justify-between text-[11px] font-bold">
+                <span className="text-[#CCC3D8]/40">PROTEÍNA</span>
+                <span className="text-[#D6B36A]">{plan.macroConsumed.protein}g / {plan.macroTargets.protein}g</span>
               </div>
-              <div style={{ color: 'var(--aion-sand)', marginTop: '0.2rem' }}>
-                Fuente: {lg.source} • Evidencia: {lg.evidence} • Confiabilidad: {((lg.confidence || 0.9) * 100).toFixed(0)}%
+              <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-[#D6B36A]"
+                  style={{ width: `${Math.min(100, (plan.macroConsumed.protein / plan.macroTargets.protein) * 100)}%` }}
+                ></div>
               </div>
             </div>
-          ))}
+
+            {/* CARBOHIDRATOS */}
+            <div className="space-y-2">
+              <div className="flex justify-between text-[11px] font-bold">
+                <span className="text-[#CCC3D8]/40">CARBOHIDRATOS</span>
+                <span className="text-[#7C3AED]">{plan.macroConsumed.carbs}g / {plan.macroTargets.carbs}g</span>
+              </div>
+              <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-[#7C3AED]"
+                  style={{ width: `${Math.min(100, (plan.macroConsumed.carbs / plan.macroTargets.carbs) * 100)}%` }}
+                ></div>
+              </div>
+            </div>
+
+            {/* GRASAS */}
+            <div className="space-y-2">
+              <div className="flex justify-between text-[11px] font-bold">
+                <span className="text-[#CCC3D8]/40">GRASAS</span>
+                <span className="text-white">{plan.macroConsumed.fats}g / {plan.macroTargets.fats}g</span>
+              </div>
+              <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-[#CCC3D8]/40"
+                  style={{ width: `${Math.min(100, (plan.macroConsumed.fats / plan.macroTargets.fats) * 100)}%` }}
+                ></div>
+              </div>
+            </div>
+          </div>
         </div>
-      )}
-    </div>
+
+        {/* AJUSTES & REGISTROS */}
+        <div className="space-y-3">
+          <h4 className="text-[11px] font-bold text-[#CCC3D8]/40 uppercase tracking-widest">Confirmar Registros Recientes</h4>
+          <div className="space-y-2">
+            {meals.length === 0 ? (
+              <div className="p-4 rounded-2xl bg-white/5 border border-white/10 text-xs text-[#CCC3D8]/60">
+                No hay comidas registradas hoy. Expresa tu comida en el Composer.
+              </div>
+            ) : (
+              meals.slice(0, 3).map((m) => (
+                <div key={m.id} className="p-4 rounded-2xl bg-white/5 border border-white/10 flex justify-between items-center group cursor-pointer hover:border-[#7C3AED]/50 transition-all">
+                  <span className="text-sm text-white">{m.preparation.name}</span>
+                  <span className="material-symbols-outlined text-[#CCC3D8] group-hover:text-[#7C3AED] transition-colors">edit</span>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* DRAWER FOOTER STITCH 1:1 */}
+      <div className="pt-6 border-t border-white/5 space-y-2">
+        <button
+          onClick={onClose}
+          className="w-full py-3.5 rounded-full bg-[#7C3AED] text-white font-bold text-[11px] tracking-[0.2em] hover:shadow-[0_10px_30px_rgba(124,58,237,0.4)] transition-all flex items-center justify-center gap-2 uppercase"
+        >
+          CONFIRMAR Y SINCRONIZAR <span className="material-symbols-outlined text-sm">sync</span>
+        </button>
+        <button
+          onClick={onClose}
+          className="w-full py-3 rounded-full border border-white/5 text-[#CCC3D8] font-bold text-[11px] tracking-[0.2em] hover:bg-white/5 transition-all uppercase"
+        >
+          DESCARTAR CAMBIOS
+        </button>
+      </div>
+    </aside>
   );
 };

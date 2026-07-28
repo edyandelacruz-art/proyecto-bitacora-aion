@@ -1,18 +1,17 @@
 import React, { useState } from 'react';
 import { NutritionLeadSpecialist, AionCoreSuperAgent, OmniDispatchResult } from '@aion/agents';
 import { AionMemoryStore } from '@aion/memory';
-import { SatelliteModuleConfig } from '@aion/shared-types';
 
 interface AegisCoreFeedProps {
   onRefreshAll: () => void;
   onOpenModuleDeepView: (moduleId: string) => void;
-  onOpenInspector: (topic: string) => void;
+  onOpenDrawer: (context: string) => void;
 }
 
 export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
   onRefreshAll,
   onOpenModuleDeepView,
-  onOpenInspector,
+  onOpenDrawer,
 }) => {
   const store = AionMemoryStore.getInstance();
   const specialist = new NutritionLeadSpecialist();
@@ -34,37 +33,6 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const [lastDispatch, setLastDispatch] = useState<OmniDispatchResult | null>(null);
 
-  // Módulos Satélite Configurables
-  const [satellites, setSatellites] = useState<SatelliteModuleConfig[]>([
-    { moduleId: 'nutrition', title: 'Nutrición & Balance', category: 'Alimentación & Hogar', visibility: 'pinned', order: 1 },
-    { moduleId: 'metabolism', title: 'Estado Metabólico', category: 'Mi Estado', visibility: 'pinned', order: 2 },
-    { moduleId: 'sleep', title: 'Sueño & Recuperación', category: 'Cuidado Diario', visibility: 'normal', order: 3 },
-    { moduleId: 'activity', title: 'Actividad & RPE', category: 'Cuidado Diario', visibility: 'normal', order: 4 },
-    { moduleId: 'hydration', title: 'Hidratación', category: 'Cuidado Diario', visibility: 'normal', order: 5 },
-    { moduleId: 'pantry', title: 'Despensa & Compras', category: 'Alimentación & Hogar', visibility: 'normal', order: 6 },
-    { moduleId: 'plan', title: 'Plan Vivo', category: 'Planificación', visibility: 'normal', order: 7 },
-  ]);
-
-  const togglePin = (moduleId: string) => {
-    setSatellites((prev) =>
-      prev.map((s) => (s.moduleId === moduleId ? { ...s, visibility: s.visibility === 'pinned' ? 'normal' : 'pinned' } : s))
-    );
-  };
-
-  const toggleMinimize = (moduleId: string) => {
-    setSatellites((prev) =>
-      prev.map((s) => (s.moduleId === moduleId ? { ...s, visibility: s.visibility === 'minimized' ? 'normal' : 'minimized' } : s))
-    );
-  };
-
-  const hideModule = (moduleId: string) => {
-    setSatellites((prev) => prev.map((s) => (s.moduleId === moduleId ? { ...s, visibility: 'hidden' } : s)));
-  };
-
-  const restoreModule = (moduleId: string) => {
-    setSatellites((prev) => prev.map((s) => (s.moduleId === moduleId ? { ...s, visibility: 'normal' } : s)));
-  };
-
   const handleSendPrompt = async (textToSend?: string) => {
     const input = (textToSend || omniInput).trim();
     if (!input) return;
@@ -84,236 +52,335 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
   };
 
   return (
-    <div className="space-y-8 max-w-[1200px] mx-auto">
-      {/* 1. COMPOSER CONVERSACIONAL GOOGLE STITCH */}
-      <section className="space-y-4">
-        <div className="flex justify-between items-end">
-          <div>
-            <p className="font-['Manrope'] text-xs text-white/50 flex items-center gap-2 mb-1">
-              <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
-              Sistemas activos • Aegis Core
-            </p>
-            <h1 className="font-['Hanken_Grotesk'] text-2xl lg:text-3xl text-white font-semibold tracking-tight">
-              Estado actual, ¿qué reportamos?
-            </h1>
-          </div>
-          <button
-            onClick={() => onOpenInspector('biochemistry')}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-[#7C3AED]/40 bg-[#7C3AED]/10 text-[#C4B5FD] font-['Manrope'] text-[10px] hover:bg-[#7C3AED]/20 transition-all font-bold tracking-widest uppercase"
-          >
-            ANÁLISIS BIOQUÍMICO <span className="material-symbols-outlined text-sm">auto_graph</span>
-          </button>
-        </div>
-
-        {/* GLASS COMPOSER SURFACE */}
-        <div className="glass-surface p-6 rounded-[32px] focus-within:ring-2 focus-within:ring-[#7C3AED]/30 transition-all shadow-2xl relative overflow-hidden">
-          <textarea
-            className="bg-transparent border-none focus:ring-0 w-full resize-none font-['Manrope'] text-base text-white placeholder:text-white/20 min-h-[90px] outline-none"
-            placeholder="Describe síntomas, ingestas, compras o eventos..."
-            value={omniInput}
-            onChange={(e) => setOmniInput(e.target.value)}
-          />
-
-          {/* SUGERENCIAS RÁPIDAS EN CHIPS */}
-          <div className="flex gap-2 flex-wrap mt-2">
-            {[
-              '🍗 "Comí 200g de pollo salteado con papa"',
-              '😴 "Dormí 7.5h y me siento renovado"',
-              '💧 "Tomé 500ml de agua"',
-              '💸 "Gasté 20.000 COP en la tienda"',
-            ].map((chip, idx) => (
-              <button
-                key={idx}
-                onClick={() => handleSendPrompt(chip.replace(/^[^"]*"|"$|"/g, ''))}
-                className="bg-white/5 border border-white/10 text-white/70 hover:text-white rounded-full px-3 py-1 text-[11px] font-medium transition-colors"
-              >
-                {chip}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/5">
-            <div className="flex gap-2">
-              <button className="w-10 h-10 flex items-center justify-center rounded-full text-white/60 hover:bg-[#7C3AED]/10 hover:text-[#C4B5FD] transition-all" title="Voz">
-                <span className="material-symbols-outlined">mic</span>
-              </button>
-              <button className="w-10 h-10 flex items-center justify-center rounded-full text-white/60 hover:bg-[#7C3AED]/10 hover:text-[#C4B5FD] transition-all" title="Cámara">
-                <span className="material-symbols-outlined">photo_camera</span>
-              </button>
-              <button className="w-10 h-10 flex items-center justify-center rounded-full text-white/60 hover:bg-[#7C3AED]/10 hover:text-[#C4B5FD] transition-all" title="Archivos">
-                <span className="material-symbols-outlined">clinical_notes</span>
-              </button>
+    <div className="max-w-[1400px] w-full mx-auto px-4 lg:px-8 py-6 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+      {/* COLUMNA IZQUIERDA: PULSO & COMPOSER (lg:col-span-7) */}
+      <div className="lg:col-span-7 space-y-8">
+        {/* COMPOSER */}
+        <section className="space-y-4">
+          <div className="flex justify-between items-end">
+            <div>
+              <p className="font-['Manrope'] text-xs text-[#E5E1E5]/50 flex items-center gap-2 mb-1">
+                <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                Sistemas activos • {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </p>
+              <h1 className="font-['Hanken_Grotesk'] text-2xl lg:text-3xl text-[#E5E1E5] font-semibold tracking-tight">
+                Estado actual, ¿qué reportamos?
+              </h1>
             </div>
             <button
-              onClick={() => handleSendPrompt()}
-              disabled={isProcessing || !omniInput.trim()}
-              className="bg-[#7C3AED] text-white px-8 py-3 rounded-full flex items-center gap-2 hover:bg-[#6D28D9] hover:shadow-[0_8px_25px_rgba(124,58,237,0.4)] transition-all font-['Manrope'] text-[11px] tracking-widest font-bold uppercase disabled:opacity-50"
+              onClick={() => onOpenDrawer('METABOLISMO')}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-[#7C3AED]/30 bg-[#7C3AED]/10 text-[#7C3AED] font-['Manrope'] text-[10px] hover:bg-[#7C3AED]/20 transition-all font-bold tracking-widest uppercase shadow-lg shadow-[#7C3AED]/5"
             >
-              {isProcessing ? 'PROCESANDO...' : 'REGISTRAR EVENTO'} <span className="material-symbols-outlined text-sm">bolt</span>
+              ANÁLISIS PROFUNDO <span className="material-symbols-outlined text-sm">auto_graph</span>
             </button>
           </div>
-        </div>
 
-        {/* RECIBO DE ACCIÓN OMNICANAL */}
-        {lastDispatch && (
-          <div className="bg-[#111017] border border-[#7C3AED]/40 rounded-2xl p-4 space-y-2">
-            <div className="flex justify-between items-center text-xs font-bold text-emerald-400">
-              <span>✓ RESPUESTA PROCESADA POR AEGIS CORE</span>
-              <span className="text-white/40">Confiabilidad: 95%</span>
-            </div>
-            <p className="text-sm text-white">{lastDispatch.coreReply}</p>
-          </div>
-        )}
-      </section>
+          {/* COMPOSER CARD STITCH 1:1 */}
+          <div className="glass-surface p-6 rounded-[40px] focus-within:ring-2 focus-within:ring-[#7C3AED]/20 transition-all shadow-2xl relative overflow-hidden group/composer">
+            <textarea
+              className="bg-transparent border-none focus:ring-0 w-full resize-none font-['Manrope'] text-base text-[#E5E1E5] placeholder:text-[#CCC3D8]/20 min-h-[90px] outline-none"
+              placeholder="Describe síntomas, ingestas o eventos..."
+              value={omniInput}
+              onChange={(e) => setOmniInput(e.target.value)}
+            />
 
-      {/* 2. SÍNTESIS DEL DÍA GOOGLE STITCH */}
-      <section className="dashboard-card rounded-[36px] p-6 lg:p-8 relative overflow-hidden space-y-6">
-        <div className="flex justify-between items-start">
-          <div>
-            <h3 className="text-lg font-bold text-white flex items-center gap-2">
-              Síntesis del Día <span className="material-symbols-outlined text-[#D6B36A] animate-pulse">auto_awesome</span>
-            </h3>
-            <p className="text-xs text-white/50">{metabolicState.naturalExplanation}</p>
-          </div>
-          <div className="flex gap-4">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#7C3AED]"></span>
-              <span className="text-[10px] text-white font-bold tracking-widest">ENERGÍA</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#D6B36A]"></span>
-              <span className="text-[10px] text-white font-bold tracking-widest">ACTIVIDAD</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="glass-surface p-4 rounded-2xl">
-            <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Balance Energético</p>
-            <p className="text-2xl font-bold text-[#D6B36A] mt-1">{energyBalance.consumedKcal - energyBalance.targetKcal} <span className="text-xs font-normal opacity-60">kcal</span></p>
-            <p className="text-[10px] text-emerald-400 font-bold uppercase mt-1">Estado: {energyBalance.state}</p>
-          </div>
-
-          <div className="glass-surface p-4 rounded-2xl">
-            <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Gasto Calórico Est.</p>
-            <p className="text-2xl font-bold text-white mt-1">≈{activity.reduce((acc, a) => acc + a.estimatedKcalBurned, 0)} <span className="text-xs font-normal opacity-60">kcal</span></p>
-            <p className="text-[10px] text-[#C4B5FD] font-bold uppercase mt-1">{totalActivityMin} min ejercicio</p>
-          </div>
-
-          <div className="glass-surface p-4 rounded-2xl">
-            <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Proteína acumulada</p>
-            <p className="text-2xl font-bold text-white mt-1">{plan.macroConsumed.protein} <span className="text-xs font-normal opacity-60">/ {plan.macroTargets.protein}g</span></p>
-            <p className="text-[10px] text-emerald-400 font-bold uppercase mt-1">Preservación magra</p>
-          </div>
-        </div>
-      </section>
-
-      {/* 3. AEGIS DETECTA (ALERTAS INTELLIGENTES) */}
-      {expiringItems.length > 0 && (
-        <div className="bg-[#D6B36A]/10 border border-[#D6B36A]/30 rounded-2xl p-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="material-symbols-outlined text-[#D6B36A]">warning</span>
-            <div>
-              <p className="text-xs font-bold text-[#D6B36A]">AEGIS DETECTA: Alimentos próximos a vencer</p>
-              <p className="text-[11px] text-white/60">{expiringItems.map((i) => i.name).join(', ')} en refrigerador.</p>
-            </div>
-          </div>
-          <button
-            onClick={() => onOpenModuleDeepView('recipes')}
-            className="px-3 py-1.5 rounded-lg border border-[#D6B36A] text-[#D6B36A] text-[11px] font-bold hover:bg-[#D6B36A]/20 transition-colors"
-          >
-            💡 Ver Recetas
-          </button>
-        </div>
-      )}
-
-      {/* 4. MÓDULOS SATÉLITE CONFIGURABLES (MIS MÓDULOS) */}
-      <section className="space-y-4">
-        <div className="flex justify-between items-center">
-          <h3 className="text-xs font-bold text-[#C4B5FD] tracking-widest uppercase">MIS MÓDULOS SATÉLITE</h3>
-          <span className="text-[11px] text-white/40">Fijar (📌) | Minimizar (_) | Ocultar (✕)</span>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {satellites
-            .filter((s) => s.visibility !== 'hidden')
-            .map((s) => {
-              const isMinimized = s.visibility === 'minimized';
-              const isPinned = s.visibility === 'pinned';
-
-              return (
-                <div
-                  key={s.moduleId}
-                  className={`dashboard-card rounded-2xl p-5 space-y-3 transition-all ${
-                    isPinned ? 'border-[#7C3AED]/40 bg-[#7C3AED]/5' : ''
-                  }`}
-                >
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs font-bold text-white">{s.title}</span>
-                    <div className="flex gap-1">
-                      <button onClick={() => togglePin(s.moduleId)} className={`p-1 text-xs hover:text-white ${isPinned ? 'text-[#7C3AED]' : 'text-white/40'}`} title="Fijar">
-                        <span className="material-symbols-outlined text-sm">push_pin</span>
-                      </button>
-                      <button onClick={() => toggleMinimize(s.moduleId)} className="p-1 text-xs text-white/40 hover:text-white" title="Minimizar">
-                        <span className="material-symbols-outlined text-sm">{isMinimized ? 'expand_more' : 'remove'}</span>
-                      </button>
-                      <button onClick={() => hideModule(s.moduleId)} className="p-1 text-xs text-white/40 hover:text-white" title="Ocultar">
-                        <span className="material-symbols-outlined text-sm">close</span>
-                      </button>
-                      <button onClick={() => onOpenModuleDeepView(s.moduleId)} className="p-1 text-xs text-[#C4B5FD] hover:text-white" title="Profundidad">
-                        <span className="material-symbols-outlined text-sm">open_in_new</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  {!isMinimized && (
-                    <div className="text-xs text-white/60 space-y-1">
-                      {s.moduleId === 'nutrition' && (
-                        <p>Kcal: <strong className="text-white">{energyBalance.consumedKcal}</strong> / {energyBalance.targetKcal} • Proteína: <strong className="text-emerald-400">{plan.macroConsumed.protein}g</strong></p>
-                      )}
-                      {s.moduleId === 'metabolism' && (
-                        <p>Fase: <strong className="text-white">{metabolicState.currentPhase}</strong> ({metabolicState.hoursElapsedSinceLastMeal?.toFixed(1)}h ayuno)</p>
-                      )}
-                      {s.moduleId === 'sleep' && (
-                        <p>Sueño: <strong className="text-white">{sleep[0]?.hoursInBed || 7.5}h</strong> (Calidad: {sleep[0]?.subjectiveQualityScore || 8}/10)</p>
-                      )}
-                      {s.moduleId === 'activity' && (
-                        <p>Ejercicio: <strong className="text-white">{totalActivityMin} min</strong> acumulados</p>
-                      )}
-                      {s.moduleId === 'hydration' && (
-                        <p>Agua: <strong className="text-sky-400">{currentWater} / 2500 ml</strong></p>
-                      )}
-                      {s.moduleId === 'pantry' && (
-                        <p>Existencias: <strong className="text-white">{inventory.length} alimentos</strong> en despensa</p>
-                      )}
-                      {s.moduleId === 'plan' && (
-                        <p>Próximo: <strong className="text-white">{plan.plannedItems[0]?.title || 'Almuerzo'}</strong> ({plan.plannedItems[0]?.scheduledTime || '14:00'})</p>
-                      )}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-        </div>
-
-        {/* RESTAURAR OCULTOS */}
-        {satellites.some((s) => s.visibility === 'hidden') && (
-          <div className="flex gap-2 items-center flex-wrap pt-2">
-            <span className="text-[11px] text-white/40">Módulos ocultos:</span>
-            {satellites
-              .filter((s) => s.visibility === 'hidden')
-              .map((s) => (
+            {/* CHIPS DE ACCIÓN RÁPIDA */}
+            <div className="flex gap-2 flex-wrap mt-2">
+              {[
+                '🍗 "Comí 200g de pollo con papa"',
+                '😴 "Dormí 7.5h renovado"',
+                '💧 "Tomé 500ml de agua"',
+                '💸 "Gasté 20.000 COP"',
+              ].map((chip, idx) => (
                 <button
-                  key={s.moduleId}
-                  onClick={() => restoreModule(s.moduleId)}
-                  className="px-2.5 py-1 rounded-lg border border-dashed border-white/10 text-[#C4B5FD] text-[11px] hover:border-[#7C3AED]"
+                  key={idx}
+                  onClick={() => handleSendPrompt(chip.replace(/^[^"]*"|"$|"/g, ''))}
+                  className="bg-white/5 border border-white/10 text-[#E5E1E5]/70 hover:text-[#7C3AED] hover:border-[#7C3AED]/40 rounded-full px-3 py-1 text-[11px] font-medium transition-colors"
                 >
-                  + Restaurar {s.title}
+                  {chip}
                 </button>
               ))}
+            </div>
+
+            <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/5 relative z-10">
+              <div className="flex gap-2">
+                <button className="w-11 h-11 flex items-center justify-center rounded-full text-[#CCC3D8] hover:bg-[#7C3AED]/10 hover:text-[#7C3AED] transition-all" title="Voz">
+                  <span className="material-symbols-outlined">mic</span>
+                </button>
+                <button className="w-11 h-11 flex items-center justify-center rounded-full text-[#CCC3D8] hover:bg-[#7C3AED]/10 hover:text-[#7C3AED] transition-all" title="Cámara">
+                  <span className="material-symbols-outlined">photo_camera</span>
+                </button>
+                <button className="w-11 h-11 flex items-center justify-center rounded-full text-[#CCC3D8] hover:bg-[#7C3AED]/10 hover:text-[#7C3AED] transition-all" title="Archivos">
+                  <span className="material-symbols-outlined">clinical_notes</span>
+                </button>
+              </div>
+              <button
+                onClick={() => handleSendPrompt()}
+                disabled={isProcessing || !omniInput.trim()}
+                className="bg-[#7C3AED] text-white px-8 py-3.5 rounded-full flex items-center gap-3 hover:shadow-[0_12px_30px_rgba(124,58,237,0.4)] hover:scale-105 transition-all font-['Manrope'] text-[11px] tracking-[0.2em] font-bold uppercase disabled:opacity-50"
+              >
+                {isProcessing ? 'PROCESANDO...' : 'REGISTRAR EVENTO'} <span className="material-symbols-outlined text-sm">bolt</span>
+              </button>
+            </div>
           </div>
-        )}
-      </section>
+
+          {/* RECIBO DE ACCIÓN OMNICANAL */}
+          {lastDispatch && (
+            <div className="bg-[#111017] border border-[#7C3AED]/40 rounded-2xl p-4 space-y-2">
+              <div className="flex justify-between items-center text-xs font-bold text-emerald-400">
+                <span>✓ RESPUESTA PROCESADA POR AEGIS CORE</span>
+                <span className="text-white/40">Confiabilidad: 95%</span>
+              </div>
+              <p className="text-sm text-white">{lastDispatch.coreReply}</p>
+            </div>
+          )}
+        </section>
+
+        {/* SÍNTESIS DEL DÍA CARD STITCH 1:1 WITH SVG GRAPH */}
+        <section className="dashboard-card rounded-[48px] p-8 lg:p-10 relative overflow-hidden space-y-6">
+          <div className="flex justify-between items-start mb-6 relative z-10">
+            <div>
+              <h3 className="text-xl font-bold text-[#E5E1E5] flex items-center gap-2">
+                Síntesis del Día
+                <span className="material-symbols-outlined text-[#D6B36A] animate-pulse">auto_awesome</span>
+              </h3>
+              <p className="text-[12px] text-[#CCC3D8]/60 font-medium">{metabolicState.naturalExplanation}</p>
+            </div>
+            <div className="flex gap-6">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#7C3AED] shadow-[0_0_8px_#7c3aed]"></span>
+                <span className="text-[10px] text-[#E5E1E5] font-bold tracking-widest uppercase">ENERGÍA</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#D6B36A] shadow-[0_0_8px_#D6B36A]"></span>
+                <span className="text-[10px] text-[#E5E1E5] font-bold tracking-widest uppercase">ACTIVIDAD</span>
+              </div>
+            </div>
+          </div>
+
+          {/* VISUAL DATA AREA (SVG GRAPH 1:1 STITCH) */}
+          <div className="h-64 w-full relative mb-4">
+            <div className="absolute inset-0 flex flex-col justify-between z-10 pointer-events-none">
+              <div className="flex justify-between items-start pointer-events-auto">
+                <div className="bg-[#111017]/80 backdrop-blur-md p-4 lg:p-5 rounded-3xl border border-white/5 shadow-xl">
+                  <p className="text-[9px] font-bold text-[#CCC3D8] uppercase tracking-[0.2em] mb-1">Balance Energético</p>
+                  <p className="text-3xl font-bold text-[#D6B36A]">{energyBalance.consumedKcal - energyBalance.targetKcal} <span className="text-sm font-medium opacity-60">kcal</span></p>
+                  <div className="mt-2 flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                    <p className="text-[10px] text-[#E5E1E5] font-bold uppercase tracking-wider">Estado: {energyBalance.state}</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-3 pointer-events-auto">
+                  <div className="text-right glass-surface px-4 py-2.5 rounded-2xl">
+                    <p className="text-[9px] font-bold text-[#CCC3D8]/40 uppercase tracking-widest">Ingesta</p>
+                    <p className="text-base font-bold text-[#E5E1E5]">{energyBalance.consumedKcal} kcal</p>
+                  </div>
+                  <div className="text-right glass-surface px-4 py-2.5 rounded-2xl">
+                    <p className="text-[9px] font-bold text-[#CCC3D8]/40 uppercase tracking-widest">Gasto Est.</p>
+                    <p className="text-base font-bold text-[#E5E1E5]">{energyBalance.targetKcal} kcal</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* CURVA SVG STITCH */}
+            <div className="absolute inset-0 group cursor-crosshair">
+              <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 100">
+                <defs>
+                  <linearGradient id="energyGradMain" x1="0%" x2="0%" y1="0%" y2="100%">
+                    <stop offset="0%" stopColor="#7c3aed" stopOpacity="0.3" />
+                    <stop offset="100%" stopColor="#7c3aed" stopOpacity="0" />
+                  </linearGradient>
+                </defs>
+                <path d="M0,80 Q25,60 50,75 T100,20 L100,100 L0,100 Z" fill="url(#energyGradMain)" />
+                <path d="M0,80 Q25,60 50,75 T100,20" fill="none" stroke="#7c3aed" strokeWidth="2" />
+                <path d="M0,90 C30,85 70,55 100,45" fill="none" stroke="#D6B36A" strokeDasharray="4 4" strokeWidth="1.5" />
+              </svg>
+            </div>
+          </div>
+
+          <div className="flex justify-between items-center text-[10px] text-[#CCC3D8]/40 font-bold uppercase tracking-[0.2em] border-t border-white/5 pt-4">
+            <span>00:00</span>
+            <span className="bg-[#D6B36A]/10 text-[#D6B36A] px-4 py-1 rounded-full text-[9px] tracking-widest">ESTIMACIÓN PROVISIONAL</span>
+            <span>AHORA</span>
+          </div>
+        </section>
+      </div>
+
+      {/* COLUMNA DERECHA: ESTADO DE MÓDULOS (lg:col-span-5) */}
+      <div className="lg:col-span-5 flex flex-col">
+        <div className="sticky top-24 space-y-6">
+          <div className="dashboard-card rounded-[32px] p-6 flex flex-col min-h-[720px]">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-base font-bold text-[#E5E1E5]">Estado de Módulos</h3>
+              <span className="px-2.5 py-1 rounded bg-[#7C3AED]/10 text-[#7C3AED] text-[9px] font-bold tracking-[0.2em] uppercase">Sincronizado</span>
+            </div>
+
+            <div className="flex-1 space-y-6 overflow-y-auto hide-scrollbar pr-1">
+              {/* CATEGORÍA: VITALES */}
+              <div className="space-y-3">
+                <p className="text-[9px] font-bold text-[#CCC3D8]/30 uppercase tracking-[0.2em] mb-2 px-1">Vitales</p>
+
+                {/* SUEÑO MODULE CARD STITCH 1:1 */}
+                <div
+                  className="p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-transparent hover:border-white/10 cursor-pointer transition-all group"
+                  onClick={() => onOpenDrawer('SUEÑO')}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="material-symbols-outlined text-[#7C3AED]">nights_stay</span>
+                      <div>
+                        <p className="text-[11px] font-bold text-[#E5E1E5]">Sueño & Recuperación</p>
+                        <p className="text-[9px] text-[#CCC3D8]/60 uppercase font-bold tracking-wider">
+                          {sleep[0]?.hoursInBed || 7.5}h • Calidad {sleep[0]?.subjectiveQualityScore || 9}/10
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-end gap-0.5 h-5">
+                      <div className="w-1 bg-[#7C3AED]/30 h-2 rounded-full"></div>
+                      <div className="w-1 bg-[#7C3AED]/50 h-4 rounded-full"></div>
+                      <div className="w-1 bg-[#7C3AED] h-5 rounded-full"></div>
+                      <div className="w-1 bg-[#7C3AED]/70 h-3 rounded-full"></div>
+                    </div>
+                  </div>
+                  <div className="mt-3 grid grid-cols-2 gap-2 text-[9px] font-bold text-[#CCC3D8]/40 tracking-wider">
+                    <div className="flex justify-between"><span>DURACIÓN:</span> <span className="text-[#E5E1E5]">ÓPTIMA</span></div>
+                    <div className="flex justify-between"><span>REGULARIDAD:</span> <span className="text-[#E5E1E5]">EXCELENTE</span></div>
+                  </div>
+                </div>
+
+                {/* METABOLISMO MODULE CARD STITCH 1:1 */}
+                <div
+                  className="p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-transparent hover:border-white/10 cursor-pointer transition-all group"
+                  onClick={() => onOpenDrawer('METABOLISMO')}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="material-symbols-outlined text-[#D6B36A]">bolt</span>
+                      <div>
+                        <p className="text-[11px] font-bold text-[#E5E1E5]">Metabolismo & Fisiología</p>
+                        <p className="text-[9px] text-[#CCC3D8]/60 uppercase font-bold tracking-wider">Fase: {metabolicState.currentPhase}</p>
+                      </div>
+                    </div>
+                    <div className="text-[10px] font-bold text-[#D6B36A] uppercase">LIPÓLISIS</div>
+                  </div>
+                  <div className="mt-3 text-[9px] font-bold text-[#CCC3D8]/40 tracking-wider">
+                    SUSTRATO: <span className="text-[#D6B36A] ml-1">ÁCIDOS GRASOS</span> • <span className="ml-2 italic text-[#CCC3D8]/30">DETERMINISTA</span>
+                  </div>
+                </div>
+
+                {/* NUTRICIÓN MODULE CARD STITCH 1:1 WITH DONUT */}
+                <div
+                  className="p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-transparent hover:border-white/10 cursor-pointer transition-all group"
+                  onClick={() => onOpenDrawer('NUTRICIONAL')}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="material-symbols-outlined text-[#7C3AED]">restaurant</span>
+                      <div>
+                        <p className="text-[11px] font-bold text-[#E5E1E5]">Nutrición & Balance</p>
+                        <p className="text-[9px] text-[#CCC3D8]/60 uppercase font-bold tracking-wider">
+                          P: {plan.macroConsumed.protein}g / C: {plan.macroConsumed.carbs}g / F: {plan.macroConsumed.fats}g
+                        </p>
+                      </div>
+                    </div>
+                    <div className="relative w-8 h-8">
+                      <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
+                        <circle cx="18" cy="18" fill="none" r="16" stroke="rgba(214, 179, 106, 0.1)" strokeWidth="3"></circle>
+                        <circle cx="18" cy="18" fill="none" r="16" stroke="#D6B36A" strokeDasharray="70, 100" strokeLinecap="round" strokeWidth="3"></circle>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* CATEGORÍA: OPERATIVOS */}
+              <div className="space-y-3">
+                <p className="text-[9px] font-bold text-[#CCC3D8]/30 uppercase tracking-[0.2em] mb-2 px-1">Operativos</p>
+
+                {/* HIDRATACIÓN */}
+                <div
+                  className="p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-transparent hover:border-white/10 cursor-pointer transition-all group"
+                  onClick={() => onOpenModuleDeepView('hydration')}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="material-symbols-outlined text-[#7C3AED]">water_drop</span>
+                      <div>
+                        <p className="text-[11px] font-bold text-[#E5E1E5]">Hidratación</p>
+                        <p className="text-[9px] text-[#CCC3D8]/60 uppercase font-bold tracking-wider">{(currentWater / 1000).toFixed(1)}L / 2.5L OBJETIVO</p>
+                      </div>
+                    </div>
+                    <span className="text-[9px] font-bold text-sky-400 px-2 py-0.5 rounded bg-sky-400/10 uppercase">
+                      {currentWater >= 2000 ? 'Óptimo' : 'En progreso'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* ACTIVIDAD */}
+                <div
+                  className="p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-transparent hover:border-white/10 cursor-pointer transition-all group"
+                  onClick={() => onOpenModuleDeepView('activity')}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="material-symbols-outlined text-[#D6B36A]">directions_run</span>
+                      <div>
+                        <p className="text-[11px] font-bold text-[#E5E1E5]">Actividad & Ejercicio</p>
+                        <p className="text-[9px] text-[#CCC3D8]/60 uppercase font-bold tracking-wider">Intensidad Media • {totalActivityMin}m</p>
+                      </div>
+                    </div>
+                    <div className="text-[10px] font-bold text-[#E5E1E5]">8 RPE</div>
+                  </div>
+                </div>
+
+                {/* ENERGÍA / MOOD */}
+                <div
+                  className="p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-transparent hover:border-white/10 cursor-pointer transition-all group"
+                  onClick={() => onOpenModuleDeepView('state')}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="material-symbols-outlined text-[#7C3AED]">psychology</span>
+                      <div>
+                        <p className="text-[11px] font-bold text-[#E5E1E5]">Energía & Mood</p>
+                        <p className="text-[9px] text-[#CCC3D8]/60 uppercase font-bold tracking-wider">Enfoque: Alto • Ánimo: Estable</p>
+                      </div>
+                    </div>
+                    <span className="material-symbols-outlined text-sm text-green-500">trending_up</span>
+                  </div>
+                </div>
+
+                {/* DESPENSA */}
+                <div
+                  className="p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-transparent hover:border-white/10 cursor-pointer transition-all group"
+                  onClick={() => onOpenModuleDeepView('pantry')}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="material-symbols-outlined text-[#D6B36A]">inventory_2</span>
+                      <div>
+                        <p className="text-[11px] font-bold text-[#E5E1E5]">Despensa & Compras</p>
+                        <p className="text-[9px] text-[#CCC3D8]/60 uppercase font-bold tracking-wider">{inventory.length} Alimentos en stock</p>
+                      </div>
+                    </div>
+                    {expiringItems.length > 0 && (
+                      <span className="text-[9px] font-bold text-[#D6B36A] px-1.5 py-0.5 rounded bg-[#D6B36A]/10 uppercase">
+                        {expiringItems.length} Vencen
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 pt-4 border-t border-white/5 text-center">
+                <p className="text-[9px] text-[#CCC3D8]/30 font-bold tracking-[0.3em] uppercase">AION AEGIS ARCHITECTURE • V3.1.0</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

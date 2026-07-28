@@ -13,9 +13,9 @@ export const App: React.FC = () => {
   const [updateKey, setUpdateKey] = useState<number>(0);
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
 
-  // Context Drawer state (Right panel opened on demand)
+  // Right Drawer state
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
-  const [drawerTopic, setDrawerTopic] = useState<string>('biochemistry');
+  const [drawerContext, setDrawerContext] = useState<string>('NUTRICIONAL');
 
   const memoryStore = AionMemoryStore.getInstance();
 
@@ -31,81 +31,67 @@ export const App: React.FC = () => {
     setUpdateKey((prev) => prev + 1);
   };
 
-  const handleOpenInspector = (topic: string) => {
-    setDrawerTopic(topic);
+  const handleOpenDrawer = (context: string) => {
+    setDrawerContext(context);
     setIsDrawerOpen(true);
   };
 
   return (
-    <div style={{ display: 'flex', background: '#070709', minHeight: '100vh', color: '#F4F4F5' }}>
-      {/* 1. LEFT SIDEBAR / RAIL NAV HIERARCHICAL */}
+    <div className="flex h-screen w-full relative overflow-hidden bg-[#070709] text-[#E5E1E5]">
+      {/* 1. SIDEBAR NAV RAIL STITCH 1:1 */}
       <SidebarNav
         currentActive={activeNav}
         onSelectNav={(id) => {
           setActiveNav(id);
-          if (id === 'audit') handleOpenInspector('audit');
+          if (id === 'audit') handleOpenDrawer('METABOLISMO');
         }}
         isCollapsed={isSidebarCollapsed}
         onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
       />
 
-      {/* 2. MAIN CONTENT AREA (AEGIS CORE FEED OR DEEP MODULE VIEW) */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, paddingBottom: '70px' }}>
+      {/* 2. MAIN WORKSPACE AREA */}
+      <main className="flex-1 flex flex-col h-screen overflow-hidden bg-[#070709] relative transition-all">
         <Header onOpenSettings={() => setIsSettingsOpen(true)} />
 
-        <main className="aion-container" key={updateKey} style={{ marginTop: '1rem', flex: 1 }}>
+        {/* SCROLLABLE WORKSPACE CONTENT */}
+        <div className="flex-1 overflow-y-auto hide-scrollbar flex flex-col pb-20" key={updateKey}>
           {activeNav === 'core' ? (
             <AegisCoreFeed
               onRefreshAll={refreshData}
               onOpenModuleDeepView={(moduleId) => setActiveNav(moduleId)}
-              onOpenInspector={handleOpenInspector}
+              onOpenDrawer={handleOpenDrawer}
             />
           ) : (
-            <ModuleDeepView
-              activeModuleId={activeNav}
-              onRefreshAll={refreshData}
-              onBackToCore={() => setActiveNav('core')}
-            />
+            <div className="max-w-[1400px] w-full mx-auto px-6 py-6">
+              <ModuleDeepView
+                activeModuleId={activeNav}
+                onRefreshAll={refreshData}
+                onBackToCore={() => setActiveNav('core')}
+              />
+            </div>
           )}
-        </main>
-      </div>
+        </div>
+      </main>
 
-      {/* 3. RIGHT CONTEXT DRAWER (OPENED ON DEMAND FOR INSPECTOR / EVIDENCE / AUDIT) */}
+      {/* 3. INTELLIGENT RIGHT DRAWER STITCH 1:1 */}
       <ContextDrawer
         isOpen={isDrawerOpen}
-        topic={drawerTopic}
+        context={drawerContext}
         onClose={() => setIsDrawerOpen(false)}
       />
 
+      {/* 4. FLOATING ACTION BUTTON STITCH 1:1 */}
+      <div className="fixed bottom-8 right-8 z-50">
+        <button
+          onClick={() => handleOpenDrawer('NUTRICIONAL')}
+          className="w-14 h-14 rounded-full bg-[#111017] text-[#7C3AED] shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all group border border-[#7C3AED]/30"
+          title="Módulos Extendidos"
+        >
+          <span className="material-symbols-outlined text-2xl">grid_view</span>
+        </button>
+      </div>
+
       <OnboardingModal isOpen={isSettingsOpen} onClose={() => { setIsSettingsOpen(false); refreshData(); }} />
-
-      {/* NAVEGACIÓN INFERIOR MÓVIL TÁCTIL */}
-      <nav className="aion-nav">
-        <button className={`aion-nav-btn ${activeNav === 'core' ? 'active' : ''}`} onClick={() => setActiveNav('core')}>
-          <span>🤖</span>
-          <span>Aegis Core</span>
-        </button>
-
-        <button className={`aion-nav-btn ${activeNav === 'nutrition' ? 'active' : ''}`} onClick={() => setActiveNav('nutrition')}>
-          <span>🍎</span>
-          <span>Comida</span>
-        </button>
-
-        <button className={`aion-nav-btn ${activeNav === 'pantry' ? 'active' : ''}`} onClick={() => setActiveNav('pantry')}>
-          <span>📦</span>
-          <span>Despensa</span>
-        </button>
-
-        <button className={`aion-nav-btn ${activeNav === 'plan' ? 'active' : ''}`} onClick={() => setActiveNav('plan')}>
-          <span>📅</span>
-          <span>Plan</span>
-        </button>
-
-        <button className={`aion-nav-btn ${activeNav === 'day' ? 'active' : ''}`} onClick={() => setActiveNav('day')}>
-          <span>📜</span>
-          <span>Mi Día</span>
-        </button>
-      </nav>
     </div>
   );
 };
