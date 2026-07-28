@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Header } from './components/Header';
-import { GlobalDashboard } from './components/GlobalDashboard';
+import { AionCoreCentralHub } from './components/AionCoreCentralHub';
 import { MealLogger } from './components/MealLogger';
 import { PantryInventory } from './components/PantryInventory';
 import { LivePlanAndMarket } from './components/LivePlanAndMarket';
@@ -10,7 +10,7 @@ import { AionCoreOmniModal } from './components/AionCoreOmniModal';
 import { AionMemoryStore } from '@aion/memory';
 
 export const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'home' | 'meal' | 'pantry' | 'plan' | 'ledger'>('home');
+  const [activeTab, setActiveTab] = useState<'core' | 'meal' | 'pantry' | 'plan' | 'ledger'>('core');
   const [updateKey, setUpdateKey] = useState(0);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isOmniModalOpen, setIsOmniModalOpen] = useState(false);
@@ -34,7 +34,7 @@ export const App: React.FC = () => {
       <Header onOpenSettings={() => setIsSettingsOpen(true)} />
 
       <main className="aion-container" key={updateKey} style={{ marginTop: '1rem' }}>
-        {activeTab === 'home' && <GlobalDashboard onRefreshAll={refreshData} />}
+        {activeTab === 'core' && <AionCoreCentralHub onRefreshAll={refreshData} />}
         {activeTab === 'meal' && <MealLogger onMealAdded={refreshData} />}
         {activeTab === 'pantry' && <PantryInventory />}
         {activeTab === 'plan' && <LivePlanAndMarket />}
@@ -78,9 +78,9 @@ export const App: React.FC = () => {
 
       {/* NAVEGACIÓN INFERIOR EJECUTIVA LIMPIA */}
       <nav className="aion-nav">
-        <button className={`aion-nav-btn ${activeTab === 'home' ? 'active' : ''}`} onClick={() => setActiveTab('home')}>
-          <span>🏠</span>
-          <span>Inicio</span>
+        <button className={`aion-nav-btn ${activeTab === 'core' ? 'active' : ''}`} onClick={() => setActiveTab('core')}>
+          <span>🤖</span>
+          <span>AION Core</span>
         </button>
 
         <button className={`aion-nav-btn ${activeTab === 'meal' ? 'active' : ''}`} onClick={() => setActiveTab('meal')}>
