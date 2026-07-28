@@ -35,7 +35,12 @@ export class AionCoreSuperAgent {
     const dispatchedEvents: string[] = [];
     const actionsSummary: string[] = [];
 
-    // 0. DETECCIÓN DE CONVERSACIÓN / SALUDO / PREGUNTAS GENERALES DE AGENDA ("CUENTAME QUE HACEMOS HOY", "ESTAS VIVO", "QUE HACEMOS HOY")
+    const profile = this.memoryStore.getCoreProfile();
+    const userName = profile.displayName || 'Edyan';
+    const plan = this.memoryStore.getLivePlan();
+    const finConfig = this.memoryStore.getFinanceConfig();
+
+    // 0. DETECCIÓN DE CONVERSACIÓN / SALUDO / PREGUNTAS GENERALES DE AGENDA
     const isAgendaSummary =
       textLower.includes('cuentame que hacemos') ||
       textLower.includes('cuéntame qué hacemos') ||
@@ -46,8 +51,18 @@ export class AionCoreSuperAgent {
       textLower.includes('que tengo pendiente') ||
       textLower.includes('qué tengo pendiente');
 
+    const isRecordQuery =
+      textLower.includes('podemos hacer registro') ||
+      textLower.includes('podemos ahcer registro') ||
+      textLower.includes('como registro') ||
+      textLower.includes('cómo registro') ||
+      textLower.includes('puedo registrar') ||
+      textLower.includes('que puedo registrar') ||
+      textLower.includes('qué puedo registrar');
+
     const isGeneralChat =
       isAgendaSummary ||
+      isRecordQuery ||
       textLower.includes('estas vivo') ||
       textLower.includes('estás vivo') ||
       textLower.includes('hola') ||
@@ -59,11 +74,6 @@ export class AionCoreSuperAgent {
 
     if (isGeneralChat && !imageUrl) {
       detectedDomains.push('CONVERSATIONAL');
-      const profile = this.memoryStore.getCoreProfile();
-      const userName = profile.displayName || 'Edyan';
-      const plan = this.memoryStore.getLivePlan();
-      const finConfig = this.memoryStore.getFinanceConfig();
-
       let coreReply = '';
 
       if (isAgendaSummary || textLower.includes('que hacemos hoy') || textLower.includes('hacemos hoy')) {
@@ -80,6 +90,14 @@ export class AionCoreSuperAgent {
           `4. 💤 **Sueño & Descanso**: Tuviste **7.5 horas** de descanso circadiano con un score de eficiencia del **88%**.\n` +
           `5. 💵 **Finanzas & Presupuesto**: Tu presupuesto mensual ($${(finConfig.monthlyBudgetCop || 2500000).toLocaleString()} COP) se encuentra ejecutado al **40%**. Todos los registros del día están sincronizados con tu Ledger Universal y Google Drive.\n\n` +
           `¿Quieres que ajustemos algún bloque de tu horario o registremos tu próxima ingesta?`;
+      } else if (isRecordQuery) {
+        coreReply = `¡Por supuesto, ${userName}! Estoy 100% listo para registrar cualquier dato. Puedes dictarme o escribirme libremente:\n\n` +
+          `• 🍳 **Comidas o Ingesta**: ej. *"Comí 200g de pechuga con ensalada y arroz"*\n` +
+          `• 💳 **Finanzas & Gastos**: ej. *"Gasté 45.000 pesos en supermercado"*\n` +
+          `• 💧 **Hidratación**: ej. *"Tomé un vaso de agua de 500ml"*\n` +
+          `• 🏋️ **Ejercicio**: ej. *"Hice 45 minutos de pesas"*\n` +
+          `• 💤 **Sueño**: ej. *"Dormí 8 horas y me siento descansado"*\n\n` +
+          `¿Qué te gustaría registrar ahora mismo?`;
       } else if (textLower.includes('estas vivo') || textLower.includes('estás vivo')) {
         coreReply = `¡100% vivo, activo y consciente, ${userName}! Soy AION Aegis, tu prótesis ejecutiva. Todo el ecosistema multiagente está en línea y monitoreando tu biometría, nutrición, finanzas y descanso en tiempo real. ¿Qué deseas registrar o consultar ahora?`;
       } else {
@@ -205,7 +223,8 @@ export class AionCoreSuperAgent {
     } else if (nutritionReply) {
       coreReply = nutritionReply;
     } else {
-      coreReply = `Entendido. He procesado tu mensaje ("${inputText}") y lo he sincronizado en el Ledger Universal.`;
+      // RESPUESTA CONVERSACIONAL FLUIDA HUMANA DINÁMICA (SIN PLANTILLAS ROBÓTICAS)
+      coreReply = `Entendido, ${userName}. He analizado tu mensaje ("${inputText}"). ¿Te gustaría que registre este dato en un módulo específico o que profundicemos en algún aspecto de tu plan de hoy?`;
     }
 
     this.memoryStore.addLedgerEntry({
