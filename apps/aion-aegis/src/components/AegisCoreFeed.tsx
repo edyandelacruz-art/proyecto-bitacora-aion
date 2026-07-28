@@ -22,14 +22,20 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const chatBottomRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   // Carga inicial y estado persistente de mensajes de chat
   const [chatMessages, setChatMessages] = useState<ChatMessageEntry[]>(() => store.getChatMessages());
 
+  const scrollToBottom = () => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  };
+
   useEffect(() => {
-    chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [chatMessages]);
+    scrollToBottom();
+  }, [chatMessages, isProcessing]);
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim() && !selectedImage) return;
@@ -122,7 +128,7 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
         </div>
 
         {/* FEED DE MENSAJES PERSISTENTES */}
-        <div className="space-y-4 max-h-[380px] overflow-y-auto hide-scrollbar p-2">
+        <div ref={chatContainerRef} className="space-y-4 max-h-[380px] overflow-y-auto hide-scrollbar p-2">
           {chatMessages.map((msg) => (
             <div
               key={msg.id}
@@ -157,8 +163,6 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
               </div>
             </div>
           ))}
-
-          <div ref={chatBottomRef} />
 
           {isProcessing && (
             <div className="flex items-center gap-3 text-xs text-[#C4B5FD] animate-pulse p-2">
