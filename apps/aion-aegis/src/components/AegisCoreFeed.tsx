@@ -42,7 +42,7 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
     {
       id: 'msg_welcome',
       sender: 'aegis',
-      text: 'Bienvenido a AION Aegis, tu prótesis ejecutiva. Escribe cualquier evento, ingesta, gasto o compromiso y la arquitectura multiagente lo procesará en tiempo real.',
+      text: 'Bienvenido a AION Aegis, tu prótesis ejecutiva. Escribe cualquier evento, síntoma, ingesta, gasto o compromiso y la arquitectura multiagente lo procesará en tiempo real.',
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     },
   ]);
@@ -103,228 +103,251 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
   };
 
   return (
-    <div className="max-w-[1400px] w-full mx-auto px-4 lg:px-8 py-6 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
-      {/* COLUMNA IZQUIERDA: CANAL CONVERSACIONAL AION CORE (lg:col-span-7) */}
-      <div className="lg:col-span-7 space-y-8">
-        
-        {/* CHAT STREAM CONVERSACIONAL REAL STITCH 1:1 */}
-        <section className="dashboard-card rounded-[36px] p-6 space-y-4 border border-[#7C3AED]/40 shadow-2xl bg-[#111017]">
-          <div className="flex justify-between items-center border-b border-white/10 pb-4">
-            <div className="flex items-center gap-3">
-              <span className="material-symbols-outlined text-[#7C3AED] text-3xl">forum</span>
-              <div>
-                <h2 className="text-lg font-bold text-white tracking-tight">Canal Conversacional AION Core</h2>
-                <p className="text-xs text-[#CCC3D8]/60">Prótesis ejecutiva & Orquestación Multiagente en vivo</p>
-              </div>
+    <div className="max-w-[1400px] w-full mx-auto px-4 lg:px-8 py-6 space-y-8">
+      
+      {/* 1. SECCIÓN SUPERIOR DE ANCHO COMPLETO (FULL WIDTH): CANAL CONVERSACIONAL AEGIS CORE */}
+      <section className="dashboard-card rounded-[36px] p-6 lg:p-8 space-y-4 border border-[#7C3AED]/40 shadow-2xl bg-[#111017] w-full">
+        <div className="flex justify-between items-center border-b border-white/10 pb-4 flex-wrap gap-4">
+          <div className="flex items-center gap-3">
+            <span className="material-symbols-outlined text-[#7C3AED] text-3xl">forum</span>
+            <div>
+              <h2 className="text-xl font-bold text-white tracking-tight">Canal Conversacional AION Core (Ancho Completo)</h2>
+              <p className="text-xs text-[#CCC3D8]/60">Escribe síntomas, ingestas, compras o compromisos. Orquestación Multiagente en Vivo</p>
             </div>
-            <span className="px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-400 text-xs font-bold border border-emerald-500/30">
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="px-4 py-1.5 rounded-full bg-[#7C3AED]/20 text-[#C4B5FD] text-xs font-bold border border-[#7C3AED]/40">
+              SCORE PHYSIO: 94/100
+            </span>
+            <span className="px-3 py-1.5 rounded-full bg-emerald-500/15 text-emerald-400 text-xs font-bold border border-emerald-500/30">
               16 AGENTES ONLINE
             </span>
           </div>
+        </div>
 
-          {/* HISTORIAL STREAM DE MENSAJES */}
-          <div
-            ref={chatContainerRef}
-            className="space-y-4 max-h-[360px] min-h-[260px] overflow-y-auto hide-scrollbar p-4 rounded-3xl bg-[#070709] border border-white/5"
-          >
-            {chatMessages.map((m) => (
+        {/* STREAM DE MENSAJES DE ANCHO COMPLETO */}
+        <div
+          ref={chatContainerRef}
+          className="space-y-4 max-h-[400px] min-h-[280px] overflow-y-auto hide-scrollbar p-6 rounded-3xl bg-[#070709] border border-white/5 w-full"
+        >
+          {chatMessages.map((m) => (
+            <div
+              key={m.id}
+              className={`flex flex-col ${m.sender === 'user' ? 'items-end' : 'items-start'}`}
+            >
               <div
-                key={m.id}
-                className={`flex flex-col ${m.sender === 'user' ? 'items-end' : 'items-start'}`}
+                className={`max-w-[75%] p-4 rounded-3xl text-xs leading-relaxed shadow-lg ${
+                  m.sender === 'user'
+                    ? 'bg-[#7C3AED] text-white rounded-br-none font-medium'
+                    : 'bg-white/10 text-[#E5E1E5] border border-white/10 rounded-bl-none'
+                }`}
               >
-                <div
-                  className={`max-w-[88%] p-4 rounded-3xl text-xs leading-relaxed shadow-lg ${
-                    m.sender === 'user'
-                      ? 'bg-[#7C3AED] text-white rounded-br-none font-medium'
-                      : 'bg-white/10 text-[#E5E1E5] border border-white/10 rounded-bl-none'
-                  }`}
-                >
-                  <p className="whitespace-pre-wrap">{m.text}</p>
-                  <div className="flex justify-between items-center gap-4 mt-2 pt-1 border-t border-white/10 text-[9px] opacity-60">
-                    <span>{m.sender === 'user' ? 'Tú (Soberano)' : 'AION Aegis SuperAgent'}</span>
-                    <span>{m.timestamp}</span>
-                  </div>
+                <p className="whitespace-pre-wrap text-sm">{m.text}</p>
+                <div className="flex justify-between items-center gap-4 mt-2 pt-1 border-t border-white/10 text-[9px] opacity-60">
+                  <span>{m.sender === 'user' ? 'Tú (Soberano)' : 'AION Aegis SuperAgent'}</span>
+                  <span>{m.timestamp}</span>
                 </div>
               </div>
-            ))}
-            {isProcessing && (
-              <div className="flex items-center gap-2 text-xs text-[#C4B5FD] font-bold p-3 bg-white/5 rounded-2xl">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#7C3AED] animate-ping"></span>
-                Orquestando respuesta con los supervisores de dominio...
-              </div>
-            )}
-          </div>
+            </div>
+          ))}
+          {isProcessing && (
+            <div className="flex items-center gap-2 text-xs text-[#C4B5FD] font-bold p-3 bg-white/5 rounded-2xl">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#7C3AED] animate-ping"></span>
+              Orquestando respuesta con los supervisores de dominio...
+            </div>
+          )}
+        </div>
 
-          {/* CAMPO DE ENTRADA CONVERSACIONAL */}
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={omniInput}
-              onChange={(e) => setOmniInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSendPrompt()}
-              placeholder="Escribe tu mensaje, ingesta, gasto o compromiso libremente..."
-              disabled={isProcessing}
-              className="flex-1 bg-[#070709] border border-white/15 rounded-full px-6 py-3.5 text-xs text-white placeholder:text-[#CCC3D8]/40 focus:border-[#7C3AED] outline-none transition-all shadow-inner"
-            />
-            <button
-              onClick={() => handleSendPrompt()}
-              disabled={isProcessing || !omniInput.trim()}
-              className="bg-[#7C3AED] text-white px-7 py-3.5 rounded-full flex items-center gap-2 hover:bg-[#6D28D9] transition-all font-bold text-xs shadow-xl disabled:opacity-50"
-            >
-              <span>Enviar</span>
-              <span className="material-symbols-outlined text-sm">send</span>
-            </button>
-          </div>
-
-          {/* CAPACIDAD TRANSVERSAL DE EXPLICACIÓN */}
-          <AegisTransversalExplainer
-            contextName="Aegis Core Feed & Conversación Principal"
-            domain="metabolism"
-            compact={true}
+        {/* CAMPO DE ENTRADA CONVERSACIONAL DE ANCHO COMPLETO */}
+        <div className="flex gap-3 w-full">
+          <input
+            type="text"
+            value={omniInput}
+            onChange={(e) => setOmniInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSendPrompt()}
+            placeholder="Escribe síntomas, ingesta, gasto o compromiso libremente (ej. Comí 200g de pechuga o Tengo dolor de cabeza)..."
+            disabled={isProcessing}
+            className="flex-1 bg-[#070709] border border-white/15 rounded-full px-6 py-4 text-xs text-white placeholder:text-[#CCC3D8]/40 focus:border-[#7C3AED] outline-none transition-all shadow-inner"
           />
-        </section>
+          <button
+            onClick={() => handleSendPrompt()}
+            disabled={isProcessing || !omniInput.trim()}
+            className="bg-[#7C3AED] text-white px-8 py-4 rounded-full flex items-center gap-2 hover:bg-[#6D28D9] transition-all font-bold text-xs shadow-xl disabled:opacity-50"
+          >
+            <span>REGISTRAR EVENTO</span>
+            <span className="material-symbols-outlined text-sm">send</span>
+          </button>
+        </div>
 
-        {/* SÍNTESIS DEL DÍA CARD STITCH 1:1 WITH SVG GRAPH */}
-        <section className="dashboard-card rounded-[36px] p-6 lg:p-8 border border-white/10 space-y-6 bg-[#111017]">
-          <div className="flex justify-between items-start">
+        {/* CAPACIDAD TRANSVERSAL DE EXPLICACIÓN */}
+        <AegisTransversalExplainer
+          contextName="Aegis Core Feed & Conversación Principal"
+          domain="metabolism"
+          compact={true}
+        />
+      </section>
+
+      {/* 2. CURVA BIOENERGÉTICA DE SÍNTESIS DE ANCHO COMPLETO */}
+      <section className="dashboard-card rounded-[36px] p-6 lg:p-8 border border-white/10 space-y-6 bg-[#111017] w-full">
+        <div className="flex justify-between items-start flex-wrap gap-4">
+          <div>
+            <span className="text-[10px] font-bold text-[#D6B36A] uppercase tracking-[0.25em]">
+              SÍNTESIS DEL DÍA • FASE METABÓLICA
+            </span>
+            <h3 className="text-xl font-bold text-white mt-1">Curva Bioenergética & Balance Glucose Wave</h3>
+          </div>
+          <button
+            onClick={() => onOpenModuleDeepView('metabolism')}
+            className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-[#C4B5FD] hover:bg-[#7C3AED]/20 transition-all flex items-center gap-2"
+          >
+            <span>Profundizar en Metabolismo</span>
+            <span className="material-symbols-outlined text-sm">open_in_new</span>
+          </button>
+        </div>
+
+        {/* SVG GRAPH */}
+        <div className="h-44 w-full bg-[#070709] rounded-3xl p-4 border border-white/10 relative overflow-hidden flex flex-col justify-end">
+          <svg className="w-full h-full absolute inset-0" preserveAspectRatio="none" viewBox="0 0 500 150">
+            <path
+              d="M 0 100 Q 125 20, 250 80 T 500 40 L 500 150 L 0 150 Z"
+              fill="url(#purpleGradient)"
+              opacity="0.4"
+            />
+            <path
+              d="M 0 100 Q 125 20, 250 80 T 500 40"
+              fill="none"
+              stroke="#7C3AED"
+              strokeWidth="4"
+            />
+            <defs>
+              <linearGradient id="purpleGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#7C3AED" />
+                <stop offset="100%" stopColor="transparent" />
+              </linearGradient>
+            </defs>
+          </svg>
+          <div className="relative z-10 flex justify-between text-xs font-bold text-[#CCC3D8] px-4 pb-2">
+            <span>Ayuno Matutino (Lipólisis)</span>
+            <span>Postprandial (Glucosa Estable)</span>
+            <span>Estado Actual ({metabolicState.currentPhase})</span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-center">
+          <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-1">
+            <span className="text-[10px] font-bold text-[#CCC3D8]/50 uppercase">Consumido</span>
+            <p className="text-xl font-bold text-white">{energyBalance.consumedKcal} <span className="text-xs font-normal">kcal</span></p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-1">
+            <span className="text-[10px] font-bold text-[#CCC3D8]/50 uppercase">Meta Diaria</span>
+            <p className="text-xl font-bold text-[#C4B5FD]">{energyBalance.targetKcal} <span className="text-xs font-normal">kcal</span></p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-1">
+            <span className="text-[10px] font-bold text-[#CCC3D8]/50 uppercase">Gasto Físico</span>
+            <p className="text-xl font-bold text-white">{energyBalance.burnedKcal} <span className="text-xs font-normal">kcal</span></p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-1">
+            <span className="text-[10px] font-bold text-[#CCC3D8]/50 uppercase">Restante</span>
+            <p className="text-xl font-bold text-[#D6B36A]">{energyBalance.remainingKcal} <span className="text-xs font-normal">kcal</span></p>
+          </div>
+        </div>
+      </section>
+
+      {/* 3. SECCIÓN INFERIOR COMPLETA (COLOCADA DEBAJO DEL CHAT): ESTADO DE MÓDULOS ACTIVOS */}
+      <section className="dashboard-card rounded-[36px] p-6 lg:p-8 border border-white/10 space-y-6 bg-[#111017] w-full">
+        <div className="flex justify-between items-center border-b border-white/10 pb-4 flex-wrap gap-4">
+          <div>
+            <span className="text-[10px] font-bold text-[#D6B36A] uppercase tracking-[0.25em]">
+              PANEL DE CONTROL GENERAL
+            </span>
+            <h3 className="text-xl font-bold text-white mt-1">Estado de Módulos Activos (Ubicados Debajo del Chat)</h3>
+          </div>
+          <span className="text-xs font-bold text-[#C4B5FD] bg-[#7C3AED]/20 px-4 py-1.5 rounded-full border border-[#7C3AED]/40">
+            77 DÍAS CONSECUTIVOS DE BITÁCORA ACTIVOS
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* SUEÑO */}
+          <div
+            onClick={() => onOpenModuleDeepView('sleep')}
+            className="p-5 rounded-3xl bg-white/5 border border-white/10 hover:border-[#7C3AED]/50 transition-all cursor-pointer space-y-3 group"
+          >
+            <div className="flex justify-between items-center">
+              <span className="material-symbols-outlined text-[#7C3AED] text-3xl group-hover:scale-110 transition-transform">nights_stay</span>
+              <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">94% EFICIENCIA</span>
+            </div>
             <div>
-              <span className="text-[10px] font-bold text-[#D6B36A] uppercase tracking-[0.25em]">
-                SÍNTESIS DEL DÍA • FASE METABÓLICA
-              </span>
-              <h3 className="text-xl font-bold text-white mt-1">Curva Bioenergética & Balance</h3>
+              <h4 className="text-sm font-bold text-white">Sueño & Circadiano</h4>
+              <p className="text-xs text-[#CCC3D8]/70 mt-1">{latestSleep.hoursInBed}h en cama • Calidad {latestSleep.subjectiveQualityScore}/10</p>
             </div>
-            <button
-              onClick={() => onOpenModuleDeepView('metabolism')}
-              className="px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-[#C4B5FD] hover:bg-[#7C3AED]/20 transition-all flex items-center gap-1"
-            >
-              <span>Profundizar</span>
-              <span className="material-symbols-outlined text-sm">open_in_new</span>
-            </button>
-          </div>
-
-          {/* SVG ENERGÍA & GLUCOSA ONDA STITCH */}
-          <div className="h-44 w-full bg-[#070709] rounded-3xl p-4 border border-white/10 relative overflow-hidden flex flex-col justify-end">
-            <svg className="w-full h-full absolute inset-0" preserveAspectRatio="none" viewBox="0 0 500 150">
-              <path
-                d="M 0 100 Q 125 20, 250 80 T 500 40 L 500 150 L 0 150 Z"
-                fill="url(#purpleGradient)"
-                opacity="0.4"
-              />
-              <path
-                d="M 0 100 Q 125 20, 250 80 T 500 40"
-                fill="none"
-                stroke="#7C3AED"
-                strokeWidth="4"
-              />
-              <defs>
-                <linearGradient id="purpleGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#7C3AED" />
-                  <stop offset="100%" stopColor="transparent" />
-                </linearGradient>
-              </defs>
-            </svg>
-            <div className="relative z-10 flex justify-between text-xs font-bold text-[#CCC3D8] px-4 pb-2">
-              <span>Ayuno Matutino (Lipólisis)</span>
-              <span>Postprandial (Glucosa Estable)</span>
-              <span>Estado Actual ({metabolicState.currentPhase})</span>
+            <div className="flex justify-between items-center text-[11px] text-[#C4B5FD] pt-2 border-t border-white/5 font-bold">
+              <span>Ver Fases REM/Profundo</span>
+              <span className="material-symbols-outlined text-sm">arrow_forward</span>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-center">
-            <div className="p-3 rounded-2xl bg-white/5 border border-white/5 space-y-1">
-              <span className="text-[10px] font-bold text-[#CCC3D8]/50 uppercase">Consumido</span>
-              <p className="text-lg font-bold text-white">{energyBalance.consumedKcal} <span className="text-xs font-normal">kcal</span></p>
+          {/* ACTIVIDAD */}
+          <div
+            onClick={() => onOpenModuleDeepView('activity')}
+            className="p-5 rounded-3xl bg-white/5 border border-white/10 hover:border-[#D6B36A]/50 transition-all cursor-pointer space-y-3 group"
+          >
+            <div className="flex justify-between items-center">
+              <span className="material-symbols-outlined text-[#D6B36A] text-3xl group-hover:scale-110 transition-transform">directions_run</span>
+              <span className="text-xs font-bold text-[#D6B36A] bg-[#D6B36A]/10 px-2.5 py-0.5 rounded-full border border-[#D6B36A]/20">ZONA 2 AERÓBICA</span>
             </div>
-
-            <div className="p-3 rounded-2xl bg-white/5 border border-white/5 space-y-1">
-              <span className="text-[10px] font-bold text-[#CCC3D8]/50 uppercase">Meta Diaria</span>
-              <p className="text-lg font-bold text-[#C4B5FD]">{energyBalance.targetKcal} <span className="text-xs font-normal">kcal</span></p>
+            <div>
+              <h4 className="text-sm font-bold text-white">Actividad & Ejercicio</h4>
+              <p className="text-xs text-[#CCC3D8]/70 mt-1">{totalActivityMin} min acumulados hoy • RPE 8/10</p>
             </div>
-
-            <div className="p-3 rounded-2xl bg-white/5 border border-white/5 space-y-1">
-              <span className="text-[10px] font-bold text-[#CCC3D8]/50 uppercase">Gasto Físico</span>
-              <p className="text-lg font-bold text-white">{energyBalance.burnedKcal} <span className="text-xs font-normal">kcal</span></p>
-            </div>
-
-            <div className="p-3 rounded-2xl bg-white/5 border border-white/5 space-y-1">
-              <span className="text-[10px] font-bold text-[#CCC3D8]/50 uppercase">Restante</span>
-              <p className="text-lg font-bold text-[#D6B36A]">{energyBalance.remainingKcal} <span className="text-xs font-normal">kcal</span></p>
+            <div className="flex justify-between items-center text-[11px] text-[#D6B36A] pt-2 border-t border-white/5 font-bold">
+              <span>Ver Zonas Cardiacas</span>
+              <span className="material-symbols-outlined text-sm">arrow_forward</span>
             </div>
           </div>
-        </section>
-      </div>
 
-      {/* COLUMNA DERECHA: MÓDULOS DE ESTADO (lg:col-span-5) */}
-      <div className="lg:col-span-5 space-y-8">
-        <section className="dashboard-card rounded-[36px] p-6 lg:p-8 border border-white/10 space-y-6 bg-[#111017]">
-          <div className="flex justify-between items-center border-b border-white/10 pb-4">
-            <h3 className="text-lg font-bold text-white">Estado de Módulos Activos</h3>
-            <span className="text-[10px] font-bold text-[#D6B36A] uppercase tracking-widest">SISTEMA COMPLETO</span>
-          </div>
-
-          <div className="space-y-4">
-            {/* SUEÑO */}
-            <div
-              onClick={() => onOpenModuleDeepView('sleep')}
-              className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-[#7C3AED]/40 transition-all cursor-pointer flex justify-between items-center"
-            >
-              <div className="flex items-center gap-3">
-                <span className="material-symbols-outlined text-[#7C3AED] text-2xl">nights_stay</span>
-                <div>
-                  <h4 className="text-xs font-bold text-white">Sueño & Circadiano</h4>
-                  <p className="text-[10px] text-[#CCC3D8]/60">{latestSleep.hoursInBed}h en cama • Calidad {latestSleep.subjectiveQualityScore}/10</p>
-                </div>
-              </div>
-              <span className="material-symbols-outlined text-[#C4B5FD] text-sm">chevron_right</span>
+          {/* HIDRATACIÓN */}
+          <div
+            onClick={() => onOpenModuleDeepView('hydration')}
+            className="p-5 rounded-3xl bg-white/5 border border-white/10 hover:border-sky-400/50 transition-all cursor-pointer space-y-3 group"
+          >
+            <div className="flex justify-between items-center">
+              <span className="material-symbols-outlined text-sky-400 text-3xl group-hover:scale-110 transition-transform">water_drop</span>
+              <span className="text-xs font-bold text-sky-400 bg-sky-500/10 px-2.5 py-0.5 rounded-full border border-sky-500/20">{currentWater} / 2500 ML</span>
             </div>
-
-            {/* ACTIVIDAD */}
-            <div
-              onClick={() => onOpenModuleDeepView('activity')}
-              className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-[#D6B36A]/40 transition-all cursor-pointer flex justify-between items-center"
-            >
-              <div className="flex items-center gap-3">
-                <span className="material-symbols-outlined text-[#D6B36A] text-2xl">directions_run</span>
-                <div>
-                  <h4 className="text-xs font-bold text-white">Actividad & Ejercicio</h4>
-                  <p className="text-[10px] text-[#CCC3D8]/60">{totalActivityMin} min hoy • Zona 2 Aeróbica</p>
-                </div>
-              </div>
-              <span className="material-symbols-outlined text-[#D6B36A] text-sm">chevron_right</span>
+            <div>
+              <h4 className="text-sm font-bold text-white">Hidratación & Electrolitos</h4>
+              <p className="text-xs text-[#CCC3D8]/70 mt-1">Tanque hídrico celular activo al {Math.min((currentWater / 2500) * 100, 100).toFixed(0)}%</p>
             </div>
-
-            {/* HIDRATACIÓN */}
-            <div
-              onClick={() => onOpenModuleDeepView('hydration')}
-              className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-sky-400/40 transition-all cursor-pointer flex justify-between items-center"
-            >
-              <div className="flex items-center gap-3">
-                <span className="material-symbols-outlined text-sky-400 text-2xl">water_drop</span>
-                <div>
-                  <h4 className="text-xs font-bold text-white">Hidratación & Electrolitos</h4>
-                  <p className="text-[10px] text-[#CCC3D8]/60">{currentWater} / 2500 ml acumulados</p>
-                </div>
-              </div>
-              <span className="material-symbols-outlined text-sky-400 text-sm">chevron_right</span>
-            </div>
-
-            {/* FINANZAS */}
-            <div
-              onClick={() => onOpenModuleDeepView('finances')}
-              className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-[#D6B36A]/40 transition-all cursor-pointer flex justify-between items-center"
-            >
-              <div className="flex items-center gap-3">
-                <span className="material-symbols-outlined text-[#D6B36A] text-2xl">payments</span>
-                <div>
-                  <h4 className="text-xs font-bold text-white">Finanzas & Ledger</h4>
-                  <p className="text-[10px] text-[#CCC3D8]/60">Gastos basados en transacciones del Ledger</p>
-                </div>
-              </div>
-              <span className="material-symbols-outlined text-[#D6B36A] text-sm">chevron_right</span>
+            <div className="flex justify-between items-center text-[11px] text-sky-400 pt-2 border-t border-white/5 font-bold">
+              <span>Registrar Toma +250ml</span>
+              <span className="material-symbols-outlined text-sm">arrow_forward</span>
             </div>
           </div>
-        </section>
-      </div>
+
+          {/* FINANZAS */}
+          <div
+            onClick={() => onOpenModuleDeepView('finances')}
+            className="p-5 rounded-3xl bg-white/5 border border-white/10 hover:border-[#D6B36A]/50 transition-all cursor-pointer space-y-3 group"
+          >
+            <div className="flex justify-between items-center">
+              <span className="material-symbols-outlined text-[#D6B36A] text-3xl group-hover:scale-110 transition-transform">payments</span>
+              <span className="text-xs font-bold text-[#D6B36A] bg-[#D6B36A]/10 px-2.5 py-0.5 rounded-full border border-[#D6B36A]/20">LEDGER ACTIVO</span>
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-white">Finanzas & Presupuesto</h4>
+              <p className="text-xs text-[#CCC3D8]/70 mt-1">Gastos derivados de compras de despensa y salud</p>
+            </div>
+            <div className="flex justify-between items-center text-[11px] text-[#D6B36A] pt-2 border-t border-white/5 font-bold">
+              <span>Ver Libro de Gastos</span>
+              <span className="material-symbols-outlined text-sm">arrow_forward</span>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 };
