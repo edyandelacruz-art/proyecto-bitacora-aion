@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from 'react';
+import { SidebarNav } from './components/SidebarNav';
+import { AegisCoreFeed } from './components/AegisCoreFeed';
+import { ContextDrawer } from './components/ContextDrawer';
+import { ModuleDeepView } from './components/ModuleDeepView';
 import { Header } from './components/Header';
-import { AionCoreCentralHub } from './components/AionCoreCentralHub';
-import { MealLogger } from './components/MealLogger';
-import { PantryInventory } from './components/PantryInventory';
-import { LivePlanAndMarket } from './components/LivePlanAndMarket';
-import { MyDayLedgerTimeline } from './components/MyDayLedgerTimeline';
 import { OnboardingModal } from './components/OnboardingModal';
-import { AionCoreOmniModal } from './components/AionCoreOmniModal';
 import { AionMemoryStore } from '@aion/memory';
 
 export const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'core' | 'meal' | 'pantry' | 'plan' | 'ledger'>('core');
-  const [updateKey, setUpdateKey] = useState(0);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [isOmniModalOpen, setIsOmniModalOpen] = useState(false);
+  const [activeNav, setActiveNav] = useState<string>('core');
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
+  const [updateKey, setUpdateKey] = useState<number>(0);
+  const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
+
+  // Context Drawer state (Right panel opened on demand)
+  const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
+  const [drawerTopic, setDrawerTopic] = useState<string>('biochemistry');
 
   const memoryStore = AionMemoryStore.getInstance();
 
@@ -29,76 +31,77 @@ export const App: React.FC = () => {
     setUpdateKey((prev) => prev + 1);
   };
 
+  const handleOpenInspector = (topic: string) => {
+    setDrawerTopic(topic);
+    setIsDrawerOpen(true);
+  };
+
   return (
-    <div style={{ background: '#070709', minHeight: '100vh', color: '#F4F4F5', paddingBottom: '80px' }}>
-      <Header onOpenSettings={() => setIsSettingsOpen(true)} />
-
-      <main className="aion-container" key={updateKey} style={{ marginTop: '1rem' }}>
-        {activeTab === 'core' && <AionCoreCentralHub onRefreshAll={refreshData} />}
-        {activeTab === 'meal' && <MealLogger onMealAdded={refreshData} />}
-        {activeTab === 'pantry' && <PantryInventory />}
-        {activeTab === 'plan' && <LivePlanAndMarket />}
-        {activeTab === 'ledger' && <MyDayLedgerTimeline onDataChanged={refreshData} />}
-      </main>
-
-      {/* BOTÓN FLOTANTE EJECUTIVO SUPER-IA (FAB) */}
-      <button
-        onClick={() => setIsOmniModalOpen(true)}
-        style={{
-          position: 'fixed',
-          bottom: '80px',
-          right: '20px',
-          background: 'linear-gradient(135deg, #7C3AED 0%, #4C1D95 100%)',
-          color: 'white',
-          border: '1px solid rgba(196, 181, 253, 0.4)',
-          borderRadius: '28px',
-          padding: '0.65rem 1.1rem',
-          fontSize: '0.82rem',
-          fontWeight: 800,
-          boxShadow: '0 4px 20px rgba(124, 58, 237, 0.45)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem',
-          cursor: 'pointer',
-          zIndex: 999,
+    <div style={{ display: 'flex', background: '#070709', minHeight: '100vh', color: '#F4F4F5' }}>
+      {/* 1. LEFT SIDEBAR / RAIL NAV HIERARCHICAL */}
+      <SidebarNav
+        currentActive={activeNav}
+        onSelectNav={(id) => {
+          setActiveNav(id);
+          if (id === 'audit') handleOpenInspector('audit');
         }}
-      >
-        <span style={{ fontSize: '1.1rem' }}>🤖</span>
-        <span>AION Core Super-IA</span>
-      </button>
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+      />
 
-      {/* OVERLAY CONVERSACIONAL FLOTANTE DE AION CORE SUPER-IA */}
-      <AionCoreOmniModal
-        isOpen={isOmniModalOpen}
-        onClose={() => setIsOmniModalOpen(false)}
-        onRefreshAll={refreshData}
+      {/* 2. MAIN CONTENT AREA (AEGIS CORE FEED OR DEEP MODULE VIEW) */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, paddingBottom: '70px' }}>
+        <Header onOpenSettings={() => setIsSettingsOpen(true)} />
+
+        <main className="aion-container" key={updateKey} style={{ marginTop: '1rem', flex: 1 }}>
+          {activeNav === 'core' ? (
+            <AegisCoreFeed
+              onRefreshAll={refreshData}
+              onOpenModuleDeepView={(moduleId) => setActiveNav(moduleId)}
+              onOpenInspector={handleOpenInspector}
+            />
+          ) : (
+            <ModuleDeepView
+              activeModuleId={activeNav}
+              onRefreshAll={refreshData}
+              onBackToCore={() => setActiveNav('core')}
+            />
+          )}
+        </main>
+      </div>
+
+      {/* 3. RIGHT CONTEXT DRAWER (OPENED ON DEMAND FOR INSPECTOR / EVIDENCE / AUDIT) */}
+      <ContextDrawer
+        isOpen={isDrawerOpen}
+        topic={drawerTopic}
+        onClose={() => setIsDrawerOpen(false)}
       />
 
       <OnboardingModal isOpen={isSettingsOpen} onClose={() => { setIsSettingsOpen(false); refreshData(); }} />
 
-      {/* NAVEGACIÓN INFERIOR EJECUTIVA LIMPIA */}
+      {/* NAVEGACIÓN INFERIOR MÓVIL TÁCTIL */}
       <nav className="aion-nav">
-        <button className={`aion-nav-btn ${activeTab === 'core' ? 'active' : ''}`} onClick={() => setActiveTab('core')}>
+        <button className={`aion-nav-btn ${activeNav === 'core' ? 'active' : ''}`} onClick={() => setActiveNav('core')}>
           <span>🤖</span>
-          <span>AION Core</span>
+          <span>Aegis Core</span>
         </button>
 
-        <button className={`aion-nav-btn ${activeTab === 'meal' ? 'active' : ''}`} onClick={() => setActiveTab('meal')}>
+        <button className={`aion-nav-btn ${activeNav === 'nutrition' ? 'active' : ''}`} onClick={() => setActiveNav('nutrition')}>
           <span>🍎</span>
           <span>Comida</span>
         </button>
 
-        <button className={`aion-nav-btn ${activeTab === 'pantry' ? 'active' : ''}`} onClick={() => setActiveTab('pantry')}>
+        <button className={`aion-nav-btn ${activeNav === 'pantry' ? 'active' : ''}`} onClick={() => setActiveNav('pantry')}>
           <span>📦</span>
           <span>Despensa</span>
         </button>
 
-        <button className={`aion-nav-btn ${activeTab === 'plan' ? 'active' : ''}`} onClick={() => setActiveTab('plan')}>
+        <button className={`aion-nav-btn ${activeNav === 'plan' ? 'active' : ''}`} onClick={() => setActiveNav('plan')}>
           <span>📅</span>
           <span>Plan</span>
         </button>
 
-        <button className={`aion-nav-btn ${activeTab === 'ledger' ? 'active' : ''}`} onClick={() => setActiveTab('ledger')}>
+        <button className={`aion-nav-btn ${activeNav === 'day' ? 'active' : ''}`} onClick={() => setActiveNav('day')}>
           <span>📜</span>
           <span>Mi Día</span>
         </button>

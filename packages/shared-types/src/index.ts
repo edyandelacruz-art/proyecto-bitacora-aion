@@ -85,6 +85,19 @@ export interface AgentInvocationResult<T = any> {
 }
 
 // ----------------------------------------------------------------------
+// SATELLITE MODULES & UI ARCHITECTURE CONTRACTS
+// ----------------------------------------------------------------------
+export type SatelliteModuleVisibility = 'pinned' | 'minimized' | 'hidden' | 'normal';
+
+export interface SatelliteModuleConfig {
+  moduleId: string;
+  title: string;
+  category: 'Mi Estado' | 'Cuidado Diario' | 'Alimentación & Hogar' | 'Planificación' | 'Información' | 'Sistema';
+  visibility: SatelliteModuleVisibility;
+  order: number;
+}
+
+// ----------------------------------------------------------------------
 // 1. NUTRITION / ALIMENTACIÓN & VISION TYPES
 // ----------------------------------------------------------------------
 export type SceneType =
