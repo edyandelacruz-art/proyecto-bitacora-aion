@@ -22,6 +22,8 @@ import { AionCoreSuperAgent, OmniDispatchResult } from './core/AionCoreSuperAgen
 import { AgentRuntime, AgentRegistry } from './runtime/AgentRuntime';
 import { NutrientCalculationEngine } from './nutrition/NutrientCalculationEngine';
 
+import { DesignAndVisualAgent } from './visual/DesignAndVisualAgent';
+
 export {
   VisionService,
   LanguageEngine,
@@ -32,6 +34,7 @@ export {
   AgentRuntime,
   AgentRegistry,
   NutrientCalculationEngine,
+  DesignAndVisualAgent,
 };
 export type { OmniDispatchResult };
 
