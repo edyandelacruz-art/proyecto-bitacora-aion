@@ -1,54 +1,133 @@
-DISEÑA LA INTERFAZ REAL DE AION AEGIS — MOBILE-FIRST + RESPONSIVE
+DISEÑA LA INTERFAZ DE AION AEGIS — MOBILE-FIRST + DESKTOP RESPONSIVE
 
-Usa como referencia visual obligatoria el logo AION Aegis adjunto o el asset del repositorio:
-apps/aion-aegis/public/brand/aion-aegis-logo-dark.svg
+Usa el LOGO AION AEGIS que adjunté como referencia principal de identidad visual.
 
-IMPORTANTE: esta tarea es exclusivamente UI/UX e interacción visual. No cambies backend, agentes, contratos, persistencia, eventos, Ledger ni lógica de dominio. No elimines funcionalidades existentes. No inventes una aplicación distinta. La interfaz debe representar el producto y la inteligencia ya definidos.
+ESTA ES UNA TAREA EXCLUSIVAMENTE DE DISEÑO UI/UX.
+No diseñes arquitectura técnica.
+No expliques backend.
+No representes agentes internos.
+No dibujes diagramas de sistema.
+No conviertas la propuesta en una presentación.
+Diseña la INTERFAZ REAL de la aplicación y sus principales estados interactivos.
 
-AION Aegis es una bitácora personal inteligente, multimodal, interactiva, adaptativa, auditada y progresivamente autónoma. Su pantalla principal se llama Aegis Core. Aegis Core es la superficie conversacional con la que el usuario siente que habla. Detrás existe una orquesta de supervisores, agentes especialistas, expertos transversales, engines, memoria, Ledger, políticas y auditoría.
+==================================================
+1. IDEA DE EXPERIENCIA
+==================================================
 
-OBJETIVO DE EXPERIENCIA
+AION Aegis es una bitácora personal inteligente e interactiva.
 
-Quiero que la app se sienta ORGÁNICA, FLUIDA, RESPIRABLE, PREMIUM, CONTEXTUAL Y MUY INTERACTIVA.
+La pantalla principal se llama AEGIS CORE.
 
-No quiero una parrilla de 12 cards ni un dashboard empresarial. No quiero que el usuario vea toda la información al mismo tiempo. Los módulos individuales sí pueden ser profundos; Aegis Core debe mostrar únicamente lo que importa AHORA y permitir expandir/abrir cuando el usuario quiera.
+Aegis Core debe sentirse como una mezcla muy refinada de:
 
-Frase rectora:
+- conversación moderna;
+- bitácora viva;
+- asistente personal;
+- resumen del día;
+- planificación;
+- accesos a módulos profundos.
+
+La experiencia debe ser:
+
+ORGÁNICA
+FLUIDA
+RESPIRABLE
+ELEGANTE
+PREMIUM
+MODERNA
+MUY INTERACTIVA
+
+No quiero saturación visual.
+No quiero 12 tarjetas en pantalla.
+No quiero un dashboard empresarial.
+No quiero una pantalla clínica.
+No quiero una hoja de cálculo convertida en aplicación.
+No quiero una copia de ChatGPT con otro color.
+
+La pantalla principal muestra POCO y deja profundizar cuando el usuario toca, expande o abre un módulo.
+
+Frase de diseño:
+
 “EL USUARIO VIVE Y CONVERSA; AEGIS ORGANIZA.”
 
-La interfaz NO debe sentirse como “ChatGPT con otro color”. Debe combinar conversación moderna + bitácora viva + asistente personal + resumen contextual + decisiones + acciones visuales.
+==================================================
+2. IDENTIDAD VISUAL
+==================================================
 
-IDENTIDAD VISUAL
+Usa el logo adjunto AION Aegis.
 
-Fondo principal #070709
-Fondo elevado #0D0B12
-Surface 1 #111017
-Surface 2 #17131F
-Surface 3 #1D1728
-Violeta #7C3AED
-Violeta fuerte #6D28D9
-Violeta brillante #8B5CF6
-Lavanda #C4B5FD
-Lavanda suave #DDD6FE
-Dorado #D6B36A
-Dorado brillante #F3D18A
-Dorado oscuro #A9803A
-Texto #F4F4F5
-Texto secundario #A1A1AA
-Texto tenue #71717A
-Success #22C55E
-Warning #F59E0B
-Danger #EF4444
-Info #38BDF8
+Paleta exacta:
 
-Composición aproximada: 75% negro/grafito, 15% violeta/lavanda, 5% dorado, 5% blanco/neutral. El dorado debe ser acento premium, no relleno masivo. Evita estética gamer, neón excesivo, glassmorphism excesivo, fondos violetas saturados y cards llenas de gradientes.
+BACKGROUND PRINCIPAL     #070709
+BACKGROUND ELEVADO       #0D0B12
+SURFACE 1                 #111017
+SURFACE 2                 #17131F
+SURFACE 3                 #1D1728
 
-NAVEGACIÓN DESKTOP
+VIOLETA PRINCIPAL         #7C3AED
+VIOLETA FUERTE            #6D28D9
+VIOLETA BRILLANTE         #8B5CF6
+LAVANDA                    #C4B5FD
+LAVANDA SUAVE              #DDD6FE
 
-Sidebar izquierda colapsable. Logo AION Aegis arriba. Grupos tipo accordion.
+DORADO PRINCIPAL           #D6B36A
+DORADO BRILLANTE           #F3D18A
+DORADO OSCURO              #A9803A
 
-Aegis Core
-Mi Día
+TEXTO PRINCIPAL            #F4F4F5
+TEXTO SECUNDARIO           #A1A1AA
+TEXTO TENUE                #71717A
+
+SUCCESS                     #22C55E
+WARNING                     #F59E0B
+DANGER                      #EF4444
+INFO                        #38BDF8
+
+Proporción visual aproximada:
+
+75% negro/grafito
+15% violeta/lavanda
+5% dorado
+5% blanco/neutro
+
+El dorado es un acento premium.
+No usarlo como fondo masivo.
+
+El violeta comunica inteligencia y actividad.
+No llenar todas las tarjetas de violeta.
+
+Evitar:
+
+- estética gamer;
+- cyberpunk;
+- exceso de neón;
+- exceso de glassmorphism;
+- glow permanente;
+- degradados en cada tarjeta;
+- demasiados bordes brillantes;
+- demasiados números simultáneos.
+
+El logo puede conservar apariencia premium y luminosa.
+La UI cotidiana debe ser más sobria y limpia.
+
+==================================================
+3. NAVEGACIÓN DESKTOP
+==================================================
+
+Crear una SIDEBAR IZQUIERDA COLAPSABLE.
+
+Arriba:
+
+- logo AION Aegis;
+- nombre AION Aegis;
+- botón discreto para contraer sidebar.
+
+Primeros destinos:
+
+AEGIS CORE
+MI DÍA
+
+Luego usar grupos tipo ACCORDION.
 
 MI ESTADO
 - Cuerpo y peso
@@ -87,552 +166,887 @@ SISTEMA
 - Integraciones
 - Configuración
 
-La sidebar expandida muestra icono + label. Colapsada muestra solo iconos y tooltip. No abrir todos los accordions por defecto.
+COMPORTAMIENTO:
 
-NAVEGACIÓN MOBILE
+- no abrir todos los accordions a la vez;
+- solo un destino activo claramente señalado;
+- sidebar expandida = icono + nombre;
+- sidebar contraída = iconos + tooltip;
+- el usuario puede abrir/cerrar grupos con animación suave.
 
-La sidebar se convierte en navigation drawer invocado por hamburger.
+==================================================
+4. BARRA SUPERIOR DESKTOP
+==================================================
 
-Bottom navigation fija con solo cuatro destinos:
-1. Aegis Core
-2. Mi Día
-3. + Registrar
-4. Más
+Debe ser minimalista.
 
-+ Registrar abre bottom sheet:
-- Comida
-- Agua
-- Sueño
-- Actividad
-- Energía / ánimo
-- Síntoma / dolor
-- Medicación
-- Peso / medida
-- Compra
-- Foto
-- Hablar
+Izquierda/centro:
+- contexto actual, por ejemplo “Aegis Core” o nombre del módulo.
 
-Más abre drawer con todos los módulos y configuración.
+Derecha:
+- notificaciones;
+- búsqueda opcional;
+- configuración rápida;
+- avatar/perfil.
 
-AEGIS CORE — PRIMER VIEWPORT MOBILE
+No llenar la barra con controles.
 
-Debe ser muy limpio.
+==================================================
+5. AEGIS CORE — ESTRUCTURA GENERAL
+==================================================
 
-Header mínimo:
-- hamburger izquierda
-- logo/nombre AION Aegis
-- notificaciones
-- avatar/perfil
+Aegis Core NO debe ser una cuadrícula fija.
+
+Debe ser un FEED VERTICAL ORGÁNICO.
+
+Orden sugerido:
+
+1. header contextual muy corto;
+2. área conversacional / composer;
+3. acciones rápidas contextuales;
+4. Pulso de hoy;
+5. Aegis detecta;
+6. Plan Vivo breve;
+7. Mi Día breve;
+8. Mis módulos;
+9. Ayer / tendencia reciente solo si aporta valor;
+10. reportes/exportación como acción secundaria.
+
+Una sección sin información útil puede ocultarse o quedar colapsada.
+
+==================================================
+6. MOBILE — PRIMER VIEWPORT
+==================================================
+
+Diseñar primero una pantalla móvil aproximadamente 390 x 844.
+
+El primer viewport debe sentirse MUY LIMPIO.
+
+Header:
+
+☰  + logo/nombre AION Aegis + 🔔 + avatar
 
 Debajo:
-- saludo contextual muy corto
-- título humano: “¿Qué está pasando?” o equivalente
-- gran composer multimodal protagonista
-- máximo 2 o 3 acciones rápidas contextuales
-- como máximo una señal importante de Aegis si existe
 
-COMPOSER
+saludo contextual muy corto
 
-Placeholder: “Cuéntame, muéstrame o pregúntame algo…”
+“¿Qué está pasando?”
 
-Controles:
-- micrófono
-- cámara
-- galería/archivo
-- enviar
+Después un COMPOSER GRANDE Y ELEGANTE.
 
-El composer acepta texto, voz, foto, documentos, recibos, etiquetas y menús.
+Placeholder:
 
-Al hacer scroll, se transforma en barra sticky compacta sobre el bottom nav:
-“Preguntar a Aegis…” + micrófono + cámara.
-Tap expande composer completo.
+“Cuéntame, muéstrame o pregúntame algo…”
 
-No mostrar ocho métricas en el primer viewport.
+Dentro del composer:
 
-FEED VERTICAL ORGÁNICO
+- micrófono;
+- cámara;
+- adjuntar;
+- enviar.
 
-El usuario debe poder hacer scroll hacia abajo. El feed NO es fijo: Aegis decide qué secciones tienen valor hoy.
+Debajo máximo 2 o 3 acciones rápidas.
 
-Orden orientativo:
-1. Ahora / Pulso de hoy
-2. Aegis Detecta
-3. Plan Vivo
-4. Mi Día
-5. Tus módulos
-6. Ayer / tendencia reciente solo si es útil
-7. Reportes/exportación secundaria
+Ejemplo visual:
 
-Una sección sin información útil puede ocultarse, reducirse a una línea o quedar colapsada. Nunca llenar espacio con ceros o datos inventados.
+[ Ya comí ]   [ Tomé agua ]   [ ¿Qué puedo comer? ]
+
+Después, como máximo UNA señal relevante.
+
+Ejemplo:
+
+Aegis nota
+Dormiste menos que tu patrón habitual.  >
+
+NO mostrar ocho métricas en el primer viewport.
+
+==================================================
+7. MOBILE — SCROLL VERTICAL
+==================================================
+
+El usuario debe poder deslizar naturalmente hacia abajo.
+
+No comprimir toda la app en una sola pantalla.
+
+Después del primer viewport aparecen, si aportan valor:
 
 AHORA / PULSO DE HOY
-
-No usar siete cards. Crear una superficie compacta con 2–4 elementos pertinentes.
-
-Ejemplo mañana:
-“Sueño 6 h 42 min · Despierto hace 18 min · Última ingesta 10 h 20 min · Próximo: caminar 09:30”
-
-Ejemplo tarde:
-“Almuerzo hace 2 h 10 min · Agua 1.4 L · Energía 7/10 · Próximo: entrenamiento 18:30”
-
-Tap abre detalle. Inferencias tienen “¿Por qué?” y badge discreto medido/calculado/estimado/probable.
-
 AEGIS DETECTA
+PLAN VIVO
+MI DÍA
+MIS MÓDULOS
+AYER
+REPORTES
 
-Máximo 1–2 señales prominentes. Resto bajo “Ver todas”.
+Cada bloque debe tener suficiente espacio negativo.
 
-Ejemplos:
-“Los tomates podrían necesitar consumirse pronto.” [Ver recetas] [Ignorar]
-“No encuentro almuerzo registrado.” [Ya comí] [Todavía no] [Omitir]
-“Hoy dormiste menos que tu patrón reciente.” [Ver sueño] [Ajustar plan]
+==================================================
+8. BOTTOM NAVIGATION MOBILE
+==================================================
 
-Toda intervención puede resolverse, rechazarse, posponerse, silenciarse y explicar por qué apareció.
+Usar SOLO cuatro destinos:
 
-PLAN VIVO EN AEGIS CORE
+AEGIS CORE
+MI DÍA
++ REGISTRAR
+MÁS
 
-Mostrar máximo:
-- AHORA
-- PRÓXIMO
-- DESPUÉS
++ REGISTRAR debe ser la acción central principal, pero elegante, no enorme.
 
-Máximo tres eventos. Botones posibles: Hecho, Posponer, Cambiar, Ver. Botón “Ver plan completo”. Swipe opcional derecha completar, izquierda acciones/posponer.
+MÁS abre un navigation drawer con todos los módulos y configuración.
 
-MI DÍA EN CORE
+==================================================
+9. + REGISTRAR — BOTTOM SHEET
+==================================================
 
-Mostrar solo últimos 3–5 eventos, por ejemplo:
-07:15 Desperté
-07:27 Agua 350 ml
-08:10 Desayuno
-10:42 Caminata 32 min
+Al pulsarlo abrir un bottom sheet elegante:
 
-Botón “Ver día completo”.
+¿Qué quieres registrar?
 
-Tap evento abre detalle. Long press abre acciones. Permitir corregir, agregar nota, ver evidencia, ver impacto y anular si es reversible. Correcciones deben conservar ANTES → DESPUÉS, nunca sobreescribir silenciosamente.
+Comida
+Agua
+Sueño
+Actividad
+Energía / ánimo
+Síntoma / dolor
+Medicación
+Peso / medida
+Compra
+Foto
+Hablar
 
-TUS MÓDULOS
+Usar iconos lineales consistentes.
 
-NO grid 3x4.
+==================================================
+10. COMPOSER STICKY
+==================================================
 
-Preferido: accordion/lista compacta:
-Alimentación — estado breve — >
-Sueño — indicador principal — >
-Actividad — indicador principal — >
-Despensa — estado breve — >
-Plan Vivo — pendientes — >
-“Ver todos los módulos”
+Cuando el usuario hace scroll hacia abajo, el composer grande se convierte en una barra compacta sticky justo encima del bottom navigation:
 
-Cada módulo solo muestra nombre + 1 indicador + 1 estado + affordance de abrir. La profundidad vive dentro del módulo.
+“Preguntar a Aegis…”      🎙   📷
 
-Alternativa móvil: carrusel horizontal de cards compactas con aproximadamente 2.3 cards visibles, nunca 12 simultáneas.
+Al tocarla se expande nuevamente.
 
-AYER / RESUMEN RECIENTE
+==================================================
+11. PULSO DE HOY
+==================================================
 
-No aparece siempre. Puede aparecer al iniciar un nuevo día o cuando el día anterior aporta contexto.
+NO hacer varias cards.
 
-Ejemplo:
-“Ayer: 7 h 18 min de sueño · 3 comidas · 54 min actividad. Mejor hidratación que tu promedio reciente.” [Ver resumen]
-
-No mostrar veinte indicadores.
-
-RESPUESTAS RICAS
-
-Aegis no debe responder solo con párrafos. Puede mezclar:
-- texto breve
-- cards accionables
-- receta
-- foto / evidencia
-- mini gráfica
-- timeline
-- comparación
-- tabla compacta
-- rango
-- badges de evidencia
-- botones
-- Action Receipt
-- “Ver en módulo”
-- una micro-pregunta
-
-Ejemplo “Tengo hambre”:
-“Con lo que tienes y tu día de hoy, empezaría por estas dos:”
-Card Huevos + tomate: ~310 kcal, 26 g proteína, 12 min, “usa tomates que conviene consumir pronto”, botones Ver receta / Elegir.
-Card Atún + ensalada: ~260 kcal, 32 g proteína, 8 min, botones Ver receta / Elegir.
-Link “¿Por qué estas opciones?”
-
-No mostrar cinco opciones si dos bastan.
-
-FOTO DE COMIDA
-
-Flujo visual obligatorio:
-foto → preview → Aegis analiza → candidatos + confidence → si existe una ambigüedad MATERIAL, UNA micro-pregunta → confirmar/corregir → estimación de porciones con rango → cálculo determinista → registrar → actualizar dominios implicados → verificar → Action Receipt.
+Crear una sola superficie compacta con 2 a 4 elementos pertinentes.
 
 Ejemplo:
-“Veo probablemente arroz (alta), pollo a la plancha (alta), tomate/cebolla (media-alta), y lo blanco podría ser queso o salsa. ¿Cuál es?”
-Botones Queso / Salsa / Otra cosa.
+
+AHORA
+
+Sueño 6 h 42 min · Despierto hace 18 min
+Última ingesta hace 10 h 20 min · Próximo: caminar 09:30
+
+O:
+
+Almuerzo hace 2 h 10 min · Agua 1.4 L
+Energía 7/10 · Próximo: entrenamiento 18:30
+
+Cada elemento debe poder tocarse para ampliar.
+
+Los datos no exactos pueden llevar un badge muy discreto:
+
+medido
+confirmado
+calculado
+estimado
+probable
+
+==================================================
+12. AEGIS DETECTA
+==================================================
+
+Mostrar máximo 1 o 2 señales prominentes.
+
+Ejemplo:
+
+Aegis detecta
+
+Los tomates podrían necesitar consumirse pronto.
+
+[ Ver recetas ]   [ Ignorar ]   [ ⋯ ]
+
+Otro ejemplo:
+
+No encuentro almuerzo registrado.
+
+[ Ya comí ]   [ Todavía no ]   [ Omitir ]
+
+El menú ⋯ puede ofrecer:
+
+- recordar luego;
+- no volver a mostrar esto;
+- ver por qué apareció.
+
+==================================================
+13. PLAN VIVO EN CORE
+==================================================
+
+Mostrar solo tres niveles:
+
+AHORA
+PRÓXIMO
+DESPUÉS
+
+Máximo 3 eventos visibles.
+
+Ejemplo:
+
+PLAN VIVO
+
+AHORA
+Preparar desayuno
+[ Hecho ] [ Cambiar ]
+
+PRÓXIMO · 11:00
+Actividad
+[ Ver ]
+
+DESPUÉS · 13:30
+Almuerzo
+
+[ Ver plan completo ]
+
+Interacciones posibles:
+
+- Hecho;
+- Posponer;
+- Cambiar;
+- Ver;
+- Replanificar.
+
+==================================================
+14. MI DÍA EN CORE
+==================================================
+
+Mostrar solo últimos 3 a 5 eventos.
+
+Ejemplo:
+
+MI DÍA
+
+07:15  Desperté
+07:27  Agua 350 ml
+08:10  Desayuno
+10:42  Caminata 32 min
+
+[ Ver día completo ]
+
+Tap en evento = abrir detalle.
+
+Long press o menú ⋯ = acciones secundarias:
+
+- corregir;
+- agregar nota;
+- ver detalle;
+- anular si corresponde.
+
+==================================================
+15. MIS MÓDULOS — INSPIRADO EN MÓDULOS SATÉLITE
+==================================================
+
+Quiero recuperar la idea de módulos satélite configurables, pero con diseño moderno y limpio.
+
+NO usar grid 3x4.
+
+Usar preferiblemente lista/accordion compacto:
+
+MIS MÓDULOS
+
+Alimentación            Hoy en curso          >
+Sueño                   Último registro       >
+Actividad               32 min hoy            >
+Despensa                2 por revisar         >
+Plan Vivo               3 pendientes          >
+
+[ Ver todos ]
+
+Cada módulo puede:
+
+- abrirse;
+- expandir un resumen corto;
+- colapsarse;
+- fijarse en Aegis Core;
+- quitarse de Aegis Core;
+- reorganizarse.
+
+Usar menú ⋯ en cada módulo:
+
+Fijar en Core
+Desfijar
+Ocultar de Core
+Mover arriba
+Mover abajo
+Abrir módulo
+
+IMPORTANTE:
+Ocultar de Core NO significa eliminar el módulo.
+
+==================================================
+16. PERSONALIZAR AEGIS CORE
+==================================================
+
+Diseñar una pantalla o bottom sheet sencillo:
+
+PERSONALIZAR CORE
+
+✓ Alimentación       Fijado
+✓ Sueño
+○ Hidratación        Oculto de Core
+✓ Actividad
+✓ Despensa
+✓ Plan Vivo          Fijado
+
+Permitir drag & drop para ordenar.
+
+No hacerlo técnico.
+
+==================================================
+17. AYER / RESUMEN RECIENTE
+==================================================
+
+No mostrarlo siempre.
+
+Ejemplo:
+
+AYER
+
+7 h 18 min sueño · 3 comidas · 54 min actividad
+Mejor hidratación que tu tendencia reciente.
+
+[ Ver resumen ]
+
+==================================================
+18. RESPUESTAS VISUALES
+==================================================
+
+La conversación NO debe devolver solo párrafos.
+
+Diseñar respuestas que puedan mezclar:
+
+- texto breve;
+- tarjeta;
+- imagen;
+- receta;
+- mini gráfica;
+- timeline;
+- rango;
+- botones;
+- chips;
+- progresos;
+- resumen de acción;
+- enlace “Ver en módulo”.
+
+Ejemplo de respuesta a:
+
+“Tengo hambre.”
+
+Aegis responde brevemente y muestra dos opciones, no cinco.
+
+OPCIÓN 1
+Huevos + tomate
+~310 kcal · 26 g proteína · 12 min
+Usa tomates que conviene consumir pronto.
+[ Ver receta ] [ Elegir ]
+
+OPCIÓN 2
+Atún + ensalada
+~260 kcal · 32 g proteína · 8 min
+[ Ver receta ] [ Elegir ]
+
+Debajo:
+¿Por qué estas opciones?
+
+==================================================
+19. FLUJO VISUAL DE FOTO DE COMIDA
+==================================================
+
+Diseñar este flujo como pantallas/estados visuales:
+
+1. cámara / seleccionar foto;
+2. preview;
+3. estado “Analizando…”;
+4. lista breve de alimentos detectados;
+5. una pregunta visual si algo es ambiguo;
+6. estimación de porciones;
+7. confirmar/corregir;
+8. resultado;
+9. resumen de lo registrado.
+
+Ejemplo:
+
+Veo probablemente:
+
+✓ arroz                         alta
+✓ pollo a la plancha            alta
+✓ tomate/cebolla                media-alta
+? lo blanco podría ser queso o salsa
+
+¿Es queso o salsa?
+
+[ Queso ] [ Salsa ] [ Otra cosa ]
 
 Después:
-Arroz 140–180 g
-Pollo 160–210 g
-Ensalada 70–100 g
-[Confirmar] [Ajustar]
 
-No exigir gramos por defecto. No mostrar una estimación como medición exacta.
+ESTIMACIÓN
 
-VOZ
+Arroz       140–180 g
+Pollo       160–210 g
+Ensalada     70–100 g
 
-Tap micrófono → waveform discreto → transcripción provisional → Corregir / Usar → Aegis procesa. Para acciones simples de bajo riesgo y alta confidence puede registrar sin un paso extra si la política lo permite.
+[ Confirmar ] [ Ajustar ]
 
-ACCIONES RÁPIDAS CONTEXTUALES
+==================================================
+20. CORREGIR FOTO / INGREDIENTE
+==================================================
 
-Cambian con el momento. Máximo tres.
+Diseñar una interacción muy simple para:
 
-Mañana: Ya desperté / Registrar peso / Tomé agua / ¿Qué desayuno?
-Mediodía: Ya comí / Tomar foto / ¿Qué puedo comer?
-Después de actividad: Terminé / RPE / Dolor-recuperación
-Supermercado: Escanear compra / Ver lista / Escanear etiqueta
+- cambiar alimento;
+- añadir uno faltante;
+- quitar uno incorrecto;
+- ajustar una porción;
+- marcar “no sé”.
 
-ACTION RECEIPT
+No convertir esto en un formulario largo.
 
-Éxito:
+==================================================
+21. VOZ
+==================================================
+
+Diseñar:
+
+- botón micrófono;
+- waveform discreto;
+- transcripción provisional;
+- botones Corregir / Usar.
+
+Ejemplo:
+
+“Me acabo de levantar y dormí como seis horas.”
+
+[ Corregir ] [ Usar ]
+
+==================================================
+22. RESUMEN DE ACCIÓN
+==================================================
+
+Después de registrar algo, mostrar un recibo visual pequeño.
+
+ÉXITO:
+
 HECHO
 ✓ comida registrada
-✓ balance recalculado
+✓ resumen actualizado
 ✓ plan actualizado
-✓ Ledger verificado
-[Ver detalles]
 
-Parcial:
+[ Ver detalles ]
+
+PARCIAL:
+
 PARCIAL
 ✓ comida registrada
-✕ no pude actualizar inventario
-[Reintentar] [Revisar]
+✕ no se pudo actualizar inventario
 
-Pendiente:
+[ Reintentar ] [ Revisar ]
+
+PENDIENTE:
+
 NECESITO CONFIRMACIÓN
-“La foto no permite distinguir queso vs salsa.”
-[Confirmar]
+No puedo distinguir queso y salsa.
 
-Nunca ocultar un fallo detrás de un mensaje de éxito.
+[ Confirmar ]
 
-EVIDENCIA / “¿POR QUÉ AEGIS CREE ESTO?”
+==================================================
+23. “¿POR QUÉ?” / DETALLE DE EVIDENCIA
+==================================================
 
-Tap abre bottom sheet con:
-- estado: medido / confirmado / calculado / estimado / probable / desconocido
-- confidence
-- fuentes
-- supuestos
-- eventos usados
-- advertencia cuando no es medición
-- Ver evidencia
-- Ver agentes
+Cuando el usuario toca “¿Por qué?” abrir:
 
-TRANSPARENCIA MULTIAGENTE
+- bottom sheet en móvil;
+- drawer lateral en desktop.
 
-En modo normal ocultar complejidad y decir algo como “Aegis está analizando…”. No mostrar chain-of-thought.
+Debe mostrar información visual simple:
 
-Si el usuario abre “Ver agentes”, mostrar metadata operativa:
-- supervisor usado
-- especialistas usados
-- tools
-- fuentes
-- confidence
-- resultado
-- errores
-- auditoría
+Estado: PROBABLE
+Confianza: MEDIA-ALTA
+Basado en:
+• última comida 08:12
+• caminata 32 min
+• hora actual 12:38
 
-Ejemplo:
-Nutrition Supervisor ✓
-Food Vision ✓
-Portion Estimation ✓
-Nutrient Calculation ✓
-Evidence & Uncertainty ✓
-Nutrition Audit ✓
-Resultado verificado
+Botones:
+[ Ver detalle ] [ Cerrar ]
 
-INTELIGENCIA INTERNA QUE EL DISEÑO DEBE SOPORTAR
+No mostrar razonamiento interno largo.
 
-Aegis Core coordina supervisores de:
-- Alimentación/Nutrición
-- Metabolismo/Fisiología
-- Sueño/Recuperación
-- Actividad/Ejercicio
-- Hidratación
-- Energía/Ánimo/Hambre/Foco
-- Medicación/Suplementos
-- Dolor/Síntomas
-- Peso/Medidas/Cuerpo
-- Hábitos/Rutinas
-- Despensa/Compras/Hogar
-- Plan Vivo
+==================================================
+24. MÓDULO PROFUNDO — PLANTILLA GENERAL
+==================================================
 
-Expertos transversales:
-- Physiology Expert
-- Biochemistry Expert
-- Evidence & Uncertainty
-- Temporal Reasoning
-- User Model / Personalization
-- Memory Curator
-- Intervention Policy
-- Cross-Domain Consistency
-- Audit
-- Safety & Permission
-- Report & Export
+Al abrir un módulo se permite mucha más información.
 
-Grupo culinario:
-- Recipe Generation
-- Recipe Adaptation
-- Ingredient Substitution
-- Culinary Technique
-- Meal Prep
-- Batch Cooking
-- Food Safety / Storage Guidance
-- Leftovers Optimization
+Estructura visual general:
 
-Especialistas de Nutrición:
-- MealInputInterpreter
-- FoodVision
-- MenuAndLabelReader
-- PortionEstimation
-- FoodResolution
-- NutrientCalculation
-- MealContext
-- DietaryPlanning
-- EatingPattern
-- NutritionAudit
+- header del módulo;
+- resumen actual;
+- 1–3 acciones principales;
+- botón “Preguntar a Aegis sobre…”;
+- tendencias;
+- timeline/historial;
+- gráficas;
+- registros;
+- filtros;
+- detalles expandibles;
+- exportar;
+- corregir.
 
-Especialistas de Metabolismo:
-- MetabolicPhase
-- FastingState
-- SubstrateUtilization
-- HormonalResponse
-- GlycogenState
-- EnergyBalance
-- ExerciseBiochemistry
-- MetabolicPattern
-- BiochemicalExplanation
-- MetabolismAudit
+Core es limpio.
+Módulos son profundos.
 
-Especialistas de Sueño:
-- SleepEventInterpreter
-- SleepWindow
-- SleepQuality
-- CircadianPattern
-- Recovery
-- WearableSleep
-- SleepRoutine
-- SleepPattern
-- SleepIntervention
-- SleepAudit
+==================================================
+25. MÓDULO ALIMENTACIÓN / NUTRICIÓN
+==================================================
 
-Especialistas de Actividad:
-- ActivityInput
-- ExerciseClassification
-- TrainingLoad
-- EnergyExpenditure
-- RPE
-- MovementPattern
-- RecoveryInteraction
-- ExercisePainContext
-- ActivityPattern
-- ActivityAudit
+Diseñar una pantalla profunda de ejemplo.
 
-Especialistas de Hidratación:
-- HydrationInput
-- HydrationNeeds
-- ExerciseHydration
-- HydrationPattern
-- HydrationAudit
+Header:
 
-Especialistas Estado/Energía:
-- SubjectiveStateInterpreter
-- EnergyPattern
-- HungerPattern
-- FocusLoad
-- ContextCorrelation
-- StateTrend
-- StateAudit
+ALIMENTACIÓN
+Hoy
 
-Especialistas Medicación:
-- MedicationLogger
-- DoseCapture
-- MedicationReminder
-- Adherence
-- SideEffectReporter
-- MedicationAudit
+[ Preguntar a Aegis ] [ Registrar ] [ Foto ]
 
-Especialistas Síntomas:
-- SymptomIntake
-- PainCharacterization
-- TriggerContext
-- Severity
-- RedFlagSafety
-- SymptomPattern
-- CrossDomainSymptom
-- SymptomsAudit
+Resumen superior compacto:
 
-Especialistas Cuerpo:
-- MeasurementCapture
-- MeasurementValidation
-- WeightTrend
-- BodyComposition
-- GoalTrend
-- BodyAudit
+- comidas de hoy;
+- energía aproximada/rango;
+- proteína;
+- carbohidratos;
+- grasas;
+- fibra;
+- progreso del día.
 
-Especialistas Hábitos:
-- HabitEvent
-- RoutineDiscovery
-- HabitAdherence
-- HabitPlanning
-- HabitPattern
-- HabitIntervention
-- HabitsAudit
+Después lista de comidas.
 
-Especialistas Despensa/Hogar:
-- InventoryInput
-- ReceiptVision
-- PurchaseParser
-- StockMovement
-- Expiration
-- Replenishment
-- ShoppingList
-- HouseholdNeeds
-- FoodWaste
-- InventoryAudit
+Cada comida puede expandirse y mostrar:
 
-Especialistas Plan Vivo:
-- DayPlanning
-- ConstraintResolver
-- MealPlanning
-- PreparationPlanning
-- ActivityPlanning
-- RecoveryPlanning
-- Replanning
-- GoalAlignment
-- PlanConflict
-- PlanAudit
+- foto;
+- hora;
+- alimentos;
+- preparación;
+- cantidad;
+- rango de porción;
+- energía/macros;
+- digestión reportada;
+- componentes relevantes;
+- notas;
+- relación con el día;
+- botón corregir;
+- botón ver análisis.
 
-El usuario NO administra esos agentes. Aegis Core los usa detrás y entrega una sola respuesta coherente.
+Agregar sección expandible:
 
-UNA ENTRADA, VARIOS MÓDULOS
+ANÁLISIS AVANZADO
 
-La interfaz debe asumir que una frase puede alimentar varios dominios. Ejemplo: “Me comí esto a las 2 y luego caminé 40 minutos.” Puede actualizar alimentación, cronología, actividad, gasto, balance, metabolismo y plan. El usuario recibe una única respuesta y Action Receipt.
+que pueda contener:
 
-PREGUNTAS INTELIGENTES
+- explicación fisiológica;
+- bioquímica;
+- rutas metabólicas;
+- sinergias;
+- incertidumbre.
 
-No interrogues. Pregunta solo cuando un dato faltante cambia materialmente el resultado, existe conflicto, la confidence es insuficiente o una acción sensible requiere confirmación.
+Este contenido NO aparece por defecto en Core.
 
-Pregunta corta y fácil de responder con tap cuando sea posible.
+==================================================
+26. MÓDULO METABOLISMO
+==================================================
 
-CORRECCIÓN FORENSE
+Diseñar pantalla profunda con:
 
-Ejemplo “No eran 2 huevos, eran 3.”
-Mostrar:
-CORRECCIÓN
-2 huevos → 3 huevos
-Se recalculará comida, nutrientes, acumulado, metabolismo y plan.
-[Confirmar corrección]
+- estado probable actual;
+- tiempo desde última ingesta;
+- timeline metabólico;
+- balance del día;
+- explicación humana;
+- detalle técnico expandible;
+- botón “¿Por qué?”;
+- tendencia reciente.
 
-Después:
-ACTUALIZADO
-✓ registro corregido
-✓ cálculos actualizados
-✓ historial conservado en Ledger
+No usar estética médica hospitalaria.
 
-MÓDULOS PROFUNDOS
+==================================================
+27. MÓDULO SUEÑO
+==================================================
 
-Dentro de los módulos sí se permite mucha más profundidad: gráficas, tendencias, filtros, historial, tablas, indicadores, evidencia, exportación, auditoría y chat contextual. Mantener jerarquía y whitespace.
+Diseñar pantalla profunda con:
 
-Cada módulo debe tener un chat contextual “Preguntar a Aegis sobre…” sin iniciar una inteligencia nueva: sigue siendo Aegis con scope preferente de ese módulo.
+- último sueño;
+- hora de dormir/despertar;
+- duración;
+- calidad;
+- despertares;
+- recuperación;
+- tendencia semanal;
+- regularidad;
+- timeline;
+- botón “Preguntar a Aegis sobre sueño”.
 
-CONFIGURACIÓN
+==================================================
+28. MÓDULO ACTIVIDAD
+==================================================
 
-Crear sección completa, sin contaminar Core:
-- Perfil y objetivos
-- Preferencias
+Diseñar pantalla profunda con:
+
+- actividad de hoy;
+- sesiones;
+- duración;
+- intensidad/RPE;
+- gasto estimado;
+- tendencia;
+- recuperación;
+- historial;
+- botón conversación contextual.
+
+==================================================
+29. MÓDULO DESPENSA / HOGAR
+==================================================
+
+Diseñar pantalla profunda con:
+
+- existencias;
+- ubicaciones;
+- bajo stock;
+- próximos a vencer;
+- lista de compras;
+- compras recientes;
+- recibos;
+- historial;
+- botones Cámara / Agregar compra / Lista.
+
+Diseñar interacción de foto de nevera o recibo.
+
+==================================================
+30. PLAN VIVO PROFUNDO
+==================================================
+
+Diseñar:
+
+- timeline de hoy;
+- planificado vs realizado;
+- ahora/próximo/después;
+- elementos movidos;
+- pendientes;
+- mañana;
+- drag & drop cuando sea natural;
+- acciones completar/posponer/cambiar.
+
+==================================================
+31. MI DÍA PROFUNDO
+==================================================
+
+Diseñar una bitácora cronológica limpia.
+
+Filtros por tipo opcionales.
+
+Eventos con hora, icono y resumen.
+
+Tap abre detalle.
+
+Debe permitir editar/corregir mediante acciones secundarias.
+
+==================================================
+32. CONFIGURACIÓN
+==================================================
+
+Diseñar una sección completa pero organizada.
+
+PERFIL Y OBJETIVOS
+PREFERENCIAS
+
+AEGIS
 - estilo de respuesta
 - nivel de detalle
-- profundidad técnica/bioquímica
+- profundidad técnica
 - preguntas automáticas
 - nivel de autonomía
 - memoria
-- notificaciones por dominio
-- privacidad y permisos
-- fotos/documentos
-- ubicación
-- integraciones
-- importación
-- exportación
-- backups
-- auditoría
 
-INTERACCIONES
+NOTIFICACIONES
 
-Tap para abrir detalle.
-Long press para acciones secundarias.
-Swipe cuando sea intuitivo.
-Drag/reorder en Plan Vivo.
-Pull to refresh.
-Bottom sheets.
-Drawers.
-Expand/collapse.
-Haptic feedback móvil en confirmaciones importantes.
-No esconder funciones esenciales solo detrás de gestos.
+PRIVACIDAD Y PERMISOS
 
-MOTION
+INTEGRACIONES
 
-150–250 ms. Suave. El logo/orbita puede tener una respiración casi imperceptible. Glow leve mientras Aegis procesa. No partículas permanentes ni animación gamer.
+DATOS
+- importar
+- exportar
+- backup
 
-MOBILE-FIRST
+APARIENCIA
+ACCESIBILIDAD
 
-Una columna, scroll natural, controles táctiles ≥44px, bottom sheets, sticky composer, bottom navigation de cuatro destinos, drawer para profundidad. No comprimir un dashboard desktop dentro de 390 px.
+Usar accordions o secciones, no una lista interminable plana.
 
-DESKTOP
+==================================================
+33. ESTADOS VACÍOS
+==================================================
 
-Sidebar colapsable. Área principal amplia. Puede existir panel contextual derecho solo cuando aporte valor (evidencia, detalle, agentes, preview). No usar el ancho extra como excusa para mostrar más información simultánea.
+Diseñar empty states elegantes.
 
-ESTADOS VACÍOS
+Ejemplo:
 
-Nunca inventar valores. En vez de “Sueño 7.5 h” si no hay datos, mostrar “Todavía no tengo suficiente información sobre tu última noche.” + acción “Contarme cómo dormí”.
+SUEÑO
 
-ERRORES
+Todavía no hay suficiente información sobre tu última noche.
 
-Ejemplo: “No pude analizar la imagen. Tu foto no fue registrada todavía.” [Reintentar] [Escribir qué contiene]. No afirmar éxito después de una excepción.
+[ Registrar sueño ]
 
-AUTONOMÍA
+Nunca rellenar una tarjeta con un número ficticio solo para que se vea bonita.
 
-Aegis puede realizar acciones silenciosas de bajo riesgo. La auditoría profunda vive fuera de Core, por ejemplo en “Actividad de Aegis”: qué hizo, qué decidió no notificar, qué cambió y por qué.
+==================================================
+34. ESTADOS DE ERROR
+==================================================
 
-ENTREGABLES DE STITCH
+Ejemplo:
+
+No pude analizar la imagen.
+
+[ Reintentar ] [ Describir manualmente ]
+
+Diseño calmado, no alarmista salvo que corresponda.
+
+==================================================
+35. INTERACCIONES GENERALES
+==================================================
+
+Tap = abrir/expandir.
+Long press o ⋯ = acciones secundarias.
+Swipe = solo cuando sea obvio.
+Drag = ordenar módulos o Plan Vivo.
+Pull to refresh = sincronizar/actualizar.
+
+Usar:
+
+- bottom sheets;
+- drawers;
+- accordions;
+- expand/collapse;
+- sticky composer;
+- chips;
+- cards accionables;
+- tooltips desktop;
+- haptic feedback sugerido en móvil.
+
+No esconder funciones críticas únicamente detrás de gestos.
+
+==================================================
+36. MOTION
+==================================================
+
+Animaciones suaves de 150–250 ms.
+
+- expandir/colapsar;
+- abrir drawer;
+- bottom sheet;
+- feedback de registro;
+- foco del composer;
+- pequeño pulso violeta mientras procesa.
+
+El logo puede tener una respiración casi imperceptible.
+
+No usar partículas permanentes.
+
+==================================================
+37. RESPONSIVE
+==================================================
+
+MOBILE:
+- una columna;
+- scroll vertical;
+- bottom nav;
+- drawer;
+- bottom sheets;
+- sticky composer;
+- módulos a pantalla completa.
+
+TABLET:
+- sidebar compacta o drawer persistente;
+- una o dos columnas;
+- más espacio, misma jerarquía.
+
+DESKTOP:
+- sidebar colapsable;
+- gran área central;
+- panel de detalle lateral solo bajo demanda;
+- no llenar el ancho extra de información innecesaria.
+
+==================================================
+38. ENTREGABLES VISUALES
+==================================================
 
 Genera como mínimo:
-1. pantalla mobile completa de Aegis Core;
-2. continuación vertical/scroll de Aegis Core;
-3. versión desktop responsive con sidebar colapsable;
-4. navigation drawer móvil;
-5. bottom sheet + Registrar;
-6. ejemplo de respuesta rica “Tengo hambre”;
-7. flujo de foto de comida con confirmación;
-8. Action Receipt éxito/parcial;
-9. bottom sheet “¿Por qué Aegis cree esto?”;
-10. transparencia “Ver agentes”;
-11. pantalla profunda de un módulo como Alimentación o Sueño;
-12. pantalla Configuración;
-13. estado vacío;
-14. estado de error;
-15. Plan Vivo interactivo.
 
-CRITERIO DE RECHAZO
+1. Aegis Core mobile — primer viewport.
+2. Aegis Core mobile — continuación vertical del scroll.
+3. Aegis Core desktop.
+4. Sidebar desktop expandida.
+5. Sidebar desktop contraída.
+6. Navigation drawer mobile.
+7. Bottom sheet + Registrar.
+8. Personalizar Core / módulos fijados.
+9. Estado “Aegis detecta”.
+10. Plan Vivo breve.
+11. Mi Día breve.
+12. Respuesta visual “Tengo hambre”.
+13. Flujo de foto de comida.
+14. Corrección de alimento/porción.
+15. Resumen de acción éxito.
+16. Resumen de acción parcial/error.
+17. Bottom sheet “¿Por qué?”.
+18. Módulo profundo Alimentación.
+19. Módulo profundo Metabolismo o Sueño.
+20. Módulo Despensa/Hogar.
+21. Plan Vivo profundo.
+22. Mi Día profundo.
+23. Configuración.
+24. Empty state.
+25. Error state.
 
-Rechaza cualquier propuesta que:
-- muestre 12 cards en Aegis Core;
-- parezca dashboard empresarial;
-- sea solo chat de texto;
-- no tenga foto/voz/archivo;
-- no tenga confirmación/corrección;
-- no tenga Action Receipt;
-- no tenga evidencia/confidence;
-- no tenga navegación completa;
-- no tenga configuración;
-- no sea mobile-first con scroll;
-- no contemple auditoría/agentes;
-- se vea visualmente saturada.
+==================================================
+39. CRITERIO DE RECHAZO
+==================================================
 
-Resultado final: debe sentirse como UNA inteligencia personal coherente y tranquila, aunque debajo exista una orquesta compleja de agentes.
+No aceptar una propuesta si:
+
+- parece un dashboard corporativo;
+- muestra todos los módulos simultáneamente;
+- llena Core de números;
+- solo diseña una caja de chat;
+- no tiene scroll orgánico;
+- no tiene navegación completa;
+- no tiene módulos expandibles;
+- no permite fijar/ocultar/reordenar resúmenes de módulos;
+- no tiene cámara;
+- no tiene voz;
+- no tiene corrección;
+- no tiene estados de éxito/error;
+- omite Configuración;
+- móvil parece desktop comprimido;
+- el dorado/violeta saturan;
+- parece gamer;
+- obliga a mirar todo a la vez.
+
+RESULTADO FINAL:
+
+AION Aegis debe sentirse como una inteligencia personal premium, tranquila y viva.
+
+La pantalla principal debe respirar.
+
+La profundidad debe existir, pero aparecer solamente cuando el usuario la abre.
