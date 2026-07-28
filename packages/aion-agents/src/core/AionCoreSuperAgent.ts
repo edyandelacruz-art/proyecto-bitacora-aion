@@ -38,18 +38,19 @@ export class AionCoreSuperAgent {
     const profile = this.memoryStore.getCoreProfile();
     const userName = profile.displayName || 'Edyan';
 
-    // 1. EXTRAER INFERENCIAS DE DATOS Y EVENTOS
+    // 1. INFERENCIA AUTÓNOMA DE DOMINIOS Y ACCIONES
     const inferenceResult = this.naturalEngine.processNaturalInput(inputText, userName);
     let detectedDomains = inferenceResult.detectedDomains;
     let actionsSummary = inferenceResult.inferredActions;
+    const primaryDomain = detectedDomains[0] || 'CONVERSATIONAL';
 
-    // 2. GENERAR RESPUESTA FLUIDA MEDIANTE MOTOR GENERATIVO LLM LIBRE DE PLANTILLAS
+    // 2. GENERACIÓN DE RESPUESTA A TRAVÉS DEL PIPELINE MULTI-RUTA DE LLM (Ollama Local -> LM Studio -> API Externa -> Sintetizador Experto)
     let finalReply = await this.llmEngine.generateResponse({
       userPrompt: inputText,
-      systemPrompt: `Eres AION Aegis, la prótesis ejecutiva IA soberana de ${userName}. Hablas en español fluido, natural, empático y profundamente inteligente. NUNCA usas plantillas enlatadas ni respuestas robóticas. Respondes directamente a las dudas de ${userName}.`,
+      domain: primaryDomain,
     });
 
-    // 3. SI ADJUNTA IMAGEN O ES ESPECÍFICO DE ALIMENTOS, PROCESAR VISIÓN Y NUTRICIÓN
+    // 3. SI ADJUNTA IMAGEN O ES ESPECÍFICO DE NUTRICIÓN, INVOCAR VISIÓN Y ANÁLISIS DE PLATO
     if (imageUrl || textLower.includes('comida') || textLower.includes('plato') || textLower.includes('almuerzo')) {
       if (!detectedDomains.includes('NUTRITION')) detectedDomains.push('NUTRITION');
       const aegisResult = await this.aegisSpecialist.processMealInput(inputText, imageUrl);
