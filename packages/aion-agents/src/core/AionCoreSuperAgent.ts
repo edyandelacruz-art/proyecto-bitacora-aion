@@ -2,6 +2,7 @@ import { AionEventBus } from '@aion/protocol';
 import { AionMemoryStore } from '@aion/memory';
 import { NutritionLeadSpecialist } from '../index';
 import { VisionService } from '../vision/VisionService';
+import { AionGenerativeLlmEngine } from './AionGenerativeLlmEngine';
 import { AionNaturalDialogueEngine } from './AionNaturalDialogueEngine';
 
 export interface OmniDispatchResult {
@@ -17,6 +18,7 @@ export class AionCoreSuperAgent {
   private memoryStore = AionMemoryStore.getInstance();
   private aegisSpecialist = new NutritionLeadSpecialist();
   private visionService = VisionService.getInstance();
+  private llmEngine = AionGenerativeLlmEngine.getInstance();
   private naturalEngine = AionNaturalDialogueEngine.getInstance();
 
   private constructor() {}
@@ -36,14 +38,18 @@ export class AionCoreSuperAgent {
     const profile = this.memoryStore.getCoreProfile();
     const userName = profile.displayName || 'Edyan';
 
-    // 1. PROCESAMIENTO A TRAVÉS DEL MOTOR DE DIÁLOGO E INFERENCIA DE LENGUAJE NATURAL
+    // 1. EXTRAER INFERENCIAS DE DATOS Y EVENTOS
     const inferenceResult = this.naturalEngine.processNaturalInput(inputText, userName);
-
-    let finalReply = inferenceResult.reply;
     let detectedDomains = inferenceResult.detectedDomains;
     let actionsSummary = inferenceResult.inferredActions;
 
-    // 2. SI ADJUNTA IMAGEN O ES ESPECÍFICO DE NUTRICIÓN, INVOCAR ESPECIALISTA EN VISIÓN / ALIMENTOS
+    // 2. GENERAR RESPUESTA FLUIDA MEDIANTE MOTOR GENERATIVO LLM LIBRE DE PLANTILLAS
+    let finalReply = await this.llmEngine.generateResponse({
+      userPrompt: inputText,
+      systemPrompt: `Eres AION Aegis, la prótesis ejecutiva IA soberana de ${userName}. Hablas en español fluido, natural, empático y profundamente inteligente. NUNCA usas plantillas enlatadas ni respuestas robóticas. Respondes directamente a las dudas de ${userName}.`,
+    });
+
+    // 3. SI ADJUNTA IMAGEN O ES ESPECÍFICO DE ALIMENTOS, PROCESAR VISIÓN Y NUTRICIÓN
     if (imageUrl || textLower.includes('comida') || textLower.includes('plato') || textLower.includes('almuerzo')) {
       if (!detectedDomains.includes('NUTRITION')) detectedDomains.push('NUTRITION');
       const aegisResult = await this.aegisSpecialist.processMealInput(inputText, imageUrl);
@@ -53,7 +59,7 @@ export class AionCoreSuperAgent {
     }
 
     this.memoryStore.addLedgerEntry({
-      id: `led_natural_${Date.now()}`,
+      id: `led_gen_${Date.now()}`,
       timestamp: new Date().toISOString(),
       type: 'recommendation',
       source: 'agent',
@@ -65,7 +71,7 @@ export class AionCoreSuperAgent {
     return {
       coreReply: finalReply,
       detectedDomains,
-      dispatchedEvents: ['aion.core.natural.dialogue.processed'],
+      dispatchedEvents: ['aion.core.generative.dialogue.processed'],
       actionsSummary,
     };
   }
