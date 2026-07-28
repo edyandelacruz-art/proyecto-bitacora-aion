@@ -197,11 +197,11 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
             <h3 className="text-xl font-bold text-white mt-1">Curva Bioenergética & Balance Glucose Wave</h3>
           </div>
           <button
-            onClick={() => onOpenModuleDeepView('metabolism')}
+            onClick={() => onOpenDrawer('METABOLISMO')}
             className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-[#C4B5FD] hover:bg-[#7C3AED]/20 transition-all flex items-center gap-2"
           >
-            <span>Profundizar en Metabolismo</span>
-            <span className="material-symbols-outlined text-sm">open_in_new</span>
+            <span>Abrir Análisis Contextual en Barra Lateral</span>
+            <span className="material-symbols-outlined text-sm">dock_to_left</span>
           </button>
         </div>
 
@@ -256,14 +256,14 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
         </div>
       </section>
 
-      {/* 3. SECCIÓN INFERIOR COMPLETA (COLOCADA DEBAJO DEL CHAT): ESTADO DE MÓDULOS ACTIVOS */}
+      {/* 3. SECCIÓN INFERIOR: TARJETAS DE MÓDULOS QUE ABREN LA BARRA LATERAL CONTEXTUAL AL HACER CLIC */}
       <section className="dashboard-card rounded-[36px] p-6 lg:p-8 border border-white/10 space-y-6 bg-[#111017] w-full">
         <div className="flex justify-between items-center border-b border-white/10 pb-4 flex-wrap gap-4">
           <div>
             <span className="text-[10px] font-bold text-[#D6B36A] uppercase tracking-[0.25em]">
               PANEL DE CONTROL GENERAL
             </span>
-            <h3 className="text-xl font-bold text-white mt-1">Estado de Módulos Activos (Ubicados Debajo del Chat)</h3>
+            <h3 className="text-xl font-bold text-white mt-1">Estado de Módulos (Haz clic para desplegar la Barra Lateral Derecha de Contexto)</h3>
           </div>
           <span className="text-xs font-bold text-[#C4B5FD] bg-[#7C3AED]/20 px-4 py-1.5 rounded-full border border-[#7C3AED]/40">
             77 DÍAS CONSECUTIVOS DE BITÁCORA ACTIVOS
@@ -271,9 +271,9 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* SUEÑO */}
+          {/* SUEÑO - ABRE DRAWER SUEÑO */}
           <div
-            onClick={() => onOpenModuleDeepView('sleep')}
+            onClick={() => onOpenDrawer('SUEÑO')}
             className="p-5 rounded-3xl bg-white/5 border border-white/10 hover:border-[#7C3AED]/50 transition-all cursor-pointer space-y-3 group"
           >
             <div className="flex justify-between items-center">
@@ -285,14 +285,14 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
               <p className="text-xs text-[#CCC3D8]/70 mt-1">{latestSleep.hoursInBed}h en cama • Calidad {latestSleep.subjectiveQualityScore}/10</p>
             </div>
             <div className="flex justify-between items-center text-[11px] text-[#C4B5FD] pt-2 border-t border-white/5 font-bold">
-              <span>Ver Fases REM/Profundo</span>
-              <span className="material-symbols-outlined text-sm">arrow_forward</span>
+              <span>Abrir Barra Lateral Contextual</span>
+              <span className="material-symbols-outlined text-sm">dock_to_left</span>
             </div>
           </div>
 
-          {/* ACTIVIDAD */}
+          {/* ACTIVIDAD - ABRE DRAWER ACTIVIDAD */}
           <div
-            onClick={() => onOpenModuleDeepView('activity')}
+            onClick={() => onOpenDrawer('ACTIVIDAD')}
             className="p-5 rounded-3xl bg-white/5 border border-white/10 hover:border-[#D6B36A]/50 transition-all cursor-pointer space-y-3 group"
           >
             <div className="flex justify-between items-center">
@@ -304,14 +304,14 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
               <p className="text-xs text-[#CCC3D8]/70 mt-1">{totalActivityMin} min acumulados hoy • RPE 8/10</p>
             </div>
             <div className="flex justify-between items-center text-[11px] text-[#D6B36A] pt-2 border-t border-white/5 font-bold">
-              <span>Ver Zonas Cardiacas</span>
-              <span className="material-symbols-outlined text-sm">arrow_forward</span>
+              <span>Abrir Barra Lateral Contextual</span>
+              <span className="material-symbols-outlined text-sm">dock_to_left</span>
             </div>
           </div>
 
-          {/* HIDRATACIÓN */}
+          {/* HIDRATACIÓN - ABRE DRAWER HIDRATACIÓN */}
           <div
-            onClick={() => onOpenModuleDeepView('hydration')}
+            onClick={() => onOpenDrawer('HIDRATACIÓN')}
             className="p-5 rounded-3xl bg-white/5 border border-white/10 hover:border-sky-400/50 transition-all cursor-pointer space-y-3 group"
           >
             <div className="flex justify-between items-center">
@@ -323,14 +323,14 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
               <p className="text-xs text-[#CCC3D8]/70 mt-1">Tanque hídrico celular activo al {Math.min((currentWater / 2500) * 100, 100).toFixed(0)}%</p>
             </div>
             <div className="flex justify-between items-center text-[11px] text-sky-400 pt-2 border-t border-white/5 font-bold">
-              <span>Registrar Toma +250ml</span>
-              <span className="material-symbols-outlined text-sm">arrow_forward</span>
+              <span>Abrir Barra Lateral Contextual</span>
+              <span className="material-symbols-outlined text-sm">dock_to_left</span>
             </div>
           </div>
 
-          {/* FINANZAS */}
+          {/* FINANZAS - ABRE DRAWER FINANZAS */}
           <div
-            onClick={() => onOpenModuleDeepView('finances')}
+            onClick={() => onOpenDrawer('FINANZAS')}
             className="p-5 rounded-3xl bg-white/5 border border-white/10 hover:border-[#D6B36A]/50 transition-all cursor-pointer space-y-3 group"
           >
             <div className="flex justify-between items-center">
@@ -342,8 +342,8 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
               <p className="text-xs text-[#CCC3D8]/70 mt-1">Gastos derivados de compras de despensa y salud</p>
             </div>
             <div className="flex justify-between items-center text-[11px] text-[#D6B36A] pt-2 border-t border-white/5 font-bold">
-              <span>Ver Libro de Gastos</span>
-              <span className="material-symbols-outlined text-sm">arrow_forward</span>
+              <span>Abrir Barra Lateral Contextual</span>
+              <span className="material-symbols-outlined text-sm">dock_to_left</span>
             </div>
           </div>
         </div>
