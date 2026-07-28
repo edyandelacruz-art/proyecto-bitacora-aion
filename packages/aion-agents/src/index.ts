@@ -36,6 +36,18 @@ export class GoogleDriveIntegration {
   }
 }
 
+export class GoogleCalendarIntegration {
+  private static instance: GoogleCalendarIntegration;
+  private constructor() {}
+  public static getInstance(): GoogleCalendarIntegration {
+    if (!GoogleCalendarIntegration.instance) GoogleCalendarIntegration.instance = new GoogleCalendarIntegration();
+    return GoogleCalendarIntegration.instance;
+  }
+  public async syncCommitmentToCalendar(title: string, dateStr: string, timeStr: string): Promise<{ eventId: string; status: string }> {
+    return { eventId: `evt_cal_${Date.now()}`, status: 'CONFIRMED' };
+  }
+}
+
 export {
   VisionService,
   LanguageEngine,
