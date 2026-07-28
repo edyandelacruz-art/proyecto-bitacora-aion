@@ -1,16 +1,6 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { AionCoreSuperAgent } from '@aion/agents';
-import { AionMemoryStore } from '@aion/memory';
-
-interface ChatMessage {
-  id: string;
-  sender: 'user' | 'agent';
-  text: string;
-  timestamp: string;
-  agentName?: string;
-  detectedDomains?: string[];
-  imageUrl?: string;
-}
+import { AionMemoryStore, ChatMessageEntry } from '@aion/memory';
 
 interface AegisCoreFeedProps {
   onRefreshAll: () => void;
@@ -24,7 +14,6 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
   onOpenDrawer,
 }) => {
   const store = AionMemoryStore.getInstance();
-  const plan = store.getLivePlan();
   const finConfig = store.getFinanceConfig();
 
   const [inputMessage, setInputMessage] = useState('');
@@ -33,17 +22,14 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const chatBottomRef = useRef<HTMLDivElement>(null);
 
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
-    {
-      id: 'welcome_msg',
-      sender: 'agent',
-      text: '¡Bienvenido a AION Aegis! Escribe o dicta cualquier síntoma, ingesta, gasto o compromiso. La arquitectura multiagente procesará tu mensaje autónomamente.',
-      timestamp: '08:00 AM',
-      agentName: 'AION Core SuperAgent',
-      detectedDomains: ['SYSTEM'],
-    },
-  ]);
+  // Carga inicial y estado persistente de mensajes de chat
+  const [chatMessages, setChatMessages] = useState<ChatMessageEntry[]>(() => store.getChatMessages());
+
+  useEffect(() => {
+    chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatMessages]);
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim() && !selectedImage) return;
@@ -51,7 +37,7 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
     const userText = inputMessage.trim();
     const userImg = selectedImage || undefined;
 
-    const userMsg: ChatMessage = {
+    const userMsg: ChatMessageEntry = {
       id: `usr_${Date.now()}`,
       sender: 'user',
       text: userText || '📷 [Imagen Adjunta]',
@@ -59,7 +45,9 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
       imageUrl: userImg,
     };
 
-    setChatMessages((prev) => [...prev, userMsg]);
+    // Guardar en la tienda de memoria persistente
+    store.addChatMessage(userMsg);
+    setChatMessages(store.getChatMessages());
     setInputMessage('');
     setSelectedImage(null);
     setIsProcessing(true);
@@ -68,7 +56,7 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
       const superAgent = AionCoreSuperAgent.getInstance();
       const res = await superAgent.processOmniInput(userText || 'Foto analizada por IA', userImg);
 
-      const agentMsg: ChatMessage = {
+      const agentMsg: ChatMessageEntry = {
         id: `agt_${Date.now()}`,
         sender: 'agent',
         text: res.coreReply,
@@ -77,7 +65,8 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
         detectedDomains: res.detectedDomains,
       };
 
-      setChatMessages((prev) => [...prev, agentMsg]);
+      store.addChatMessage(agentMsg);
+      setChatMessages(store.getChatMessages());
       onRefreshAll();
     } catch (e) {
       console.error('Error procesando entrada omnicanal:', e);
@@ -107,7 +96,7 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
   return (
     <div className="space-y-8 w-full max-w-[1400px] mx-auto px-4 lg:px-6 pt-4 pb-16">
       
-      {/* 1. CANAL CONVERSACIONAL CORE (100% FULL-WIDTH CON VOZ E IMAGEN) */}
+      {/* 1. CANAL CONVERSACIONAL CORE PERSISTENTE EN STORAGE */}
       <div className="w-full bg-[#111017] border border-[#7C3AED]/40 rounded-[36px] p-6 lg:p-8 space-y-6 shadow-2xl relative overflow-hidden">
         <div className="flex justify-between items-center flex-wrap gap-4 border-b border-white/10 pb-4">
           <div className="flex items-center gap-3">
@@ -132,7 +121,7 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
           </div>
         </div>
 
-        {/* FEED DE MENSAJES */}
+        {/* FEED DE MENSAJES PERSISTENTES */}
         <div className="space-y-4 max-h-[380px] overflow-y-auto hide-scrollbar p-2">
           {chatMessages.map((msg) => (
             <div
@@ -148,7 +137,7 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
               >
                 {msg.sender === 'agent' && (
                   <div className="flex justify-between items-center gap-3 border-b border-white/10 pb-2 mb-1">
-                    <span className="font-bold text-[#D6B36A] text-[10px] uppercase tracking-wider">{msg.agentName}</span>
+                    <span className="font-bold text-[#D6B36A] text-[10px] uppercase tracking-wider">{msg.agentName || 'AION Core SuperAgent'}</span>
                     <div className="flex gap-1">
                       {msg.detectedDomains?.map((d, i) => (
                         <span key={i} className="px-2 py-0.5 rounded-full bg-white/10 text-[8px] font-bold text-[#C4B5FD]">
@@ -168,6 +157,8 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
               </div>
             </div>
           ))}
+
+          <div ref={chatBottomRef} />
 
           {isProcessing && (
             <div className="flex items-center gap-3 text-xs text-[#C4B5FD] animate-pulse p-2">
@@ -272,7 +263,7 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
         </div>
       </div>
 
-      {/* 3. CURVA BIOENERGÉTICA CON RÓTULOS COMPLETOS DE EJES (X: HORAS 00:00 - 24:00 | Y: GLUCOSA mg/dL & BMR kcal) */}
+      {/* 3. CURVA BIOENERGÉTICA CON RÓTULOS COMPLETOS DE EJES */}
       <div className="dashboard-card rounded-[36px] p-6 lg:p-8 bg-[#111017] border border-white/10 space-y-6">
         <div className="flex justify-between items-center flex-wrap gap-4 border-b border-white/10 pb-4">
           <div>
@@ -295,11 +286,10 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
           </div>
         </div>
 
-        {/* GRÁFICO SVG VECTORIAL COMPLETO CON EJES Y ETICADAS DE VALOR */}
         <div className="w-full bg-[#070709] rounded-3xl p-6 border border-white/10 space-y-4">
           <div className="relative w-full h-64">
             
-            {/* EJE Y (ETIQUETAS IZQUIERDA DE VALORES) */}
+            {/* EJE Y */}
             <div className="absolute left-0 top-0 bottom-8 w-16 flex flex-col justify-between text-[10px] font-mono text-[#CCC3D8]/70 border-r border-white/10 pr-2 text-right">
               <span>150 mg/dL</span>
               <span className="text-amber-400 font-bold">120 mg/dL</span>
@@ -308,20 +298,16 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
               <span>50 mg/dL</span>
             </div>
 
-            {/* ÁREA SVG DEL GRÁFICO CON MARCAS Y PUNTOS */}
+            {/* ÁREA SVG */}
             <div className="absolute left-16 right-0 top-0 bottom-8 pl-4">
               <svg className="w-full h-full overflow-visible" viewBox="0 0 700 200" preserveAspectRatio="none">
-                
-                {/* LÍNEAS DE CUADRÍCULA HORIZONTALES */}
                 <line x1="0" y1="20" x2="700" y2="20" stroke="rgba(255,255,255,0.05)" strokeDasharray="2,2" />
-                <line x1="0" y1="60" x2="700" y2="60" stroke="rgba(251,191,36,0.3)" strokeDasharray="4,4" /> {/* 120 mg/dL */}
-                <line x1="0" y1="100" x2="700" y2="100" stroke="rgba(214,179,106,0.5)" strokeDasharray="2,2" /> {/* 100 mg/dL Media */}
-                <line x1="0" y1="140" x2="700" y2="140" stroke="rgba(52,211,153,0.3)" strokeDasharray="4,4" /> {/* 80 mg/dL */}
+                <line x1="0" y1="60" x2="700" y2="60" stroke="rgba(251,191,36,0.3)" strokeDasharray="4,4" />
+                <line x1="0" y1="100" x2="700" y2="100" stroke="rgba(214,179,106,0.5)" strokeDasharray="2,2" />
+                <line x1="0" y1="140" x2="700" y2="140" stroke="rgba(52,211,153,0.3)" strokeDasharray="4,4" />
 
-                {/* ZONA SOMBREADA EUGLUCÉMICA (70 - 120 mg/dL) */}
                 <rect x="0" y="60" width="700" height="80" fill="rgba(52,211,153,0.05)" />
 
-                {/* CURVA DE ONDA BIOENERGÉTICA */}
                 <path
                   d="M0,120 C100,50 200,160 300,70 C400,130 500,40 600,110 L700,90"
                   fill="none"
@@ -329,22 +315,18 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
                   strokeWidth="3.5"
                 />
 
-                {/* PUNTOS INTERACTIVOS CON VALORES NUMÉRICOS */}
-                {/* Desayuno (08:00 AM) */}
                 <circle cx="100" cy="50" r="5" fill="#D6B36A" />
                 <text x="100" y="35" textAnchor="middle" fill="#D6B36A" fontSize="10" fontWeight="bold">135 mg/dL (Desayuno)</text>
 
-                {/* Almuerzo (01:00 PM) */}
                 <circle cx="300" cy="70" r="5" fill="#7C3AED" />
                 <text x="300" y="55" textAnchor="middle" fill="#C4B5FD" fontSize="10" fontWeight="bold">122 mg/dL (Almuerzo)</text>
 
-                {/* Gimnasio / Depleción (05:30 PM) */}
                 <circle cx="500" cy="40" r="5" fill="#34D399" />
                 <text x="500" y="25" textAnchor="middle" fill="#34D399" fontSize="10" fontWeight="bold">140 mg/dL (Pico Entreno)</text>
               </svg>
             </div>
 
-            {/* EJE X (ETIQUETAS DE TIEMPO 00:00 - 24:00) */}
+            {/* EJE X */}
             <div className="absolute left-16 right-0 bottom-0 h-6 flex justify-between text-[10px] font-mono text-[#CCC3D8]/60 border-t border-white/10 pt-1 pl-4">
               <span>00:00</span>
               <span>04:00</span>

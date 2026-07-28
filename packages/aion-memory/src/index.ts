@@ -41,6 +41,17 @@ const STORAGE_KEY_BODY = 'aion_memory_body';
 const STORAGE_KEY_HABITS = 'aion_memory_habits';
 const STORAGE_KEY_RECEIPTS = 'aion_memory_receipts';
 const STORAGE_KEY_FINANCE_CONFIG = 'aion_memory_finance_config';
+const STORAGE_KEY_CHAT_MESSAGES = 'aion_memory_chat_messages';
+
+export interface ChatMessageEntry {
+  id: string;
+  sender: 'user' | 'agent';
+  text: string;
+  timestamp: string;
+  agentName?: string;
+  detectedDomains?: string[];
+  imageUrl?: string;
+}
 
 export interface FinancialProjectionRow {
   month: string;
@@ -80,6 +91,7 @@ export class AionMemoryStore {
   private bodyRecords: BodyMeasurementRecord[] = [];
   private habitRecords: HabitRecord[] = [];
   private receiptRecords: PurchaseReceiptRecord[] = [];
+  private chatMessages: ChatMessageEntry[] = [];
 
   private financeConfig: FinanceConfig;
 
@@ -258,6 +270,9 @@ export class AionMemoryStore {
 
       const fin = localStorage.getItem(STORAGE_KEY_FINANCE_CONFIG);
       if (fin) this.financeConfig = JSON.parse(fin);
+
+      const cm = localStorage.getItem(STORAGE_KEY_CHAT_MESSAGES);
+      if (cm) this.chatMessages = JSON.parse(cm);
     } catch (e) {
       console.error('Error cargando AionMemoryStore:', e);
     }
@@ -284,6 +299,7 @@ export class AionMemoryStore {
       localStorage.setItem(STORAGE_KEY_BODY, JSON.stringify(this.bodyRecords));
       localStorage.setItem(STORAGE_KEY_HABITS, JSON.stringify(this.habitRecords));
       localStorage.setItem(STORAGE_KEY_FINANCE_CONFIG, JSON.stringify(this.financeConfig));
+      localStorage.setItem(STORAGE_KEY_CHAT_MESSAGES, JSON.stringify(this.chatMessages));
     } catch (e) {
       console.error('Error guardando AionMemoryStore:', e);
     }
@@ -334,6 +350,27 @@ export class AionMemoryStore {
   public getRecipes(): Recipe[] { return [...this.recipes]; }
   public getPreparedBatches(): PreparedBatch[] { return [...this.preparedBatches]; }
   public addPreparedBatch(batch: PreparedBatch): void { this.preparedBatches.unshift(batch); this.saveToStorage(); }
+
+  public getChatMessages(): ChatMessageEntry[] {
+    if (this.chatMessages.length === 0) {
+      return [
+        {
+          id: 'welcome_msg',
+          sender: 'agent',
+          text: '¡Bienvenido a AION Aegis! Escribe o dicta cualquier síntoma, ingesta, gasto o compromiso. La arquitectura multiagente procesará tu mensaje autónomamente.',
+          timestamp: '08:00 AM',
+          agentName: 'AION Core SuperAgent',
+          detectedDomains: ['SYSTEM'],
+        },
+      ];
+    }
+    return [...this.chatMessages];
+  }
+
+  public addChatMessage(msg: ChatMessageEntry): void {
+    this.chatMessages.push(msg);
+    this.saveToStorage();
+  }
 
   public getSleepRecords(): SleepRecord[] { return [...this.sleepRecords]; }
   public addSleepRecord(record: SleepRecord): void { this.sleepRecords.unshift(record); this.saveToStorage(); }
