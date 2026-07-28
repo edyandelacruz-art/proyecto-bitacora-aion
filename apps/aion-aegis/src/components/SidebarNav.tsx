@@ -58,6 +58,7 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
         { id: 'nutrition', label: 'Nutrición & Balance' },
         { id: 'pantry', label: 'Despensa & Compras' },
         { id: 'recipes', label: 'Recetas & Preparaciones' },
+        { id: 'finances', label: 'Finanzas & Presupuesto ($ COP)' },
       ],
     },
     {
