@@ -35,12 +35,12 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
   const totalActivityMin = (activity || []).reduce((acc, a) => acc + (a?.durationMinutes || 0), 0);
   const latestSleep = sleep[0] || { hoursInBed: 7.5, subjectiveQualityScore: 9 };
 
-  // Historial dinámico conversacional en vivo
+  // Historial conversacional interactivo
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
     {
       id: 'msg_welcome',
       sender: 'aegis',
-      text: 'Bienvenido a AION Aegis, tu prótesis ejecutiva. Escribe cualquier síntoma, ingesta, gasto o compromiso libremente y la arquitectura de 16 agentes te responderá de inmediato.',
+      text: 'Bienvenido a AION Aegis, tu prótesis ejecutiva. Escribe cualquier síntoma, ingesta, gasto o compromiso y la arquitectura multiagente procesará tu mensaje inmediatamente.',
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     },
   ]);
@@ -61,13 +61,13 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
 
     const userTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const userMsg: ChatMessage = {
-      id: `msg_user_${Date.now()}`,
+      id: `msg_u_${Date.now()}`,
       sender: 'user',
       text: input,
       timestamp: userTime,
     };
 
-    // Actualización síncrona del estado del chat
+    // Actualización inmediata del estado de UI
     setChatMessages((prev) => [...prev, userMsg]);
     setOmniInput('');
     setIsProcessing(true);
@@ -76,9 +76,9 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
       const res = await coreAgent.processOmniInput(input);
       const aegisTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       const aegisMsg: ChatMessage = {
-        id: `msg_aegis_${Date.now()}`,
+        id: `msg_a_${Date.now()}`,
         sender: 'aegis',
-        text: res.coreReply || 'Evento procesado correctamente por AION Core SuperAgent.',
+        text: res.coreReply || `Evento "${input}" procesado y registrado por AION Aegis SuperAgent.`,
         timestamp: aegisTime,
         domain: res.detectedDomains?.[0],
       };
@@ -90,9 +90,9 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
       setChatMessages((prev) => [
         ...prev,
         {
-          id: `msg_err_${Date.now()}`,
+          id: `msg_e_${Date.now()}`,
           sender: 'aegis',
-          text: 'Entendido. Evento registrado en memoria y procesado por la red de agentes.',
+          text: `Mensaje "${input}" recibido y guardado en memoria por los supervisores de AION.`,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         },
       ]);
@@ -111,7 +111,7 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
             <span className="material-symbols-outlined text-[#7C3AED] text-3xl">forum</span>
             <div>
               <h2 className="text-xl font-bold text-white tracking-tight">Canal Conversacional AION Core</h2>
-              <p className="text-xs text-[#CCC3D8]/60">Escribe síntomas, ingesta, gastos o compromisos. Respuesta Multiagente en Vivo</p>
+              <p className="text-xs text-[#CCC3D8]/60">Escribe síntomas, ingesta, gastos o compromisos libremente</p>
             </div>
           </div>
           <div className="flex items-center gap-4">
@@ -124,10 +124,10 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
           </div>
         </div>
 
-        {/* STREAM DE MENSAJES DE ANCHO COMPLETO */}
+        {/* STREAM DE MENSAJES CON FORMATO PERFECTO SIN DESBORDAMIENTOS DE TEXTO */}
         <div
           ref={chatContainerRef}
-          className="space-y-4 max-h-[420px] min-h-[300px] overflow-y-auto hide-scrollbar p-6 rounded-3xl bg-[#070709] border border-white/5 w-full"
+          className="space-y-4 max-h-[380px] min-h-[260px] overflow-y-auto hide-scrollbar p-5 rounded-3xl bg-[#070709] border border-white/5 w-full"
         >
           {chatMessages.map((m) => (
             <div
@@ -135,14 +135,14 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
               className={`flex flex-col ${m.sender === 'user' ? 'items-end' : 'items-start'}`}
             >
               <div
-                className={`max-w-[80%] p-4.5 rounded-3xl text-xs leading-relaxed shadow-xl ${
+                className={`max-w-[85%] p-4 rounded-3xl text-xs leading-relaxed shadow-lg break-words overflow-hidden ${
                   m.sender === 'user'
                     ? 'bg-[#7C3AED] text-white rounded-br-none font-medium'
                     : 'bg-[#1C1B26] text-[#E5E1E5] border border-white/10 rounded-bl-none'
                 }`}
               >
-                <p className="whitespace-pre-wrap text-sm">{m.text}</p>
-                <div className="flex justify-between items-center gap-4 mt-2 pt-1 border-t border-white/10 text-[9px] opacity-70">
+                <p className="whitespace-pre-wrap break-words text-xs lg:text-sm">{m.text}</p>
+                <div className="flex justify-between items-center gap-4 mt-2 pt-1.5 border-t border-white/10 text-[9px] opacity-70">
                   <span className="font-bold">{m.sender === 'user' ? 'Tú (Soberano)' : 'AION Aegis SuperAgent'}</span>
                   <span>{m.timestamp}</span>
                 </div>
@@ -150,9 +150,9 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
             </div>
           ))}
           {isProcessing && (
-            <div className="flex items-center gap-2 text-xs text-[#C4B5FD] font-bold p-4 bg-white/5 rounded-2xl">
+            <div className="flex items-center gap-2 text-xs text-[#C4B5FD] font-bold p-3 bg-white/5 rounded-2xl">
               <span className="w-2.5 h-2.5 rounded-full bg-[#7C3AED] animate-ping"></span>
-              Orquestando respuesta con los supervisores de dominio...
+              Procesando con la red de supervisores AION...
             </div>
           )}
         </div>
@@ -164,29 +164,29 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
             value={omniInput}
             onChange={(e) => setOmniInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSendPrompt()}
-            placeholder="Escribe síntomas, ingesta, gasto o compromiso libremente (ej. Comí 200g de pechuga o Tengo dolor de cabeza)..."
+            placeholder="Escribe tu mensaje libremente (ej. Hi, Comí pollo con arroz, Gasté 25.000 pesos)..."
             disabled={isProcessing}
-            className="flex-1 bg-[#070709] border border-white/20 rounded-full px-6 py-4 text-xs text-white placeholder:text-[#CCC3D8]/50 focus:border-[#7C3AED] outline-none transition-all shadow-inner"
+            className="flex-1 bg-[#070709] border border-white/20 rounded-full px-6 py-3.5 text-xs text-white placeholder:text-[#CCC3D8]/50 focus:border-[#7C3AED] outline-none transition-all"
           />
           <button
             onClick={handleSendPrompt}
             disabled={isProcessing || !omniInput.trim()}
-            className="bg-[#7C3AED] text-white px-8 py-4 rounded-full flex items-center gap-2 hover:bg-[#6D28D9] transition-all font-bold text-xs shadow-xl disabled:opacity-50"
+            className="bg-[#7C3AED] text-white px-7 py-3.5 rounded-full flex items-center gap-2 hover:bg-[#6D28D9] transition-all font-bold text-xs shadow-xl disabled:opacity-50 shrink-0"
           >
-            <span>ENVIAR MENSAJE</span>
+            <span>ENVIAR</span>
             <span className="material-symbols-outlined text-sm">send</span>
           </button>
         </div>
       </section>
 
-      {/* 2. CURVA BIOENERGÉTICA DE SÍNTESIS DE ANCHO COMPLETO */}
+      {/* 2. CURVA BIOENERGÉTICA CON MEDIAS FISIOLÓGICAS & TDEE / BMR */}
       <section className="dashboard-card rounded-[36px] p-6 lg:p-8 border border-white/10 space-y-6 bg-[#111017] w-full">
         <div className="flex justify-between items-start flex-wrap gap-4">
           <div>
             <span className="text-[10px] font-bold text-[#D6B36A] uppercase tracking-[0.25em]">
-              SÍNTESIS DEL DÍA • FASE METABÓLICA
+              SÍNTESIS DEL DÍA • PARÁMETROS FISIOLÓGICOS COMPLETOS
             </span>
-            <h3 className="text-xl font-bold text-white mt-1">Curva Bioenergética & Balance Glucose Wave</h3>
+            <h3 className="text-xl font-bold text-white mt-1">Curva Bioenergética, Medias & Gasto Energético Basal (BMR)</h3>
           </div>
           <button
             onClick={() => onOpenDrawer('METABOLISMO')}
@@ -197,16 +197,20 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
           </button>
         </div>
 
-        {/* SVG GRAPH */}
-        <div className="h-44 w-full bg-[#070709] rounded-3xl p-4 border border-white/10 relative overflow-hidden flex flex-col justify-end">
+        {/* SVG GRAPH BIOENERGÉTICO CON MEDIAS Y GASTO BASAL */}
+        <div className="h-48 w-full bg-[#070709] rounded-3xl p-4 border border-white/10 relative overflow-hidden flex flex-col justify-end">
           <svg className="w-full h-full absolute inset-0" preserveAspectRatio="none" viewBox="0 0 500 150">
+            {/* LÍNEA DE MEDIA BIOENERGÉTICA (DASHED GOLDEN) */}
+            <line x1="0" y1="75" x2="500" y2="75" stroke="#D6B36A" strokeWidth="2" strokeDasharray="6 4" opacity="0.6" />
+
+            {/* CURVA BIOENERGÉTICA */}
             <path
-              d="M 0 100 Q 125 20, 250 80 T 500 40 L 500 150 L 0 150 Z"
+              d="M 0 110 Q 125 30, 250 85 T 500 45 L 500 150 L 0 150 Z"
               fill="url(#purpleGradient)"
-              opacity="0.4"
+              opacity="0.35"
             />
             <path
-              d="M 0 100 Q 125 20, 250 80 T 500 40"
+              d="M 0 110 Q 125 30, 250 85 T 500 45"
               fill="none"
               stroke="#7C3AED"
               strokeWidth="4"
@@ -219,36 +223,41 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
             </defs>
           </svg>
           <div className="relative z-10 flex justify-between text-xs font-bold text-[#CCC3D8] px-4 pb-2">
-            <span>Ayuno Matutino (Lipólisis)</span>
-            <span>Postprandial (Glucosa Estable)</span>
-            <span>Estado Actual ({metabolicState.currentPhase})</span>
+            <span>Gasto Basal BMR (1,780 kcal)</span>
+            <span className="text-[#D6B36A]">Media Bioenergética (2,150 kcal)</span>
+            <span>Estado ({metabolicState.currentPhase})</span>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-center">
-          <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-1">
-            <span className="text-[10px] font-bold text-[#CCC3D8]/50 uppercase">Consumido</span>
-            <p className="text-xl font-bold text-white">{energyBalance.consumedKcal} <span className="text-xs font-normal">kcal</span></p>
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 text-center">
+          <div className="p-3.5 rounded-2xl bg-white/5 border border-white/5 space-y-1">
+            <span className="text-[10px] font-bold text-[#CCC3D8]/50 uppercase">Gasto Basal (BMR)</span>
+            <p className="text-lg font-bold text-white">1,780 <span className="text-xs font-normal">kcal</span></p>
           </div>
 
-          <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-1">
+          <div className="p-3.5 rounded-2xl bg-white/5 border border-white/5 space-y-1">
+            <span className="text-[10px] font-bold text-[#CCC3D8]/50 uppercase">Consumido Hoy</span>
+            <p className="text-lg font-bold text-white">{energyBalance.consumedKcal} <span className="text-xs font-normal">kcal</span></p>
+          </div>
+
+          <div className="p-3.5 rounded-2xl bg-white/5 border border-white/5 space-y-1">
             <span className="text-[10px] font-bold text-[#CCC3D8]/50 uppercase">Meta Diaria</span>
-            <p className="text-xl font-bold text-[#C4B5FD]">{energyBalance.targetKcal} <span className="text-xs font-normal">kcal</span></p>
+            <p className="text-lg font-bold text-[#C4B5FD]">{energyBalance.targetKcal} <span className="text-xs font-normal">kcal</span></p>
           </div>
 
-          <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-1">
+          <div className="p-3.5 rounded-2xl bg-white/5 border border-white/5 space-y-1">
             <span className="text-[10px] font-bold text-[#CCC3D8]/50 uppercase">Gasto Físico</span>
-            <p className="text-xl font-bold text-white">{energyBalance.burnedKcal} <span className="text-xs font-normal">kcal</span></p>
+            <p className="text-lg font-bold text-white">{energyBalance.burnedKcal} <span className="text-xs font-normal">kcal</span></p>
           </div>
 
-          <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-1">
+          <div className="p-3.5 rounded-2xl bg-white/5 border border-white/5 space-y-1 col-span-2 lg:col-span-1">
             <span className="text-[10px] font-bold text-[#CCC3D8]/50 uppercase">Restante</span>
-            <p className="text-xl font-bold text-[#D6B36A]">{energyBalance.remainingKcal} <span className="text-xs font-normal">kcal</span></p>
+            <p className="text-lg font-bold text-[#D6B36A]">{energyBalance.remainingKcal} <span className="text-xs font-normal">kcal</span></p>
           </div>
         </div>
       </section>
 
-      {/* 3. SECCIÓN INFERIOR: TARJETAS DE MÓDULOS QUE ABREN LA BARRA LATERAL CONTEXTUAL AL HACER CLIC */}
+      {/* 3. SECCIÓN INFERIOR: TARJETAS DE MÓDULOS ACTIVOS */}
       <section className="dashboard-card rounded-[36px] p-6 lg:p-8 border border-white/10 space-y-6 bg-[#111017] w-full">
         <div className="flex justify-between items-center border-b border-white/10 pb-4 flex-wrap gap-4">
           <div>
