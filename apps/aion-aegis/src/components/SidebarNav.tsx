@@ -19,7 +19,7 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
     alimentacion: true,
     planificacion: true,
     informacion: true,
-    sistema: false,
+    sistema: true,
   });
 
   const toggleGroup = (groupId: string) => {
@@ -76,13 +76,17 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
       items: [
         { id: 'reports', label: 'Reportes & Exportación' },
         { id: 'audit', label: 'Auditoría Aegis Ledger' },
+        { id: 'glossary', label: 'Glosario & Biblioteca' },
       ],
     },
     {
       id: 'sistema',
-      title: 'SISTEMA',
+      title: 'SISTEMA & AGENTES',
       icon: 'settings_suggest',
-      items: [{ id: 'settings', label: 'Perfil & Configuración' }],
+      items: [
+        { id: 'analytics', label: 'Analítica & Agentes' },
+        { id: 'settings', label: 'Perfil & Configuración' },
+      ],
     },
   ];
 
@@ -100,103 +104,90 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
             shield
           </span>
           {!isCollapsed && (
-            <span className="font-['Hanken_Grotesk'] text-base text-[#7C3AED] font-bold tracking-tight uppercase whitespace-nowrap">
-              AION Aegis
-            </span>
+            <div className="leading-none whitespace-nowrap">
+              <span className="font-['Hanken_Grotesk'] text-base font-extrabold tracking-wider text-white">
+                AION <span className="text-[#7C3AED]">AEGIS</span>
+              </span>
+              <p className="text-[9px] font-bold text-[#D6B36A] uppercase tracking-[0.25em] mt-0.5">
+                PROTESIS EJECUTIVA
+              </p>
+            </div>
           )}
         </div>
+
         <button
           onClick={onToggleCollapse}
-          className="p-1.5 rounded-lg bg-white/5 hover:bg-[#7C3AED]/20 text-[#CCC3D8] hover:text-white transition-all flex items-center justify-center shrink-0"
+          className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 text-[#C4B5FD] flex items-center justify-center transition-all border border-white/10 shrink-0"
           title={isCollapsed ? 'Expandir menú' : 'Colapsar menú'}
         >
-          <span className="material-symbols-outlined text-base">
+          <span className="material-symbols-outlined text-lg">
             {isCollapsed ? 'chevron_right' : 'chevron_left'}
           </span>
         </button>
       </div>
 
-      {/* NAV ITEMS LIST SCROLLABLE */}
-      <div className="flex-1 px-3 py-4 space-y-3 overflow-y-auto hide-scrollbar">
-        {/* AEGIS CORE MAIN DESTINATION */}
-        <div
+      {/* CORE HOME LINK */}
+      <div className="p-3 border-b border-white/5">
+        <button
           onClick={() => onSelectNav('core')}
-          className={`flex items-center h-11 rounded-2xl px-3.5 gap-3 cursor-pointer transition-all ${
+          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl font-['Manrope'] text-xs font-bold transition-all ${
             currentActive === 'core'
-              ? 'bg-[#7C3AED]/20 text-[#C4B5FD] border border-[#7C3AED]/50 font-bold'
-              : 'text-[#E5E1E5]/80 hover:bg-white/5 hover:text-white'
+              ? 'bg-[#7C3AED] text-white shadow-lg shadow-[#7C3AED]/30'
+              : 'text-[#C4B5FD] hover:bg-white/5 hover:text-white'
           }`}
         >
-          <span className="material-symbols-outlined text-xl shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>
-            shield
-          </span>
-          {!isCollapsed && (
-            <span className="font-['Manrope'] text-[12px] font-bold uppercase tracking-wider whitespace-nowrap">
-              Aegis Core
-            </span>
-          )}
-        </div>
+          <span className="material-symbols-outlined text-lg shrink-0">dashboard</span>
+          {!isCollapsed && <span>Aegis Core Feed</span>}
+        </button>
+      </div>
 
-        {/* MI DÍA BITÁCORA */}
-        <div
-          onClick={() => onSelectNav('day')}
-          className={`flex items-center h-11 rounded-2xl px-3.5 gap-3 cursor-pointer transition-all ${
-            currentActive === 'day'
-              ? 'bg-[#7C3AED]/20 text-[#C4B5FD] border border-[#7C3AED]/50 font-bold'
-              : 'text-[#E5E1E5]/80 hover:bg-white/5 hover:text-white'
-          }`}
-        >
-          <span className="material-symbols-outlined text-xl shrink-0">receipt_long</span>
-          {!isCollapsed && (
-            <span className="font-['Manrope'] text-[12px] font-bold uppercase tracking-wider whitespace-nowrap">
-              Mi Día (Bitácora)
-            </span>
-          )}
-        </div>
-
-        {!isCollapsed && <div className="h-px bg-white/10 my-2" />}
-
-        {/* ACCORDION GROUPS */}
+      {/* NAVIGATION ACCORDION GROUPS */}
+      <div className="flex-1 overflow-y-auto hide-scrollbar p-3 space-y-4">
         {navGroups.map((group) => {
-          const isOpen = !!openGroups[group.id];
+          const isOpen = openGroups[group.id];
+          const hasActiveChild = group.items.some((item) => item.id === currentActive);
+
           return (
             <div key={group.id} className="space-y-1">
-              <div
+              {/* GROUP HEADER */}
+              <button
                 onClick={() => toggleGroup(group.id)}
-                className="flex items-center justify-between h-8 px-3 text-[#CCC3D8]/70 hover:text-white cursor-pointer transition-colors"
+                className={`w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-[10px] font-bold tracking-widest uppercase transition-colors ${
+                  hasActiveChild ? 'text-[#D6B36A]' : 'text-[#CCC3D8]/60 hover:text-white'
+                }`}
               >
-                <div className="flex items-center gap-3 overflow-hidden">
-                  <span className="material-symbols-outlined text-base shrink-0 text-[#7C3AED]">{group.icon}</span>
-                  {!isCollapsed && (
-                    <span className="font-['Manrope'] text-[10px] font-extrabold uppercase tracking-[0.12em] text-[#C4B5FD] whitespace-nowrap">
-                      {group.title}
-                    </span>
-                  )}
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-sm">{group.icon}</span>
+                  {!isCollapsed && <span>{group.title}</span>}
                 </div>
                 {!isCollapsed && (
-                  <span className="material-symbols-outlined text-xs text-[#CCC3D8]/50">
+                  <span className="material-symbols-outlined text-xs opacity-60">
                     {isOpen ? 'expand_less' : 'expand_more'}
                   </span>
                 )}
-              </div>
+              </button>
 
+              {/* GROUP SUB-ITEMS */}
               {(isOpen || isCollapsed) && (
-                <div className={`${isCollapsed ? 'pl-0' : 'pl-8'} space-y-1`}>
+                <div className="space-y-0.5 pl-2 border-l border-white/5">
                   {group.items.map((item) => {
                     const isActive = currentActive === item.id;
                     return (
-                      <div
+                      <button
                         key={item.id}
                         onClick={() => onSelectNav(item.id)}
-                        className={`py-1.5 px-2 rounded-lg text-[11px] font-semibold cursor-pointer transition-all whitespace-nowrap ${
+                        className={`w-full text-left px-3 py-2 rounded-xl text-xs font-medium transition-all flex items-center justify-between ${
                           isActive
-                            ? 'text-[#C4B5FD] font-bold bg-[#7C3AED]/25 border-l-2 border-[#7C3AED]'
-                            : 'text-[#E5E1E5]/70 hover:text-white hover:bg-white/5'
+                            ? 'bg-[#7C3AED]/20 text-[#C4B5FD] font-bold border border-[#7C3AED]/50'
+                            : 'text-[#CCC3D8]/80 hover:bg-white/5 hover:text-white'
                         }`}
                         title={isCollapsed ? item.label : undefined}
                       >
-                        {!isCollapsed ? item.label : '•'}
-                      </div>
+                        <span className="truncate">{isCollapsed ? item.label[0] : item.label}</span>
+                        {isActive && !isCollapsed && (
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#7C3AED]"></span>
+                        )}
+                      </button>
                     );
                   })}
                 </div>
@@ -204,6 +195,21 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
             </div>
           );
         })}
+      </div>
+
+      {/* USER PROFILE FOOTER */}
+      <div className="p-3 border-t border-white/10 shrink-0">
+        <div className="flex items-center gap-3 p-2 rounded-2xl bg-white/5 border border-white/5">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#7C3AED] to-[#D6B36A] flex items-center justify-center text-white text-xs font-bold shrink-0">
+            E
+          </div>
+          {!isCollapsed && (
+            <div className="overflow-hidden leading-tight">
+              <p className="text-xs font-bold text-white truncate">EDYAN DE LA CRUZ</p>
+              <p className="text-[9px] text-[#CCC3D8]/60 truncate">Soberano • Protesis Ejecutiva</p>
+            </div>
+          )}
+        </div>
       </div>
     </aside>
   );

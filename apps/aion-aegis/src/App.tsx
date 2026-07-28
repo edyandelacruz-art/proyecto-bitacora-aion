@@ -65,6 +65,7 @@ export const App: React.FC = () => {
             <div className="max-w-[1400px] w-full mx-auto px-6 py-6">
               <ModuleDeepView
                 activeModuleId={activeNav}
+                onSelectModule={(id) => setActiveNav(id)}
                 onRefreshAll={refreshData}
                 onBackToCore={() => setActiveNav('core')}
               />
