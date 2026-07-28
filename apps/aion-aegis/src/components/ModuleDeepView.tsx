@@ -10,6 +10,7 @@ import { TopModuleTabs } from './TopModuleTabs';
 import { AionGlossaryLibrary } from './AionGlossaryLibrary';
 import { AionAgentsAndAnalytics } from './AionAgentsAndAnalytics';
 import { ModuleAgentChatWidget } from './ModuleAgentChatWidget';
+import { FinancesDashboard } from './FinancesDashboard';
 import {
   SleepDashboard,
   ActivityDashboard,
@@ -55,6 +56,8 @@ export const ModuleDeepView: React.FC<ModuleDeepViewProps> = ({
         return { name: 'InventoryHomeSupervisorAgent', role: 'Supervisor de Cadena de Suministro', icon: 'inventory_2', placeholder: 'Ej. Compré 1kg de pechuga de pollo y 2L de leche' };
       case 'recipes':
         return { name: 'RecipeSkillAgent', role: 'Especialista en Preparaciones Inteligentes', icon: 'auto_awesome', placeholder: 'Ej. ¿Qué puedo cocinar rápidamente con lo que hay en mi despensa?' };
+      case 'finances':
+        return { name: 'FinancesAgent', role: 'Supervisor de Gastos & Ledger Financiero', icon: 'payments', placeholder: 'Ej. Gasté 25.000 pesos en el supermercado' };
       case 'state':
         return { name: 'StateSupervisorAgent', role: 'Supervisor de Energía, Ánimo & Enfoque', icon: 'psychology', placeholder: 'Ej. Me siento con mucha energía y gran concentración' };
       case 'medication':
@@ -100,6 +103,7 @@ export const ModuleDeepView: React.FC<ModuleDeepViewProps> = ({
       {activeModuleId === 'nutrition' && <MealLogger onMealAdded={onRefreshAll} />}
       {activeModuleId === 'recipes' && <WhatCanIEatNow />}
       {activeModuleId === 'pantry' && <PantryInventory />}
+      {activeModuleId === 'finances' && <FinancesDashboard onRefresh={onRefreshAll} />}
       {activeModuleId === 'sleep' && <SleepDashboard onRefresh={onRefreshAll} />}
       {activeModuleId === 'activity' && <ActivityDashboard onRefresh={onRefreshAll} />}
       {activeModuleId === 'hydration' && <HydrationDashboard onRefresh={onRefreshAll} />}

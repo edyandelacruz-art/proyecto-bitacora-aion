@@ -42,6 +42,7 @@ export const MODULE_GROUPS: ModuleGroup[] = [
       { id: 'nutrition', label: 'Nutrición Ingesta', icon: 'restaurant' },
       { id: 'pantry', label: 'Despensa & Compras', icon: 'inventory_2' },
       { id: 'recipes', label: 'Recetas & Sugerencias', icon: 'auto_awesome' },
+      { id: 'finances', label: 'Finanzas & Compras', icon: 'payments' },
     ],
   },
   {
