@@ -584,7 +584,17 @@ export class AionMemoryStore {
 
   // Live Plan API
   public getLivePlan(): LivePlan {
-    return { ...this.livePlan };
+    const defaultPlan = this.createInitialPlan();
+    return {
+      dailyTargetKcal: this.livePlan?.dailyTargetKcal ?? defaultPlan.dailyTargetKcal,
+      consumedKcal: this.livePlan?.consumedKcal ?? defaultPlan.consumedKcal,
+      remainingKcal: this.livePlan?.remainingKcal ?? defaultPlan.remainingKcal,
+      macroTargets: this.livePlan?.macroTargets ?? defaultPlan.macroTargets,
+      macroConsumed: this.livePlan?.macroConsumed ?? defaultPlan.macroConsumed,
+      plannedItems: Array.isArray(this.livePlan?.plannedItems) ? this.livePlan.plannedItems : defaultPlan.plannedItems,
+      lastRecalculated: this.livePlan?.lastRecalculated ?? defaultPlan.lastRecalculated,
+      adaptiveNote: this.livePlan?.adaptiveNote ?? defaultPlan.adaptiveNote,
+    };
   }
 
   private recalculatePlanAfterMeal(kcal: number, protein: number, carbs: number, fats: number): void {

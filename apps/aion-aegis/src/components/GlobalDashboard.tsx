@@ -29,14 +29,14 @@ export const GlobalDashboard: React.FC<GlobalDashboardProps> = ({ onRefreshAll }
   const metabolicState = specialist.getCurrentMetabolicState();
   const energyBalance = specialist.getCurrentEnergyBalance();
   const plan = store.getLivePlan();
-  const inventory = store.getInventory();
-  const sleep = store.getSleepRecords();
-  const activity = store.getActivityRecords();
-  const hydration = store.getHydrationRecords();
+  const inventory = store.getInventory() || [];
+  const sleep = store.getSleepRecords() || [];
+  const activity = store.getActivityRecords() || [];
+  const hydration = store.getHydrationRecords() || [];
 
-  const currentWater = hydration.reduce((acc, h) => acc + h.amountMl, 0);
-  const totalActivityMin = activity.reduce((acc, a) => acc + a.durationMinutes, 0);
-  const expiringItems = inventory.filter((i) => i.availability === 'PRÓXIMO A VENCER' || i.availability === 'BAJO');
+  const currentWater = (hydration || []).reduce((acc, h) => acc + (h?.amountMl || 0), 0);
+  const totalActivityMin = (activity || []).reduce((acc, a) => acc + (a?.durationMinutes || 0), 0);
+  const expiringItems = (inventory || []).filter((i) => i && (i.availability === 'PRÓXIMO A VENCER' || i.availability === 'BAJO'));
 
   const [activeModuleModal, setActiveModuleModal] = useState<string | null>(null);
 
