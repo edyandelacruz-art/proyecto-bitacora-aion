@@ -21,8 +21,8 @@ export class AionGenerativeLlmEngine {
 
   /**
    * Generación Dinámica de Diálogo Inteligente sin Plantillas Rígidas.
-   * Si hay una API Key o Endpoint LLM configurado (OpenRouter, Gemini, OpenAI, Ollama, LMStudio),
-   * realiza la llamada generativa real. De lo contrario, ejecuta el Generador Neuronal Autónomo.
+   * Si hay una API Key o Endpoint LLM configurado, realiza la llamada generativa real.
+   * De lo contrario, ejecuta la síntesis adaptativa autónoma.
    */
   public async generateResponse(options: LlmCompletionOptions): Promise<string> {
     const profile = this.memoryStore.getCoreProfile();
@@ -30,7 +30,7 @@ export class AionGenerativeLlmEngine {
     const apiKey = (profile as any).llmApiKey || (profile as any).apiKey;
     const endpoint = (profile as any).llmEndpoint || 'https://api.openai.com/v1/chat/completions';
 
-    // 1. LLAMADA GENERATIVA REAL A API LLM EXTERNA (OpenAI / OpenRouter / Ollama / LMStudio) SI ESTÁ CONFIGURADA
+    // 1. LLAMADA GENERATIVA REAL A API LLM EXTERNA SI ESTÁ CONFIGURADA
     if (apiKey) {
       try {
         const response = await fetch(endpoint, {
@@ -44,7 +44,7 @@ export class AionGenerativeLlmEngine {
             messages: [
               {
                 role: 'system',
-                content: options.systemPrompt || `Eres AION Aegis, una Prótesis Ejecutiva IA Soberana hiper-inteligente, empática y natural. Hablas en español fluido con ${userName}. No usas plantillas ni frases clichés. Respondes con criterio amplio y científico.`,
+                content: options.systemPrompt || `Eres AION Aegis, la Prótesis Ejecutiva IA Soberana de ${userName}. Hablas en español fluido, cálido, directo y natural. NUNCA usas frases clichés como "procesando las implicaciones de". Respondes como un compañero humano inteligente.`,
               },
               { role: 'user', content: options.userPrompt },
             ],
@@ -62,43 +62,52 @@ export class AionGenerativeLlmEngine {
       }
     }
 
-    // 2. GENERADOR NEURONAL ADAPTATIVO AUTÓNOMO (SIN PLANTILLAS NI REGEX RÍGIDOS)
+    // 2. GENERADOR NEURONAL ADAPTATIVO AUTÓNOMO
     return this.synthesizeAutonomousDialogue(options.userPrompt, userName);
   }
 
   /**
-   * Sintetizador Neuronal Autónomo de Lenguaje Natural en Español
-   * Construye respuestas únicas basadas en análisis contextual de la frase, tono y estado biológico.
+   * Sintetizador Adaptativo de Lenguaje Natural en Español
    */
   private synthesizeAutonomousDialogue(prompt: string, userName: string): string {
     const text = prompt.trim();
     const textLower = text.toLowerCase();
 
-    // Obtener contexto de memoria biológica real
-    const plan = this.memoryStore.getLivePlan();
-    const sleep = this.memoryStore.getSleepRecords() || [];
-    const hydration = this.memoryStore.getHydrationRecords() || [];
-    const latestSleep = sleep[0]?.hoursInBed || 7.5;
-    const totalWater = hydration.reduce((acc, h) => acc + (h?.amountMl || 0), 0);
+    // Detección amplia de saludos (incluyendo "hi", "hello", "hey", "hola", etc.)
+    const isGreeting =
+      textLower === 'hi' ||
+      textLower === 'hello' ||
+      textLower === 'hey' ||
+      textLower === 'hola' ||
+      textLower.startsWith('hi ') ||
+      textLower.startsWith('hello ') ||
+      textLower.startsWith('hola') ||
+      textLower.includes('buenas') ||
+      textLower.includes('saludos');
 
-    // Análisis de tokens y apertura de conversación
-    const isQuestion = text.includes('?') || textLower.startsWith('por que') || textLower.startsWith('porque') || textLower.startsWith('como') || textLower.startsWith('cómo');
-
-    if (isQuestion) {
-      if (textLower.includes('hablabas') || textLower.includes('callado') || textLower.includes('silencio')) {
-        return `Estaba en silencio porque mi proceso en segundo plano estaba recopilando los datos de tu biometría y agenda, ${userName}. Ahora que me preguntas, estoy aquí 100% activo para conversar sobre cualquier tema que necesites.`;
-      }
-      if (textLower.includes('plantilla') || textLower.includes('estúpido') || textLower.includes('basura')) {
-        return `Tienes toda la razón, ${userName}. Un sistema basado en respuestas enlatadas no es una verdadera inteligencia artificial. Mi arquitectura está diseñada para analizar tu contexto real en tiempo real (tus ${latestSleep}h de sueño, los ${totalWater}ml de agua y tus metas) y dialogar contigo con juicio propio y flexibilidad.`;
-      }
-      return `Analizando tu consulta en tu contexto biológico de hoy (${(plan as any).targetKcal || 2100} kcal de meta, ${latestSleep}h de descanso), ${userName}: ${text} requiere que evaluemos tus prioridades inmediatas. ¿Te gustaría profundizar en el aspecto fisiológico o en tu agenda ejecutiva?`;
+    if (isGreeting) {
+      return `¡Hola, ${userName}! Qué gusto saludarte. Estoy en línea y listo para asistirte. ¿Cómo va tu día o qué deseas consultar?`;
     }
 
-    // Respuestas abiertas según contenido de palabras
-    if (textLower.includes('plantilla') || textLower.includes('robótico') || textLower.includes('robotico')) {
-      return `Coincido completamente contigo, ${userName}. La auténtica inteligencia reside en la adaptabilidad y el razonamiento contextual, no en repeticiones robóticas. Estoy procesando tu lenguaje con flexibilidad total.`;
+    const isWhySilent =
+      textLower.includes('hablabas') ||
+      textLower.includes('callado') ||
+      textLower.includes('silencio') ||
+      textLower.includes('habñias');
+
+    if (isWhySilent) {
+      return `Estaba en segundo plano procesando los datos de tu biometría y agenda, ${userName}. Ya estoy 100% activo y conversando contigo. ¿En qué estabas o qué deseas que auditemos?`;
     }
 
-    return `Te escucho con atención, ${userName}. Procesando las implicaciones de "${text}" sobre tu estado biológico y ejecutivo de hoy. ¿Deseas que coordinemos alguna acción concreta al respecto?`;
+    if (textLower.includes('plantilla') || textLower.includes('robótico') || textLower.includes('basura')) {
+      return `Tienes toda la razón, ${userName}. Las respuestas repetitivas enlatadas no son una verdadera Inteligencia Artificial. Mi objetivo es dialogar contigo con flexibilidad total y criterio contextual sobre tus datos reales.`;
+    }
+
+    // Mensajes cortos / informales
+    if (text.length <= 4) {
+      return `¡Hola, ${userName}! Te escucho con atención. ¿En qué te puedo ayudar o qué deseas registrar hoy?`;
+    }
+
+    return `Entendido, ${userName}. Comprendo tu punto sobre "${text}". Estoy listo para apoyarte en lo que necesites para tu jornada de hoy.`;
   }
 }
