@@ -19,10 +19,11 @@ import { VisionService } from './vision/VisionService';
 import { LanguageEngine } from './language/LanguageEngine';
 import { RecipeSkill } from './skills/RecipeSkill';
 import { DailyReportEngine } from './export/DailyReportEngine';
+import { AionCoreSuperAgent, OmniDispatchResult } from './core/AionCoreSuperAgent';
 
-export { VisionService, LanguageEngine, RecipeSkill, DailyReportEngine };
+export { VisionService, LanguageEngine, RecipeSkill, DailyReportEngine, AionCoreSuperAgent };
+export type { OmniDispatchResult };
 
-// Agente Especialista de Contexto y Ubicación
 export class ContextAndLocationAgent {
   private memoryStore = AionMemoryStore.getInstance();
 
@@ -42,7 +43,6 @@ export class ContextAndLocationAgent {
   }
 }
 
-// Orquestador Principal: Especialista de Nutrición AION
 export class NutritionLeadSpecialist {
   private memoryStore = AionMemoryStore.getInstance();
   private eventBus = AionEventBus.getInstance();

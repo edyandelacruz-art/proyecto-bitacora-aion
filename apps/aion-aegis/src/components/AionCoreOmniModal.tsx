@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AionCoreSuperAgent, OmniDispatchResult } from '@aion/core-router';
+import { AionCoreSuperAgent, OmniDispatchResult } from '@aion/agents';
 
 interface AionCoreOmniModalProps {
   isOpen: boolean;
