@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 
 interface HowAionWorksModalProps {
   isOpen: boolean;
@@ -8,10 +9,10 @@ interface HowAionWorksModalProps {
 export const HowAionWorksModal: React.FC<HowAionWorksModalProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 z-[9999] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 lg:p-6 overflow-hidden">
+  const modalContent = (
+    <div className="fixed inset-0 z-[99999] bg-black/90 backdrop-blur-xl flex items-center justify-center p-4 lg:p-6 overflow-hidden">
       {/* VENTANA EMERGENTE CENTRADA 1:1 STITCH */}
-      <div className="relative bg-[#111017] border-2 border-[#7C3AED] rounded-[32px] w-full max-w-2xl max-h-[85vh] shadow-[0_0_80px_rgba(124,58,237,0.6)] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
+      <div className="relative bg-[#111017] border-2 border-[#7C3AED] rounded-[32px] w-full max-w-2xl max-h-[85vh] shadow-[0_0_90px_rgba(124,58,237,0.7)] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
         
         {/* HEADER MODAL */}
         <div className="p-6 bg-[#070709] border-b border-white/10 flex justify-between items-center shrink-0">
@@ -26,9 +27,9 @@ export const HowAionWorksModal: React.FC<HowAionWorksModalProps> = ({ isOpen, on
           </div>
           <button
             onClick={onClose}
-            className="w-9 h-9 rounded-full bg-white/10 hover:bg-red-500/20 hover:text-red-400 text-white flex items-center justify-center transition-all border border-white/10 shrink-0"
+            className="w-10 h-10 rounded-full bg-white/10 hover:bg-red-500/20 hover:text-red-400 text-white flex items-center justify-center transition-all border border-white/10 shrink-0 cursor-pointer"
           >
-            <span className="material-symbols-outlined text-lg">close</span>
+            <span className="material-symbols-outlined text-xl">close</span>
           </button>
         </div>
 
@@ -79,12 +80,14 @@ export const HowAionWorksModal: React.FC<HowAionWorksModalProps> = ({ isOpen, on
         <div className="p-4 bg-[#070709] border-t border-white/10 flex justify-end shrink-0">
           <button
             onClick={onClose}
-            className="px-6 py-2.5 rounded-full bg-[#7C3AED] text-white font-bold text-xs hover:bg-[#6D28D9] transition-all shadow-lg"
+            className="px-6 py-2.5 rounded-full bg-[#7C3AED] text-white font-bold text-xs hover:bg-[#6D28D9] transition-all shadow-lg cursor-pointer"
           >
-            ENTENDIDO
+            ENTENDIDO Y CERRAR
           </button>
         </div>
       </div>
     </div>
   );
+
+  return ReactDOM.createPortal(modalContent, document.body);
 };
