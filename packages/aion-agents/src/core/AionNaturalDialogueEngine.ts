@@ -132,15 +132,17 @@ export class AionNaturalDialogueEngine {
         `• ${inferredActions.join('\n• ')}\n\n` +
         `Todo se encuentra integrado en tu Bitácora sin necesidad de comandos rígidos. ¿Deseas ajustar algún parámetro o profundizar en algo más?`;
     } else {
-      // Conversación fluida directa
-      if (textLower.includes('hola') || textLower.includes('buenas')) {
-        reply = `¡Hola ${userName}! Un gusto saludarte. Estoy en línea y listo para acompañarte. ¿Cómo va tu día o qué tienes en mente?`;
+      // Conversación fluida directa y empática
+      if (textLower.includes('como has estado') || textLower.includes('cómo has estado') || textLower.includes('como estas') || textLower.includes('cómo estás') || textLower.includes('que tal') || textLower.includes('qué tal')) {
+        reply = `¡Excelente, ${userName}! He estado monitoreando todo tu ecosistema biológico y financiero en segundo plano. Mi sistema está al 100% operativo y todos tus supervisores están listos. ¿Cómo has estado tú y cómo va tu día?`;
+      } else if (textLower.includes('hola') || textLower.includes('buenas')) {
+        reply = `¡Hola, ${userName}! Qué gusto saludarte. Estoy totalmente en línea y disponible para ti. ¿Cómo va tu día o qué deseas consultar?`;
       } else if (textLower.includes('gracias') || textLower.includes('excelente') || textLower.includes('bien')) {
-        reply = `¡Me alegra mucho, ${userName}! Todo el ecosistema AION Aegis permanece atento a cualquier otra necesidad de tu jornada.`;
+        reply = `¡Con todo el gusto, ${userName}! Me alegra saberlo. Todo el equipo multiagente AION Aegis sigue atento a tus necesidades.`;
       } else if (textLower.includes('qué opinas') || textLower.includes('que opinas') || textLower.includes('recomiendas')) {
-        reply = `Evaluando tu contexto biológico de hoy, ${userName}: Tu balance calórico e hidratación se mantienen estables. Te sugiero tomar una pequeña pausa para estirar, respirar profundo y reponer electrolitos antes de tu siguiente actividad.`;
+        reply = `Evaluando tu estado de hoy, ${userName}: Tu nivel glucémico y de hidratación están balanceados. Te sugiero tomarte un momento para estirar, beber un poco de agua y continuar con tu agenda óptima.`;
       } else {
-        reply = `Te escucho con atención, ${userName}. Comprendo tu reflexión ("${text}"). Lo he registrado en tu contexto general. ¿Hay algo en lo que quieras que profundicemos ahora?`;
+        reply = `Entendido perfectamente, ${userName}. He analizado tu mensaje con atención. Estoy listo para profundizar en el tema o ayudarte a organizar lo que necesites para tu jornada.`;
       }
     }
 
