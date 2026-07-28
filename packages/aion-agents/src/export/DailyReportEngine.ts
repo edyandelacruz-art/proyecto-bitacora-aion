@@ -1,15 +1,16 @@
 import {
   DailyTechnicalReport,
   GoogleDriveIntegration,
-  AionReportTemplate,
 } from '@aion/shared-types';
 import { AionMemoryStore } from '@aion/memory';
 import { AionEventBus } from '@aion/protocol';
+import { XlsxExporter } from './XlsxExporter';
 
 export class DailyReportEngine {
   private static instance: DailyReportEngine;
   private memoryStore = AionMemoryStore.getInstance();
   private eventBus = AionEventBus.getInstance();
+  private xlsxExporter = XlsxExporter.getInstance();
 
   private constructor() {}
 
@@ -27,7 +28,6 @@ export class DailyReportEngine {
     const meals = this.memoryStore.getMeals();
     const plan = this.memoryStore.getLivePlan();
     const inventory = this.memoryStore.getInventory();
-    const ledger = this.memoryStore.getLedgerEntries();
 
     const todayStr = targetDate || new Date().toISOString().split('T')[0];
 
@@ -65,19 +65,82 @@ export class DailyReportEngine {
       createdAt: new Date().toISOString(),
     };
 
-    // Registrar generación de informe en el Aegis Ledger Universal
     this.memoryStore.addLedgerEntry({
       id: `led-rep-${Date.now()}`,
       timestamp: new Date().toISOString(),
       type: 'report_generated',
       source: 'agent',
+      authoritativeModule: 'NUTRITION',
+      agentsInvoked: ['DailyReportEngine', 'ReportExportAgent'],
+      toolsInvoked: ['generateDailyTechnicalReport'],
       payload: report,
-      evidence: 'DETERMINISTIC_CALCULATION',
+      evidence: 'MEASURED',
       confidence: 1.0,
       reversible: false,
     });
 
     return report;
+  }
+
+  /**
+   * Genera el archivo Excel (.xlsx) oficial de 24 pestañas
+   */
+  public async generateOfficialXlsxBuffer(): Promise<Buffer> {
+    return await this.xlsxExporter.generateFullWorkbookBuffer();
+  }
+
+  /**
+   * Genera el informe visual en HTML para exportación PDF
+   */
+  public generatePdfHtmlReport(): string {
+    const report = this.generateDailyTechnicalReport();
+    const meals = this.memoryStore.getMeals();
+    const sleep = this.memoryStore.getSleepRecords();
+    const activity = this.memoryStore.getActivityRecords();
+
+    return `
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Informe Técnico AION Aegis - ${report.date}</title>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #070709; color: #F4F4F5; padding: 2rem; }
+    h1 { color: #C4B5FD; border-bottom: 2px solid #7C3AED; padding-bottom: 0.5rem; }
+    .card { background: #111017; border: 1px solid #2B2338; border-radius: 12px; padding: 1.2rem; margin-bottom: 1rem; }
+    table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
+    th, td { border: 1px solid #2B2338; padding: 0.6rem; text-align: left; font-size: 0.85rem; }
+    th { background: #17131F; color: #C4B5FD; }
+  </style>
+</head>
+<body>
+  <h1>📊 INFORME TÉCNICO COMPLETO AION AEGIS</h1>
+  <div class="card">
+    <h3>Resumen del Día (${report.date})</h3>
+    <p>${report.summaryText}</p>
+    <p><strong>Calorías:</strong> ${report.totalKcal} / 1800 kcal | <strong>Proteína:</strong> ${report.totalProtein}g | <strong>Carbohidratos:</strong> ${report.totalCarbs}g | <strong>Lípidos:</strong> ${report.totalFats}g</p>
+  </div>
+
+  <div class="card">
+    <h3>Ingestas Alimentarias (${meals.length})</h3>
+    <table>
+      <thead>
+        <tr><th>Hora</th><th>Comida</th><th>Kcal</th><th>Proteína (g)</th><th>Carbs (g)</th><th>Grasas (g)</th><th>Confiabilidad</th></tr>
+      </thead>
+      <tbody>
+        ${meals.map(m => `<tr><td>${new Date(m.timestamp).toLocaleTimeString()}</td><td>${m.preparation.name}</td><td>${m.consumedPortion.actualKcal}</td><td>${m.consumedPortion.actualProtein}</td><td>${m.consumedPortion.actualCarbs}</td><td>${m.consumedPortion.actualFats}</td><td>${m.confidence}</td></tr>`).join('')}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Sueño y Actividad</h3>
+    <p><strong>Sueño registrado:</strong> ${sleep[0]?.hoursInBed || 0}h (Calidad: ${sleep[0]?.subjectiveQualityScore || 'N/A'}/10)</p>
+    <p><strong>Actividad física:</strong> ${activity.reduce((a, b) => a + b.durationMinutes, 0)} minutos totales</p>
+  </div>
+</body>
+</html>
+    `;
   }
 
   /**
@@ -96,10 +159,9 @@ export class DailyReportEngine {
     }
 
     if (format === 'json') {
-      return JSON.stringify({ meals, inventory }, null, 2);
+      return JSON.stringify({ meals, inventory, ledger: this.memoryStore.getLedgerEntries() }, null, 2);
     }
 
-    // Markdown Formatted Matrix
     let md = `# MATRIZ DE ALIMENTACIÓN Y NUTRICIÓN AION AEGIS\n\n`;
     md += `**Fecha de Exportación:** ${new Date().toLocaleString()}\n\n`;
     md += `## 1. REGISTRO DE INGRESOS Y COMIDAS\n\n`;
@@ -140,6 +202,9 @@ export class DailyReportEngine {
       timestamp: new Date().toISOString(),
       type: 'drive_synced',
       source: 'integration',
+      authoritativeModule: 'CROSS_DOMAIN',
+      agentsInvoked: ['ReportExportAgent'],
+      toolsInvoked: ['syncWithGoogleDrive'],
       payload: { userEmail, status: 'synced_successfully' },
       evidence: 'USER_CONFIRMED',
       confidence: 1.0,

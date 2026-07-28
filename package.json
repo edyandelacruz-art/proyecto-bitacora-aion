@@ -20,5 +20,11 @@
     "aion-protocol"
   ],
   "author": "AION System Architect",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "exceljs": "^4.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.2"
+  }
 }

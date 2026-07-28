@@ -7,8 +7,6 @@ import {
   RecipeOption,
   InventoryItem,
   LivePlan,
-  AionUserProfile,
-  AegisProfile,
   EvidenceLevel,
   VisionAnalysis,
   ResponseLanguageProfile,
@@ -19,9 +17,22 @@ import { VisionService } from './vision/VisionService';
 import { LanguageEngine } from './language/LanguageEngine';
 import { RecipeSkill } from './skills/RecipeSkill';
 import { DailyReportEngine } from './export/DailyReportEngine';
+import { XlsxExporter } from './export/XlsxExporter';
 import { AionCoreSuperAgent, OmniDispatchResult } from './core/AionCoreSuperAgent';
+import { AgentRuntime, AgentRegistry } from './runtime/AgentRuntime';
+import { NutrientCalculationEngine } from './nutrition/NutrientCalculationEngine';
 
-export { VisionService, LanguageEngine, RecipeSkill, DailyReportEngine, AionCoreSuperAgent };
+export {
+  VisionService,
+  LanguageEngine,
+  RecipeSkill,
+  DailyReportEngine,
+  XlsxExporter,
+  AionCoreSuperAgent,
+  AgentRuntime,
+  AgentRegistry,
+  NutrientCalculationEngine,
+};
 export type { OmniDispatchResult };
 
 export class ContextAndLocationAgent {
@@ -48,6 +59,7 @@ export class NutritionLeadSpecialist {
   private eventBus = AionEventBus.getInstance();
   private visionService = VisionService.getInstance();
   private languageEngine = LanguageEngine.getInstance();
+  private nutrientEngine = NutrientCalculationEngine.getInstance();
   private contextAgent = new ContextAndLocationAgent();
 
   public async processMealInput(
@@ -73,45 +85,23 @@ export class NutritionLeadSpecialist {
       };
     }
 
-    const fraction = fractionConsumed ?? 0.2;
+    const fraction = fractionConsumed ?? 1.0;
     const fractionText = fraction === 1.0 ? '100% (Toda la comida)' : `${(fraction * 100).toFixed(0)}% de la preparación (${fraction === 0.2 ? '1/5' : fraction === 0.33 ? '1/3' : '1/2'})`;
 
-    const ingredients = visionAnalysis.detectedItems.map((item, idx) => {
+    const ingredients = visionAnalysis.detectedItems.map((item) => {
       const range = item.portionRange || { likely: 150, min: 120, max: 180, unit: 'g', confidence: 0.8, method: 'Estimación volumétrica' };
-      const isChicken = item.candidateName.toLowerCase().includes('pollo');
-      const isPotato = item.candidateName.toLowerCase().includes('papa');
-
-      const kcalBase = isChicken ? 220 : isPotato ? 150 : 240;
-      const protBase = isChicken ? 32 : isPotato ? 3 : 16;
-      const carbsBase = isChicken ? 0 : isPotato ? 33 : 1;
-      const fatsBase = isChicken ? 5 : isPotato ? 0.2 : 18;
-
-      return {
-        id: `ing-${idx}-${Date.now()}`,
-        name: item.candidateName,
-        amountPreparation: 1,
-        amountConsumed: fraction,
-        unit: range.unit,
-        gramsEstimated: Math.round(range.likely * fraction),
-        portionRange: {
-          ...range,
-          min: Math.round(range.min * fraction),
-          max: Math.round(range.max * fraction),
-          likely: Math.round(range.likely * fraction),
-        },
-        kcal: Math.round(kcalBase * fraction),
-        proteinGrams: Math.round(protBase * fraction),
-        carbsGrams: Math.round(carbsBase * fraction),
-        fatsGrams: Math.round(fatsBase * fraction),
-        confidence: item.confidence > 0.85 ? ('ALTA' as const) : ('MEDIA' as const),
-        source: visionAnalysis.evidenceLevel,
-      };
+      return this.nutrientEngine.calculateNutrientsForIngredient(
+        item.candidateName,
+        range.likely,
+        fraction,
+        visionAnalysis.evidenceLevel
+      );
     });
 
-    const actualKcal = ingredients.reduce((acc, curr) => acc + curr.kcal, 0);
-    const actualProtein = ingredients.reduce((acc, curr) => acc + curr.proteinGrams, 0);
-    const actualCarbs = ingredients.reduce((acc, curr) => acc + curr.carbsGrams, 0);
-    const actualFats = ingredients.reduce((acc, curr) => acc + curr.fatsGrams, 0);
+    const actualKcal = Math.round(ingredients.reduce((acc, curr) => acc + curr.kcal, 0));
+    const actualProtein = Math.round(ingredients.reduce((acc, curr) => acc + curr.proteinGrams, 0) * 10) / 10;
+    const actualCarbs = Math.round(ingredients.reduce((acc, curr) => acc + curr.carbsGrams, 0) * 10) / 10;
+    const actualFats = Math.round(ingredients.reduce((acc, curr) => acc + curr.fatsGrams, 0) * 10) / 10;
 
     const mealRecord: MealRecord = {
       id: `meal-${Date.now()}`,
@@ -137,7 +127,7 @@ export class NutritionLeadSpecialist {
         actualFats,
       },
       confidence: visionAnalysis.evidenceLevel === 'VISUAL_ESTIMATE_HIGH' ? 'ALTA' : 'MEDIA',
-      evidenceSummary: `Análisis visual (${visionAnalysis.scene.type}) con certeza ${visionAnalysis.evidenceLevel}.`,
+      evidenceSummary: `Análisis visual (${visionAnalysis.scene.type}) con cálculo determinista de composición alimentaria.`,
       evidenceLevel: fractionConsumed ? 'USER_CONFIRMED' : visionAnalysis.evidenceLevel,
       userConfirmed: true,
     };
@@ -156,11 +146,11 @@ export class NutritionLeadSpecialist {
     });
 
     const portionSummary = ingredients
-      .map((i) => `${i.name} (aprox. ${i.portionRange?.min || i.gramsEstimated}-${i.portionRange?.max || i.gramsEstimated}g)`)
+      .map((i) => `${i.name} (${i.gramsEstimated}g)`)
       .join(', ');
 
     return {
-      agentReply: `He procesado el análisis visual de tu plato (${portionSummary}). Registrado: ${actualKcal} kcal (${actualProtein}g prot, ${actualCarbs}g carbs, ${actualFats}g grasas). Tu estado metabólico posprandial ha sido actualizado y se descontaron los ingredientes de tu despensa.`,
+      agentReply: `Procesado mediante cálculo determinista (${portionSummary}). Registrado: ${actualKcal} kcal (${actualProtein}g prot, ${actualCarbs}g carbs, ${actualFats}g grasas). Tu estado metabólico posprandial ha sido actualizado.`,
       visionAnalysis,
       mealRecord,
     };
@@ -237,6 +227,8 @@ export class NutritionLeadSpecialist {
         proteinsStatus: 'Equilibrio de síntesis y degradación proteica',
         glycogenStatus: 'En uso para mantenimiento normoglucémico',
         fatBurnRate: 'moderada',
+        confidence: 0.9,
+        evidenceLevel: 'DETERMINISTIC_CALCULATION',
       };
     }
 
@@ -259,6 +251,8 @@ export class NutritionLeadSpecialist {
       fatBurnRate: phase === 'POSPRANDIAL' ? 'menor_temporalmente' : phase === 'POSTABSORTIVO' ? 'moderada' : 'alta',
       lastMealTime: lastMeal.timestamp,
       hoursElapsedSinceLastMeal: hoursElapsed,
+      confidence: 0.95,
+      evidenceLevel: lastMeal.evidenceLevel,
     };
   }
 

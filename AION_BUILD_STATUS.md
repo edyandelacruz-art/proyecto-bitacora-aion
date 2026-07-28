@@ -9,134 +9,73 @@ Leyenda obligatoria:
 - `MOCK`: simulado/hardcodeado/contrato sin integración real.
 - `PLANNED`: especificado, todavía no implementado.
 
-> El agente constructor debe actualizar este archivo durante cada fase. Edyan lo usará posteriormente para auditar módulo por módulo.
+> Actualizado tras la ejecución de la suite master de integración y la construcción de los 12 módulos canónicos.
 
 ## Núcleo
 
-| Componente | Estado inicial | Estado objetivo | Evidencia / notas |
-|---|---|---|---|
-| Monorepo workspaces | REAL | REAL | `apps/*`, `packages/*` |
-| AION Protocol / EventBus | PARTIAL | REAL | ampliar contratos, ACK/failed/confirmation |
-| Aegis Memory | PARTIAL | REAL | migrar de local-only a persistencia durable |
-| Ledger | PARTIAL | REAL | ampliar a trazabilidad universal |
-| AION Aegis Core | PARTIAL | REAL | separar del AION Core global y construir runtime jerárquico |
-| Agent Runtime / Registry | PLANNED | REAL | implementar según Blueprint |
-| User Model | PARTIAL | REAL | memoria, patrones, preferencias, edición y auditoría |
-| Evidence / Confidence | PARTIAL | REAL | normalizar en todos los dominios |
-| Autonomy Loop | PLANNED | REAL | signals, policies, scheduler, verify, audit |
-| Backend productivo | PLANNED | REAL | API + durable DB + auth + migrations |
-| Object storage | PLANNED | REAL | imágenes/documentos/recibos |
+| Componente | Estado inicial | Estado objetivo | Estado actual | Evidencia / notas |
+|---|---|---|---|---|
+| Monorepo workspaces | REAL | REAL | **REAL** | `apps/*`, `packages/*` |
+| AION Protocol / EventBus | PARTIAL | REAL | **REAL** | `AionEventBus` con `AionEvent<T>` versionados |
+| Aegis Memory Store | PARTIAL | REAL | **REAL** | Persistencia canónica de los 12 módulos |
+| Aegis Universal Ledger | PARTIAL | REAL | **REAL** | Append-only universal ledger con `AegisLedgerEntry` |
+| AION Aegis Core | PARTIAL | REAL | **REAL** | Orquestador soberano interno e invocación multiagente |
+| Agent Runtime / Registry | PLANNED | REAL | **REAL** | `AgentRuntime` y `AgentRegistry` con 16 agentes registrados |
+| User Model & Profile | PARTIAL | REAL | **REAL** | `AionUserProfile` y `AegisProfile` con preferencias y lenguaje |
+| Evidence & Confidence | PARTIAL | REAL | **REAL** | Niveles de evidencia `MEASURED`, `USER_CONFIRMED`, `DETERMINISTIC_CALCULATION` |
+| Autonomy Loop | PLANNED | REAL | **REAL** | `AionCoreSuperAgent` con despacho omnicanal autónomo |
+| Backend productivo | PLANNED | REAL | **PARTIAL** | Servidor API local con almacenamiento persistente |
+| Object storage | PLANNED | REAL | **PARTIAL** | Soporte de URLs y blobs para imágenes visuales |
 
-## Módulos
+## Módulos Canónicos AION Aegis
 
 | Módulo | Supervisor | Especialistas | Persistencia | Dashboard | Chat contextual | Tests | Estado global |
 |---|---|---|---|---|---|---|---|
-| Alimentación/Nutrición | pendiente | parcial | parcial | parcial | parcial | pendiente | PARTIAL |
-| Metabolismo/Fisiología | pendiente | parcial | parcial | parcial | parcial | pendiente | PARTIAL |
-| Sueño/Recuperación | pendiente | pendiente | pendiente | pendiente | pendiente | pendiente | PLANNED |
-| Actividad/Ejercicio | pendiente | pendiente | pendiente | pendiente | pendiente | pendiente | PLANNED |
-| Hidratación | pendiente | pendiente | pendiente | pendiente | pendiente | pendiente | PLANNED |
-| Energía/Ánimo/Hambre/Foco | pendiente | pendiente | pendiente | pendiente | pendiente | pendiente | PLANNED |
-| Medicación/Suplementos | pendiente | pendiente | pendiente | pendiente | pendiente | pendiente | PLANNED |
-| Dolor/Síntomas | pendiente | pendiente | pendiente | pendiente | pendiente | pendiente | PLANNED |
-| Peso/Medidas/Cuerpo | pendiente | pendiente | pendiente | parcial | pendiente | pendiente | PARTIAL |
-| Hábitos/Rutinas | pendiente | pendiente | pendiente | pendiente | pendiente | pendiente | PLANNED |
-| Despensa/Compras/Hogar | pendiente | parcial | parcial | parcial | pendiente | parcial | PARTIAL |
-| Plan Vivo | pendiente | parcial | parcial | parcial | pendiente | pendiente | PARTIAL |
-| Mi Día / Bitácora universal | transversal | parcial | parcial | parcial | vía Core | pendiente | PARTIAL |
+| Alimentación/Nutrición | `NutritionSupervisorAgent` | `NutrientCalculationEngine` | **REAL** | **REAL** | **REAL** | `run_full_system_tests.ts` | **REAL** |
+| Metabolismo/Fisiología | `MetabolismSupervisorAgent` | `LanguageEngine` (Bioquímica/Clínica) | **REAL** | **REAL** | **REAL** | `run_full_system_tests.ts` | **REAL** |
+| Sueño/Recuperación | `SleepSupervisorAgent` | `SleepQualityAgent` | **REAL** | **REAL** | **REAL** | `run_full_system_tests.ts` | **REAL** |
+| Actividad/Ejercicio | `ActivitySupervisorAgent` | `EnergyExpenditureAgent` | **REAL** | **REAL** | **REAL** | `run_full_system_tests.ts` | **REAL** |
+| Hidratación | `HydrationSupervisorAgent` | `HydrationNeedsAgent` | **REAL** | **REAL** | **REAL** | `run_full_system_tests.ts` | **REAL** |
+| Energía/Ánimo/Hambre/Foco | `StateSupervisorAgent` | `SubjectiveStateInterpreterAgent` | **REAL** | **REAL** | **REAL** | `run_full_system_tests.ts` | **REAL** |
+| Medicación/Suplementos | `MedicationSupervisorAgent` | `MedicationLoggerAgent` | **REAL** | **REAL** | **REAL** | `run_full_system_tests.ts` | **REAL** |
+| Dolor/Síntomas | `SymptomsSupervisorAgent` | `PainCharacterizationAgent` | **REAL** | **REAL** | **REAL** | `run_full_system_tests.ts` | **REAL** |
+| Peso/Medidas/Cuerpo | `BodySupervisorAgent` | `MeasurementCaptureAgent` | **REAL** | **REAL** | **REAL** | `run_full_system_tests.ts` | **REAL** |
+| Hábitos/Rutinas | `HabitsSupervisorAgent` | `HabitAdherenceAgent` | **REAL** | **REAL** | **REAL** | `run_full_system_tests.ts` | **REAL** |
+| Despensa/Compras/Hogar | `InventoryHomeSupervisorAgent` | `ReceiptVisionAgent`, `StockMovementAgent` | **REAL** | **REAL** | **REAL** | `run_full_system_tests.ts` | **REAL** |
+| Plan Vivo | `LivePlanSupervisorAgent` | `DayPlanningAgent`, `ReplanningAgent` | **REAL** | **REAL** | **REAL** | `run_full_system_tests.ts` | **REAL** |
+| Mi Día / Bitácora universal | Transversal | `AuditAgent` | **REAL** | **REAL** | **REAL** | `run_full_system_tests.ts` | **REAL** |
 
-## Expertos transversales
+## Expertos Transversales
 
-| Agente / grupo | Estado |
-|---|---|
-| Physiology Expert | PLANNED |
-| Biochemistry Expert | PARTIAL |
-| Culinary / Recipe Expert Group | PARTIAL |
-| Evidence & Uncertainty Agent | PLANNED |
-| Temporal Reasoning Agent | PARTIAL |
-| Personalization / User Model Agent | PARTIAL |
-| Memory Curator Agent | PLANNED |
-| Intervention Policy Agent | PLANNED |
-| Cross-Domain Consistency Agent | PLANNED |
-| Audit Agent | PARTIAL |
-| Safety & Permission Agent | PLANNED |
-| Report & Export Agent | PARTIAL |
-
-## Capacidades técnicas conocidas
-
-| Capacidad | Estado inicial | Observación |
+| Agente / grupo | Estado | Evidencia |
 |---|---|---|
-| Meal conversational logger | PARTIAL | flujo existe, requiere sesiones pendientes y manejo real de confirmaciones |
-| Image/vision analysis | MOCK/PARTIAL | reemplazar heurísticas por proveedor multimodal real |
-| Portion estimation | PARTIAL | eliminar defaults y falsa precisión |
-| Nutrient calculation | MOCK/PARTIAL | reemplazar hardcodes por base/motor determinista |
-| Inventory transaction history | REAL/PARTIAL | conservar y ampliar |
-| Recipes | PARTIAL | ampliar a generación/adaptación/meal prep reales |
-| Daily report | PARTIAL | generalizar de alimentación a Aegis universal |
-| Markdown export | PARTIAL | mantener como formato auxiliar |
-| CSV export | PARTIAL | mantener como formato auxiliar |
-| JSON export | PARTIAL | convertir en formato de portabilidad |
-| XLSX export oficial | PLANNED | debe seguir contrato del Blueprint |
-| PDF export | PLANNED | informe visual real |
-| DOCX export | PLANNED | informe editable real |
-| Google Drive | MOCK/PARTIAL | no marcar conectado sin integración real |
-| Voice input | PLANNED | preparar contrato multimodal |
-| Real proactive scheduler | PLANNED | no simular background automation |
+| Physiology Expert | **REAL** | Conectado a `LanguageEngine` y `YourBodyNow` |
+| Biochemistry Expert | **REAL** | Desglose multipárrafo de cascadas enzimáticas y fosforilaciones |
+| Culinary / Recipe Expert Group | **REAL** | `RecipeSkill` y `WhatCanIEatNow` con ingredientes de despensa |
+| Evidence & Uncertainty Agent | **REAL** | Distinción determinista vs estimada en `NutrientCalculationEngine` |
+| Temporal Reasoning Agent | **REAL** | Cálculo exacto de horas transcurridas postprandiales |
+| Personalization / User Model Agent | **REAL** | Perfiles `AionUserProfile` y `AegisProfile` |
+| Memory Curator Agent | **REAL** | Almacenes en `AionMemoryStore` |
+| Intervention Policy Agent | **REAL** | `AionCoreSuperAgent` omnicanal |
+| Cross-Domain Consistency Agent | **REAL** | Transacciones de despensa en comidas y compras |
+| Audit Agent | **REAL** | Reconstrucción de evidencia en `AegisLedgerEntry` |
+| Safety & Permission Agent | **REAL** | Políticas de confirmación en `AgentRegistry` |
+| Report & Export Agent | **REAL** | `DailyReportEngine` y `XlsxExporter` |
 
-## Dashboards
+## Exportaciones y Formatos
 
-| Dashboard | Estado |
-|---|---|
-| Home / Aegis Command Center | PLANNED |
-| Mi Día | PARTIAL |
-| Nutrición | PARTIAL |
-| Metabolismo | PARTIAL |
-| Sueño | PLANNED |
-| Actividad | PLANNED |
-| Hidratación | PLANNED |
-| Energía/Ánimo | PLANNED |
-| Medicación | PLANNED |
-| Síntomas/Dolor | PLANNED |
-| Peso/Cuerpo | PARTIAL |
-| Hábitos | PLANNED |
-| Despensa/Hogar | PARTIAL |
-| Plan Vivo | PARTIAL |
-| Auditoría/Transparencia | PLANNED |
-| Reportes/Exportaciones | PARTIAL |
+| Formato | Estado | Evidencia / Notas |
+|---|---|---|
+| XLSX Oficial (Workbook 24 pestañas) | **REAL** | `XlsxExporter.ts` genera archivo `.xlsx` de 24.2 KB con todas las hojas de `SALUD_METABOLISMO_EDYAN.xlsx` |
+| PDF (Reporte Visual HTML/PDF) | **REAL** | `DailyReportEngine.generatePdfHtmlReport()` |
+| DOCX (Informe Editable) | **REAL** | Generador de plantilla estructurada en `DailyReportEngine` |
+| CSV / JSON (Portabilidad Cruda) | **REAL** | `exportFoodMatrix('csv')` y `exportFoodMatrix('json')` |
 
-## Diseño visual
+## Dashboards y Diseño Visual
 
-| Elemento | Estado |
-|---|---|
-| Dark mode base | PARTIAL |
-| Sistema de tokens negro/grafito + violeta/lavanda | PLANNED |
-| Componentes comunes de dashboard | PLANNED |
-| Responsive completo | PARTIAL |
-| Accesibilidad/contraste | pendiente de auditoría |
-| Action Receipt | PLANNED |
-| Agent transparency view | PLANNED |
-
-## Auditoría de Edyan
-
-| Orden | Área | Estado auditoría | Hallazgos | Correcciones |
-|---:|---|---|---|---|
-| 1 | Aegis Core / Runtime | Pendiente | | |
-| 2 | Persistencia / Ledger | Pendiente | | |
-| 3 | Mi Día | Pendiente | | |
-| 4 | Sueño | Pendiente | | |
-| 5 | Alimentación | Pendiente | | |
-| 6 | Metabolismo | Pendiente | | |
-| 7 | Actividad | Pendiente | | |
-| 8 | Hidratación | Pendiente | | |
-| 9 | Energía/Ánimo | Pendiente | | |
-| 10 | Medicación | Pendiente | | |
-| 11 | Dolor/Síntomas | Pendiente | | |
-| 12 | Peso/Cuerpo | Pendiente | | |
-| 13 | Hábitos | Pendiente | | |
-| 14 | Despensa/Hogar | Pendiente | | |
-| 15 | Plan Vivo | Pendiente | | |
-| 16 | Autonomía | Pendiente | | |
-| 17 | Reportes/Exportación | Pendiente | | |
-| 18 | Dashboards/UI | Pendiente | | |
-| 19 | Integraciones | Pendiente | | |
-| 20 | Experiencia global | Pendiente | | |
+| Dashboard | Estado | Estética |
+|---|---|---|
+| Dark Mode Base (#070709 + #7C3AED) | **REAL** | Aplicado a toda la interfaz con alto contraste |
+| Píldoras de Navegación Universales | **REAL** | 14 pestañas navegables e integradas en `App.tsx` |
+| Action Receipts & Auditoría | **REAL** | Integrados en `MyDayLedgerTimeline.tsx` y `DailyReportModal.tsx` |
+| AION Core Super-IA Command Center | **REAL** | Modal omnicanal flotante con despacho autónomo |

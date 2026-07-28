@@ -10,7 +10,15 @@ import {
   InventoryTransaction,
   Recipe,
   PreparedBatch,
-  EvidenceLevel,
+  SleepRecord,
+  ActivityRecord,
+  HydrationRecord,
+  StateRecord,
+  MedicationRecord,
+  SymptomRecord,
+  BodyMeasurementRecord,
+  HabitRecord,
+  PurchaseReceiptRecord,
 } from '@aion/shared-types';
 
 const STORAGE_KEY_MEALS = 'aion_memory_meals';
@@ -23,6 +31,15 @@ const STORAGE_KEY_LEDGER = 'aion_memory_ledger';
 const STORAGE_KEY_TRANSACTIONS = 'aion_memory_transactions';
 const STORAGE_KEY_RECIPES = 'aion_memory_recipes';
 const STORAGE_KEY_BATCHES = 'aion_memory_batches';
+const STORAGE_KEY_SLEEP = 'aion_memory_sleep';
+const STORAGE_KEY_ACTIVITY = 'aion_memory_activity';
+const STORAGE_KEY_HYDRATION = 'aion_memory_hydration';
+const STORAGE_KEY_STATE = 'aion_memory_state';
+const STORAGE_KEY_MEDICATION = 'aion_memory_medication';
+const STORAGE_KEY_SYMPTOMS = 'aion_memory_symptoms';
+const STORAGE_KEY_BODY = 'aion_memory_body';
+const STORAGE_KEY_HABITS = 'aion_memory_habits';
+const STORAGE_KEY_RECEIPTS = 'aion_memory_receipts';
 
 export class AionMemoryStore {
   private static instance: AionMemoryStore;
@@ -37,6 +54,17 @@ export class AionMemoryStore {
   private transactions: InventoryTransaction[] = [];
   private recipes: Recipe[] = [];
   private preparedBatches: PreparedBatch[] = [];
+
+  // Nuevos Almacenes Canónicos de Módulos Aegis
+  private sleepRecords: SleepRecord[] = [];
+  private activityRecords: ActivityRecord[] = [];
+  private hydrationRecords: HydrationRecord[] = [];
+  private stateRecords: StateRecord[] = [];
+  private medicationRecords: MedicationRecord[] = [];
+  private symptomRecords: SymptomRecord[] = [];
+  private bodyRecords: BodyMeasurementRecord[] = [];
+  private habitRecords: HabitRecord[] = [];
+  private receiptRecords: PurchaseReceiptRecord[] = [];
 
   private constructor() {
     this.coreProfile = this.createDefaultCoreProfile();
@@ -60,6 +88,15 @@ export class AionMemoryStore {
     this.transactions = [];
     this.recipes = [];
     this.preparedBatches = [];
+    this.sleepRecords = [];
+    this.activityRecords = [];
+    this.hydrationRecords = [];
+    this.stateRecords = [];
+    this.medicationRecords = [];
+    this.symptomRecords = [];
+    this.bodyRecords = [];
+    this.habitRecords = [];
+    this.receiptRecords = [];
     this.livePlan = this.createInitialPlan();
     this.saveToStorage();
   }
@@ -75,8 +112,6 @@ export class AionMemoryStore {
       locale: 'es-CO',
       currency: 'COP',
       unitSystem: 'metric',
-      dateFormat: 'DD/MM/YYYY',
-      timeFormat: '12h',
       languageProfile: {
         mode: 'human',
         verbosity: 'balanced',
@@ -94,7 +129,6 @@ export class AionMemoryStore {
       intolerances: [],
       dislikedFoods: [],
       preferredFoods: ['Atún', 'Papa sabanera', 'Pollo', 'Queso costeño', 'Tomate'],
-      cookingSkill: 'medium',
       typicalPrepTimeMinutes: 20,
       householdSize: 1,
     };
@@ -107,12 +141,12 @@ export class AionMemoryStore {
       remainingKcal: 1800,
       macroTargets: { protein: 120, carbs: 180, fats: 60 },
       macroConsumed: { protein: 0, carbs: 0, fats: 0 },
-      plannedMeals: [
-        { mealType: 'Almuerzo', suggestedTime: '14:00', recipeTitle: 'Pechuga de pollo salteada con vegetales', kcal: 520 },
-        { mealType: 'Cena', suggestedTime: '20:00', recipeTitle: 'Ensalada de Atún con tomate', kcal: 450 },
+      plannedItems: [
+        { id: 'plan-1', scheduledTime: '14:00', title: 'Almuerzo', description: 'Pechuga de pollo salteada con vegetales', moduleOwner: 'NUTRITION', status: 'PENDIENTE', priority: 'ALTA' },
+        { id: 'plan-2', scheduledTime: '20:00', title: 'Cena', description: 'Ensalada de Atún con tomate y queso', moduleOwner: 'NUTRITION', status: 'PENDIENTE', priority: 'MEDIA' },
       ],
       lastRecalculated: new Date().toISOString(),
-      adaptiveNote: 'Plan inicial disponible.',
+      adaptiveNote: 'Plan vivo recalculado para el día actual.',
     };
   }
 
@@ -148,8 +182,35 @@ export class AionMemoryStore {
 
       const savedBatches = localStorage.getItem(STORAGE_KEY_BATCHES);
       if (savedBatches) this.preparedBatches = JSON.parse(savedBatches);
+
+      const savedSleep = localStorage.getItem(STORAGE_KEY_SLEEP);
+      if (savedSleep) this.sleepRecords = JSON.parse(savedSleep);
+
+      const savedAct = localStorage.getItem(STORAGE_KEY_ACTIVITY);
+      if (savedAct) this.activityRecords = JSON.parse(savedAct);
+
+      const savedHydr = localStorage.getItem(STORAGE_KEY_HYDRATION);
+      if (savedHydr) this.hydrationRecords = JSON.parse(savedHydr);
+
+      const savedState = localStorage.getItem(STORAGE_KEY_STATE);
+      if (savedState) this.stateRecords = JSON.parse(savedState);
+
+      const savedMed = localStorage.getItem(STORAGE_KEY_MEDICATION);
+      if (savedMed) this.medicationRecords = JSON.parse(savedMed);
+
+      const savedSym = localStorage.getItem(STORAGE_KEY_SYMPTOMS);
+      if (savedSym) this.symptomRecords = JSON.parse(savedSym);
+
+      const savedBody = localStorage.getItem(STORAGE_KEY_BODY);
+      if (savedBody) this.bodyRecords = JSON.parse(savedBody);
+
+      const savedHab = localStorage.getItem(STORAGE_KEY_HABITS);
+      if (savedHab) this.habitRecords = JSON.parse(savedHab);
+
+      const savedRec = localStorage.getItem(STORAGE_KEY_RECEIPTS);
+      if (savedRec) this.receiptRecords = JSON.parse(savedRec);
     } catch (e) {
-      console.warn('[AION Memory] Usando memoria de tiempo de ejecución.');
+      console.warn('[AION Memory] Usando almacenamiento en tiempo de ejecución.');
     }
   }
 
@@ -166,12 +227,21 @@ export class AionMemoryStore {
       localStorage.setItem(STORAGE_KEY_TRANSACTIONS, JSON.stringify(this.transactions));
       localStorage.setItem(STORAGE_KEY_RECIPES, JSON.stringify(this.recipes));
       localStorage.setItem(STORAGE_KEY_BATCHES, JSON.stringify(this.preparedBatches));
+      localStorage.setItem(STORAGE_KEY_SLEEP, JSON.stringify(this.sleepRecords));
+      localStorage.setItem(STORAGE_KEY_ACTIVITY, JSON.stringify(this.activityRecords));
+      localStorage.setItem(STORAGE_KEY_HYDRATION, JSON.stringify(this.hydrationRecords));
+      localStorage.setItem(STORAGE_KEY_STATE, JSON.stringify(this.stateRecords));
+      localStorage.setItem(STORAGE_KEY_MEDICATION, JSON.stringify(this.medicationRecords));
+      localStorage.setItem(STORAGE_KEY_SYMPTOMS, JSON.stringify(this.symptomRecords));
+      localStorage.setItem(STORAGE_KEY_BODY, JSON.stringify(this.bodyRecords));
+      localStorage.setItem(STORAGE_KEY_HABITS, JSON.stringify(this.habitRecords));
+      localStorage.setItem(STORAGE_KEY_RECEIPTS, JSON.stringify(this.receiptRecords));
     } catch (e) {
-      console.warn('[AION Memory] Error guardando en localStorage');
+      console.warn('[AION Memory] Error al guardar en localStorage.');
     }
   }
 
-  // API de Perfiles y Lenguaje
+  // Core & Aegis Profile APIs
   public getCoreProfile(): AionUserProfile {
     return { ...this.coreProfile };
   }
@@ -198,7 +268,7 @@ export class AionMemoryStore {
     this.saveToStorage();
   }
 
-  // API de Aegis Ledger Universal
+  // Aegis Universal Ledger API
   public addLedgerEntry(entry: AegisLedgerEntry): void {
     this.ledger.unshift(entry);
     this.saveToStorage();
@@ -208,7 +278,7 @@ export class AionMemoryStore {
     return [...this.ledger];
   }
 
-  // API de Transacciones de Inventario Auditable (Reductor Único de Estado Materializado)
+  // Inventory & Transactions API
   public addInventoryTransaction(tx: InventoryTransaction): void {
     this.transactions.unshift(tx);
 
@@ -225,7 +295,6 @@ export class AionMemoryStore {
 
       this.inventory[matchIdx] = { ...current, amount: newAmount, availability: newAvailability };
     } else {
-      // Si el ítem no existe en la colección de inventario, se registra con la cantidad delta inicial
       const newItem: InventoryItem = {
         id: tx.pantryItemId,
         name: tx.pantryItemName,
@@ -245,23 +314,6 @@ export class AionMemoryStore {
     return this.transactions.filter((tx) => tx.pantryItemId === pantryItemId);
   }
 
-  // API Comidas
-  public getMeals(): MealRecord[] {
-    return [...this.meals];
-  }
-
-  public addMeal(meal: MealRecord): void {
-    this.meals.unshift(meal);
-    this.recalculatePlanAfterMeal(
-      meal.consumedPortion.actualKcal,
-      meal.consumedPortion.actualProtein,
-      meal.consumedPortion.actualCarbs,
-      meal.consumedPortion.actualFats
-    );
-    this.saveToStorage();
-  }
-
-  // API Inventario (Delegado Exclusivo a addInventoryTransaction)
   public getInventory(): InventoryItem[] {
     return [...this.inventory];
   }
@@ -309,7 +361,199 @@ export class AionMemoryStore {
     }
   }
 
-  // API de Recetas & Meal Prep
+  // Meals API
+  public getMeals(): MealRecord[] {
+    return [...this.meals];
+  }
+
+  public addMeal(meal: MealRecord): void {
+    this.meals.unshift(meal);
+    this.recalculatePlanAfterMeal(
+      meal.consumedPortion.actualKcal,
+      meal.consumedPortion.actualProtein,
+      meal.consumedPortion.actualCarbs,
+      meal.consumedPortion.actualFats
+    );
+    this.saveToStorage();
+  }
+
+  // Sleep API
+  public getSleepRecords(): SleepRecord[] {
+    return [...this.sleepRecords];
+  }
+
+  public addSleepRecord(record: SleepRecord): void {
+    this.sleepRecords.unshift(record);
+    this.addLedgerEntry({
+      id: `led-sleep-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      type: 'sleep_logged',
+      source: record.source === 'USER_REPORTED' ? 'user' : 'integration',
+      authoritativeModule: 'SLEEP',
+      agentsInvoked: ['SleepSupervisorAgent', 'SleepQualityAgent'],
+      toolsInvoked: ['saveSleepRecord'],
+      payload: record,
+      evidence: record.evidenceLevel,
+      confidence: 0.95,
+    });
+    this.saveToStorage();
+  }
+
+  // Activity API
+  public getActivityRecords(): ActivityRecord[] {
+    return [...this.activityRecords];
+  }
+
+  public addActivityRecord(record: ActivityRecord): void {
+    this.activityRecords.unshift(record);
+    this.addLedgerEntry({
+      id: `led-act-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      type: 'activity_logged',
+      source: 'user',
+      authoritativeModule: 'ACTIVITY',
+      agentsInvoked: ['ActivitySupervisorAgent', 'EnergyExpenditureAgent'],
+      toolsInvoked: ['saveActivityRecord'],
+      payload: record,
+      evidence: record.evidenceLevel,
+      confidence: 0.92,
+    });
+    this.saveToStorage();
+  }
+
+  // Hydration API
+  public getHydrationRecords(): HydrationRecord[] {
+    return [...this.hydrationRecords];
+  }
+
+  public addHydrationRecord(record: HydrationRecord): void {
+    this.hydrationRecords.unshift(record);
+    this.addLedgerEntry({
+      id: `led-hyd-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      type: 'hydration_logged',
+      source: 'user',
+      authoritativeModule: 'HYDRATION',
+      agentsInvoked: ['HydrationSupervisorAgent'],
+      toolsInvoked: ['saveHydrationRecord'],
+      payload: record,
+      evidence: record.evidenceLevel,
+      confidence: 1.0,
+    });
+    this.saveToStorage();
+  }
+
+  // State (Energy/Mood/Hunger) API
+  public getStateRecords(): StateRecord[] {
+    return [...this.stateRecords];
+  }
+
+  public addStateRecord(record: StateRecord): void {
+    this.stateRecords.unshift(record);
+    this.addLedgerEntry({
+      id: `led-state-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      type: 'state_logged',
+      source: 'user',
+      authoritativeModule: 'STATE',
+      agentsInvoked: ['StateSupervisorAgent', 'SubjectiveStateInterpreterAgent'],
+      toolsInvoked: ['saveStateRecord'],
+      payload: record,
+      evidence: record.evidenceLevel,
+      confidence: 1.0,
+    });
+    this.saveToStorage();
+  }
+
+  // Medication API
+  public getMedicationRecords(): MedicationRecord[] {
+    return [...this.medicationRecords];
+  }
+
+  public addMedicationRecord(record: MedicationRecord): void {
+    this.medicationRecords.unshift(record);
+    this.addLedgerEntry({
+      id: `led-med-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      type: 'medication_logged',
+      source: 'user',
+      authoritativeModule: 'MEDICATION',
+      agentsInvoked: ['MedicationSupervisorAgent', 'MedicationLoggerAgent'],
+      toolsInvoked: ['saveMedicationRecord'],
+      payload: record,
+      evidence: record.evidenceLevel,
+      confidence: 1.0,
+    });
+    this.saveToStorage();
+  }
+
+  // Symptoms API
+  public getSymptomRecords(): SymptomRecord[] {
+    return [...this.symptomRecords];
+  }
+
+  public addSymptomRecord(record: SymptomRecord): void {
+    this.symptomRecords.unshift(record);
+    this.addLedgerEntry({
+      id: `led-symp-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      type: 'symptom_logged',
+      source: 'user',
+      authoritativeModule: 'SYMPTOMS',
+      agentsInvoked: ['SymptomsSupervisorAgent', 'PainCharacterizationAgent'],
+      toolsInvoked: ['saveSymptomRecord'],
+      payload: record,
+      evidence: record.evidenceLevel,
+      confidence: 1.0,
+    });
+    this.saveToStorage();
+  }
+
+  // Body Measurements API
+  public getBodyRecords(): BodyMeasurementRecord[] {
+    return [...this.bodyRecords];
+  }
+
+  public addBodyRecord(record: BodyMeasurementRecord): void {
+    this.bodyRecords.unshift(record);
+    this.addLedgerEntry({
+      id: `led-body-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      type: 'body_measurement_logged',
+      source: 'user',
+      authoritativeModule: 'BODY',
+      agentsInvoked: ['BodySupervisorAgent', 'MeasurementCaptureAgent'],
+      toolsInvoked: ['saveBodyRecord'],
+      payload: record,
+      evidence: record.evidenceLevel,
+      confidence: 1.0,
+    });
+    this.saveToStorage();
+  }
+
+  // Habits API
+  public getHabitRecords(): HabitRecord[] {
+    return [...this.habitRecords];
+  }
+
+  public addHabitRecord(record: HabitRecord): void {
+    this.habitRecords.unshift(record);
+    this.addLedgerEntry({
+      id: `led-habit-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      type: 'habit_logged',
+      source: 'user',
+      authoritativeModule: 'HABITS',
+      agentsInvoked: ['HabitsSupervisorAgent', 'HabitAdherenceAgent'],
+      toolsInvoked: ['saveHabitRecord'],
+      payload: record,
+      evidence: record.evidenceLevel,
+      confidence: 1.0,
+    });
+    this.saveToStorage();
+  }
+
+  // Recipes & Batches API
   public getRecipes(): Recipe[] {
     return [...this.recipes];
   }
@@ -328,7 +572,7 @@ export class AionMemoryStore {
     this.saveToStorage();
   }
 
-  // API Facts
+  // Memory Facts API
   public addFact(fact: MemoryFact): void {
     this.facts.unshift(fact);
     this.saveToStorage();
@@ -338,7 +582,7 @@ export class AionMemoryStore {
     return [...this.facts];
   }
 
-  // API Plan Vivo
+  // Live Plan API
   public getLivePlan(): LivePlan {
     return { ...this.livePlan };
   }
