@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { AionMemoryStore } from '@aion/memory';
 
 // ==========================================
-// 1. SUEÑO & ARQUITECTURA CIRCADIANA (SVG ANILLO CIRCADIANO ORGANIC)
+// 1. SUEÑO & ARQUITECTURA CIRCADIANA (UN SOLO CÍRCULO UNIFICADO)
 // ==========================================
 export const SleepDashboard: React.FC<{ onRefresh: () => void }> = ({ onRefresh }) => {
   const store = AionMemoryStore.getInstance();
@@ -29,9 +29,15 @@ export const SleepDashboard: React.FC<{ onRefresh: () => void }> = ({ onRefresh 
     onRefresh();
   };
 
+  // Porcentajes de fases (Un solo círculo continuo de 314px de circunferencia)
+  // Total r=50 -> Circunferencia C = 2 * PI * 50 = 314.15
+  // Sueño Profundo: 35% -> 110px
+  // Sueño REM: 40% -> 125.6px
+  // Sueño Ligero: 25% -> 78.5px
+
   return (
     <div className="space-y-6">
-      {/* TARJETA INFOGRÁFICA HIPER-ORGÁNICA DEL SUEÑO */}
+      {/* TARJETA INFOGRÁFICA DEL SUEÑO (UN SOLO CÍRCULO CON SEGMENTOS) */}
       <div className="dashboard-card rounded-[36px] p-6 lg:p-8 border border-[#7C3AED]/30 space-y-6 bg-[#111017]">
         <div className="flex justify-between items-center flex-wrap gap-4">
           <div>
@@ -44,17 +50,18 @@ export const SleepDashboard: React.FC<{ onRefresh: () => void }> = ({ onRefresh 
             </h2>
           </div>
           <span className="px-4 py-1.5 rounded-full bg-[#7C3AED]/20 text-[#C4B5FD] text-xs font-bold border border-[#7C3AED]/40">
-            SINCRO CIRCADIANA 94%
+            EFICIENCIA CIRCADIANA 94%
           </span>
         </div>
 
-        {/* VISUALIZACIÓN GRÁFICA CIRCULAR EN SVG (ANILLO DE FASES DE SUEÑO) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+          {/* UN SOLO CÍRCULO UNIFICADO CON LOS 3 SEGMENTOS DE FASES */}
           <div className="relative flex justify-center items-center py-4">
-            <svg className="w-56 h-56 transform -rotate-90" viewBox="0 0 120 120">
-              {/* Círculo base */}
-              <circle cx="60" cy="60" r="50" stroke="#1F1D2B" strokeWidth="12" fill="transparent" />
-              {/* Anillo Sueño Profundo (Violeta) */}
+            <svg className="w-60 h-60 transform -rotate-90" viewBox="0 0 120 120">
+              {/* Círculo base de fondo */}
+              <circle cx="60" cy="60" r="50" stroke="#1C1B26" strokeWidth="12" fill="transparent" />
+
+              {/* Segmento 1: Sueño Profundo (Violeta #7C3AED) - 35% */}
               <circle
                 cx="60"
                 cy="60"
@@ -62,37 +69,53 @@ export const SleepDashboard: React.FC<{ onRefresh: () => void }> = ({ onRefresh 
                 stroke="#7C3AED"
                 strokeWidth="12"
                 fill="transparent"
-                strokeDasharray="314"
-                strokeDashoffset="120"
+                strokeDasharray="110 204.15"
+                strokeDashoffset="0"
                 strokeLinecap="round"
               />
-              {/* Anillo Sueño REM (Dorado) */}
+
+              {/* Segmento 2: Sueño REM (Dorado #D6B36A) - 40% */}
               <circle
                 cx="60"
                 cy="60"
-                r="36"
+                r="50"
                 stroke="#D6B36A"
-                strokeWidth="10"
+                strokeWidth="12"
                 fill="transparent"
-                strokeDasharray="226"
-                strokeDashoffset="70"
+                strokeDasharray="125.6 188.55"
+                strokeDashoffset="-115"
+                strokeLinecap="round"
+              />
+
+              {/* Segmento 3: Sueño Ligero (Azul Cielo #38BDF8) - 25% */}
+              <circle
+                cx="60"
+                cy="60"
+                r="50"
+                stroke="#38BDF8"
+                strokeWidth="12"
+                fill="transparent"
+                strokeDasharray="78.5 235.65"
+                strokeDashoffset="-242"
                 strokeLinecap="round"
               />
             </svg>
+
             <div className="absolute flex flex-col items-center justify-center text-center">
               <span className="text-3xl font-extrabold text-white">{latest.hoursInBed}h</span>
               <span className="text-[10px] text-[#C4B5FD] font-bold uppercase tracking-widest">En Cama</span>
+              <span className="text-[9px] text-[#D6B36A] font-bold mt-0.5">Calidad: {latest.subjectiveQualityScore}/10</span>
             </div>
           </div>
 
-          {/* LEYENDA VISUAL INFOGRÁFICA */}
-          <div className="space-y-4">
+          {/* LEYENDA EXPLICATIVA FASES DE SUEÑO */}
+          <div className="space-y-3">
             <div className="p-4 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <span className="w-3.5 h-3.5 rounded-full bg-[#7C3AED] shadow-[0_0_10px_#7C3AED]"></span>
                 <div>
-                  <p className="text-xs font-bold text-white">Sueño Profundo (Reparación Celular)</p>
-                  <p className="text-[10px] text-[#CCC3D8]/60">95 min • Hormona de crecimiento activa</p>
+                  <p className="text-xs font-bold text-white">Sueño Profundo (No-REM Fase N3)</p>
+                  <p className="text-[10px] text-[#CCC3D8]/60">95 min • Reparación muscular & hormona de crecimiento</p>
                 </div>
               </div>
               <span className="text-xs font-bold text-[#C4B5FD]">35%</span>
@@ -102,8 +125,8 @@ export const SleepDashboard: React.FC<{ onRefresh: () => void }> = ({ onRefresh 
               <div className="flex items-center gap-3">
                 <span className="w-3.5 h-3.5 rounded-full bg-[#D6B36A] shadow-[0_0_10px_#D6B36A]"></span>
                 <div>
-                  <p className="text-xs font-bold text-white">Sueño REM (Consolidación Neuro)</p>
-                  <p className="text-[10px] text-[#CCC3D8]/60">110 min • Memoria & Aprendizaje</p>
+                  <p className="text-xs font-bold text-white">Sueño REM (Rapid Eye Movement)</p>
+                  <p className="text-[10px] text-[#CCC3D8]/60">110 min • Consolidación de memoria & salud neuro-emocional</p>
                 </div>
               </div>
               <span className="text-xs font-bold text-[#D6B36A]">40%</span>
@@ -111,15 +134,27 @@ export const SleepDashboard: React.FC<{ onRefresh: () => void }> = ({ onRefresh 
 
             <div className="p-4 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <span className="w-3.5 h-3.5 rounded-full bg-slate-600"></span>
+                <span className="w-3.5 h-3.5 rounded-full bg-sky-400 shadow-[0_0_10px_#38BDF8]"></span>
                 <div>
-                  <p className="text-xs font-bold text-white">Sueño Ligero & Transición</p>
-                  <p className="text-[10px] text-[#CCC3D8]/60">75 min • Ajuste metabólico</p>
+                  <p className="text-xs font-bold text-white">Sueño Ligero (Fases N1/N2)</p>
+                  <p className="text-[10px] text-[#CCC3D8]/60">75 min • Ajuste metabólico y transición de ondas</p>
                 </div>
               </div>
-              <span className="text-xs font-bold text-slate-400">25%</span>
+              <span className="text-xs font-bold text-sky-400">25%</span>
             </div>
           </div>
+        </div>
+
+        {/* GLOSARIO CONTEXTUAL DEL MÓDULO DE SUEÑO */}
+        <div className="p-4 rounded-2xl bg-[#070709] border border-white/10 space-y-2">
+          <h4 className="text-xs font-bold text-[#D6B36A] uppercase tracking-wider flex items-center gap-2">
+            <span className="material-symbols-outlined text-sm">help</span> Glosario Circadiano
+          </h4>
+          <p className="text-[11px] text-[#CCC3D8]/80 leading-relaxed">
+            • <strong>Sueño REM:</strong> Etapa donde ocurren los sueños vívidos. Crucial para la creatividad y aprendizaje.<br/>
+            • <strong>Sueño Profundo:</strong> Ocurre al inicio de la noche. La presión arterial disminuye y el cuerpo sintetiza proteínas de reparación.<br/>
+            • <strong>Melatonina:</strong> Hormona inducida por la oscuridad que sincroniza el reloj maestro supraquiasmático.
+          </p>
         </div>
       </div>
 
@@ -166,7 +201,7 @@ export const SleepDashboard: React.FC<{ onRefresh: () => void }> = ({ onRefresh 
 };
 
 // ==========================================
-// 2. ACTIVIDAD FÍSICA & ONDA CARDIACA RPE (SVG ONDA ORGÁNICA)
+// 2. ACTIVIDAD FÍSICA & ZONAS CARDIACAS RPE (MEJORADO CON UN SOLO CÍRCULO DE ZONAS Y GLOSARIO)
 // ==========================================
 export const ActivityDashboard: React.FC<{ onRefresh: () => void }> = ({ onRefresh }) => {
   const store = AionMemoryStore.getInstance();
@@ -195,48 +230,123 @@ export const ActivityDashboard: React.FC<{ onRefresh: () => void }> = ({ onRefre
 
   return (
     <div className="space-y-6">
+      {/* MÓDULO MEJORADO DE ACTIVIDAD FÍSICA */}
       <div className="dashboard-card rounded-[36px] p-6 lg:p-8 border border-[#D6B36A]/30 space-y-6 bg-[#111017]">
         <div className="flex justify-between items-center flex-wrap gap-4">
           <div>
             <span className="text-[10px] font-bold text-[#D6B36A] uppercase tracking-[0.25em]">
-              ESTÍMULO NEUROMUSCULAR & CARDIOLOGÍA
+              ESTÍMULO NEUROMUSCULAR & ZONAS METABÓLICAS
             </span>
             <h2 className="text-xl lg:text-2xl font-bold text-white mt-1 flex items-center gap-3">
               <span className="material-symbols-outlined text-[#D6B36A] text-3xl">directions_run</span>
-              Curva de Esfuerzo RPE & Gasto Físico
+              Análisis Fisiológico de Entrenamiento
             </h2>
           </div>
           <span className="px-4 py-1.5 rounded-full bg-[#D6B36A]/20 text-[#D6B36A] text-xs font-bold border border-[#D6B36A]/40">
-            ESTÍMULO ZONA 2 / RPE {rpe}
+            DISPOSICIÓN FÍSICA: 90% (OPTIMO)
           </span>
         </div>
 
-        {/* GRAFICA SVG ONDA DE INTENSIDAD RPE */}
-        <div className="h-44 w-full bg-[#070709] rounded-3xl p-4 border border-white/10 relative overflow-hidden flex flex-col justify-end">
-          <svg className="w-full h-full absolute inset-0" preserveAspectRatio="none" viewBox="0 0 500 150">
-            <path
-              d="M 0 120 Q 75 40, 150 90 T 300 30 T 450 100 L 500 130 L 500 150 L 0 150 Z"
-              fill="url(#goldGradient)"
-              opacity="0.35"
-            />
-            <path
-              d="M 0 120 Q 75 40, 150 90 T 300 30 T 450 100 L 500 130"
-              fill="none"
-              stroke="#D6B36A"
-              strokeWidth="4"
-            />
-            <defs>
-              <linearGradient id="goldGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#D6B36A" />
-                <stop offset="100%" stopColor="transparent" />
-              </linearGradient>
-            </defs>
-          </svg>
-          <div className="relative z-10 flex justify-between text-xs font-bold text-[#CCC3D8] px-4 pb-2">
-            <span>Calentamiento</span>
-            <span>Pico de Fuerza (RPE {rpe})</span>
-            <span>Enfriamiento</span>
+        {/* UN SOLO CÍRCULO UNIFICADO PARA ZONAS CARDIACAS Y DE ESFUERZO */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+          <div className="relative flex justify-center items-center py-4">
+            <svg className="w-60 h-60 transform -rotate-90" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="50" stroke="#1C1B26" strokeWidth="12" fill="transparent" />
+
+              {/* Zona 2 Aeróbica (Esmeralda) - 50% */}
+              <circle
+                cx="60"
+                cy="60"
+                r="50"
+                stroke="#10B981"
+                strokeWidth="12"
+                fill="transparent"
+                strokeDasharray="157 157.15"
+                strokeDashoffset="0"
+                strokeLinecap="round"
+              />
+
+              {/* Zona 4 Umbral Láctico (Dorado) - 30% */}
+              <circle
+                cx="60"
+                cy="60"
+                r="50"
+                stroke="#D6B36A"
+                strokeWidth="12"
+                fill="transparent"
+                strokeDasharray="94.2 219.95"
+                strokeDashoffset="-162"
+                strokeLinecap="round"
+              />
+
+              {/* Zona 5 Máxima Anaeróbica (Violeta) - 20% */}
+              <circle
+                cx="60"
+                cy="60"
+                r="50"
+                stroke="#7C3AED"
+                strokeWidth="12"
+                fill="transparent"
+                strokeDasharray="62.8 251.35"
+                strokeDashoffset="-260"
+                strokeLinecap="round"
+              />
+            </svg>
+
+            <div className="absolute flex flex-col items-center justify-center text-center">
+              <span className="text-3xl font-extrabold text-white">{totalMin}m</span>
+              <span className="text-[10px] text-[#D6B36A] font-bold uppercase tracking-widest">Minutos Hoy</span>
+              <span className="text-[9px] text-[#C4B5FD] font-bold mt-0.5">RPE: {rpe}/10</span>
+            </div>
           </div>
+
+          {/* DESGLOSE INFOGRÁFICO DE ZONAS */}
+          <div className="space-y-3">
+            <div className="p-4 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="w-3.5 h-3.5 rounded-full bg-emerald-400 shadow-[0_0_10px_#10B981]"></span>
+                <div>
+                  <p className="text-xs font-bold text-white">Zona 2 (Oxidación Grasas Base)</p>
+                  <p className="text-[10px] text-[#CCC3D8]/60">60-70% FC Max • Flexibilidad mitocondrial</p>
+                </div>
+              </div>
+              <span className="text-xs font-bold text-emerald-400">50%</span>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="w-3.5 h-3.5 rounded-full bg-[#D6B36A] shadow-[0_0_10px_#D6B36A]"></span>
+                <div>
+                  <p className="text-xs font-bold text-white">Zona 4 (Umbral de Lactato)</p>
+                  <p className="text-[10px] text-[#CCC3D8]/60">80-90% FC Max • Hipertrofia & Fuerza</p>
+                </div>
+              </div>
+              <span className="text-xs font-bold text-[#D6B36A]">30%</span>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="w-3.5 h-3.5 rounded-full bg-[#7C3AED] shadow-[0_0_10px_#7C3AED]"></span>
+                <div>
+                  <p className="text-xs font-bold text-white">Zona 5 (Máximo VO2 Max)</p>
+                  <p className="text-[10px] text-[#CCC3D8]/60">90-100% FC Max • Potencia neuromuscular</p>
+                </div>
+              </div>
+              <span className="text-xs font-bold text-[#C4B5FD]">20%</span>
+            </div>
+          </div>
+        </div>
+
+        {/* GLOSARIO CONTEXTUAL DEL MÓDULO DE ACTIVIDAD FÍSICA */}
+        <div className="p-4 rounded-2xl bg-[#070709] border border-white/10 space-y-2">
+          <h4 className="text-xs font-bold text-[#D6B36A] uppercase tracking-wider flex items-center gap-2">
+            <span className="material-symbols-outlined text-sm">help</span> Glosario de Fisiología Deportiva
+          </h4>
+          <p className="text-[11px] text-[#CCC3D8]/80 leading-relaxed">
+            • <strong>RPE (Rating of Perceived Exertion):</strong> Escala Borg (1-10) que mide el esfuerzo neuromuscular percibido.<br/>
+            • <strong>Zona 2:</strong> Intensidad donde los ácidos grasos son el sustrato energético primario sin acumulación masiva de lactato.<br/>
+            • <strong>EPOC:</strong> Consumo excesivo de oxígeno post-ejercicio que mantiene elevado el metabolismo basal tras entrenar.
+          </p>
         </div>
       </div>
 
@@ -297,7 +407,7 @@ export const ActivityDashboard: React.FC<{ onRefresh: () => void }> = ({ onRefre
 };
 
 // ==========================================
-// 3. HIDRATACIÓN & LIQUIDO FLUIDO SVG
+// 3. HIDRATACIÓN & LIQUIDO FLUIDO
 // ==========================================
 export const HydrationDashboard: React.FC<{ onRefresh: () => void }> = ({ onRefresh }) => {
   const store = AionMemoryStore.getInstance();
@@ -337,7 +447,6 @@ export const HydrationDashboard: React.FC<{ onRefresh: () => void }> = ({ onRefr
           </span>
         </div>
 
-        {/* TANQUE HÍDRICO INTERACTIVO */}
         <div className="h-28 w-full bg-[#070709] rounded-3xl border border-white/10 relative overflow-hidden flex items-end">
           <div
             style={{ height: `${fillPercent}%` }}
@@ -348,7 +457,6 @@ export const HydrationDashboard: React.FC<{ onRefresh: () => void }> = ({ onRefr
           </div>
         </div>
 
-        {/* BOTONES RÁPIDOS DE ADICIÓN */}
         <div className="flex gap-4">
           {[250, 500, 750, 1000].map((ml) => (
             <button
@@ -366,7 +474,7 @@ export const HydrationDashboard: React.FC<{ onRefresh: () => void }> = ({ onRefr
 };
 
 // ==========================================
-// 4. MEDICACIÓN & SUPLEMENTOS EDITABLES CON TOGGLES INTERACTIVOS
+// 4. MEDICACIÓN & SUPLEMENTOS
 // ==========================================
 export const MedicationDashboard: React.FC<{ onRefresh: () => void }> = ({ onRefresh }) => {
   const store = AionMemoryStore.getInstance();
