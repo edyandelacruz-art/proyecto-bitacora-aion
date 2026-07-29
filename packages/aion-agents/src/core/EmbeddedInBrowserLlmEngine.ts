@@ -72,6 +72,22 @@ export class EmbeddedInBrowserLlmEngine {
       return `¡Todo excelente, ${userName}! Operando de forma fluida y sin interrupciones. ¿Qué deseas revisar o registrar hoy?`;
     }
 
+    const isWhatAreYouSaying =
+      textLower.includes('que dices') ||
+      textLower.includes('qué dices') ||
+      textLower.includes('que me cuentas') ||
+      textLower.includes('qué me cuentas') ||
+      textLower.includes('de que hablas') ||
+      textLower.includes('de qué hablas') ||
+      textLower.includes('que dijiste') ||
+      textLower.includes('qué dijiste') ||
+      textLower.includes('como asi') ||
+      textLower.includes('cómo así');
+
+    if (isWhatAreYouSaying) {
+      return `Te comentaba sobre la optimización de tu biometría y agenda de hoy, ${userName}. ¿Tienes alguna pregunta o prefieres conversar sobre otro tema?`;
+    }
+
     const isWhySilent =
       textLower.includes('hablabas') ||
       textLower.includes('callado') ||

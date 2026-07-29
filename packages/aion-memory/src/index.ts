@@ -164,7 +164,7 @@ export class AionMemoryStore {
 
   private createDefaultCoreProfile(): AionUserProfile {
     return {
-      displayName: 'Usuario AION',
+      displayName: 'Edyan',
       language: 'es',
       country: 'Colombia',
       region: 'Cundinamarca',

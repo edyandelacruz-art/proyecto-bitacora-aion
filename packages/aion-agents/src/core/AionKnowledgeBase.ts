@@ -151,15 +151,33 @@ export class AionKnowledgeBase {
 
   /** Busca entradas de conocimiento relevantes por keywords coincidentes */
   public findRelevantKnowledge(text: string, domain?: string): KnowledgeEntry[] {
-    const textLower = text.toLowerCase();
-    const tokens = textLower.split(/\s+/);
+    const textLower = text.toLowerCase().trim();
+    // Stop words comunes en español que deben ignorarse para evitar falsos positivos
+    const stopWords = new Set([
+      'que', 'qué', 'de', 'del', 'el', 'la', 'los', 'las', 'en', 'un', 'una', 'unos', 'unas',
+      'por', 'para', 'con', 'sin', 'sobre', 'como', 'cómo', 'es', 'son', 'fue', 'fueron',
+      'me', 'te', 'se', 'nos', 'mi', 'tu', 'su', 'mis', 'tus', 'sus', 'dices', 'dijiste',
+      'cuentas', 'haces', 'hacer', 'decir', 'ver', 'va', 'vas', 'bien', 'mal', 'hola', 'hi'
+    ]);
+
+    const tokens = textLower
+      .replace(/[^\w\sáéíóúñ]/g, '')
+      .split(/\s+/)
+      .filter((t) => t.length >= 3 && !stopWords.has(t));
+
+    if (tokens.length === 0) return [];
 
     return this.entries
       .filter((entry) => {
         if (domain && entry.domain !== domain && domain !== 'CONVERSATIONAL') return false;
-        return entry.keywords.some((kw) => tokens.some((t) => t.includes(kw) || kw.includes(t)));
+        return entry.keywords.some((kw) =>
+          tokens.some((t) => {
+            const kwLower = kw.toLowerCase();
+            return t === kwLower || (kwLower.length >= 5 && t.startsWith(kwLower.substring(0, kwLower.length - 2)));
+          })
+        );
       })
-      .slice(0, 3); // Máximo 3 entradas relevantes para no sobrecargar el contexto
+      .slice(0, 2);
   }
 
   /** Construye un contexto de conocimiento como string para inyectar al generador */
