@@ -29,17 +29,16 @@ export const AegisCoreFeed: React.FC<AegisCoreFeedProps> = ({
 
   const scrollToBottom = () => {
     if (chatContainerRef.current) {
-      const currentWindowY = window.scrollY;
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-      if (window.scrollY !== currentWindowY) {
-        window.scrollTo(0, currentWindowY);
-      }
     }
   };
 
   useEffect(() => {
-    scrollToBottom();
-  }, [chatMessages.length, isProcessing]);
+    // Desplazar solo el contenedor interno de chat sin alterar la posición de scroll de la ventana
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [chatMessages.length]);
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim() && !selectedImage) return;
