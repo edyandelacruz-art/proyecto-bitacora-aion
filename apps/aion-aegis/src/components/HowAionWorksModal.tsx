@@ -37,7 +37,7 @@ export const HowAionWorksModal: React.FC<HowAionWorksModalProps> = ({ isOpen, on
         <div className="p-6 flex-1 overflow-y-auto hide-scrollbar space-y-5 text-xs text-[#E5E1E5]">
           <div className="p-4 rounded-2xl bg-[#7C3AED]/15 border border-[#7C3AED]/40 space-y-2">
             <h3 className="text-xs font-bold text-white flex items-center gap-2">
-              <span className="material-symbols-outlined text-[#7C3AED]">shield</span>
+              <img src="/images/aion_aegis_logo.jpg" alt="AION Aegis" className="h-5 w-5 object-contain mix-blend-screen" />
               AION Aegis: Prótesis Ejecutiva de Integración Multiagente
             </h3>
             <p className="text-white/80 leading-relaxed">

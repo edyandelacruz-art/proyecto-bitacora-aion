@@ -108,9 +108,11 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
       {/* BRAND HEADER & TOGGLE BUTTON */}
       <div className="h-20 flex items-center px-4 justify-between border-b border-white/10 shrink-0">
         <div className="flex items-center gap-3 cursor-pointer overflow-hidden" onClick={() => onSelectNav('core')}>
-          <span className="material-symbols-outlined text-[#7C3AED] text-2xl shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>
-            shield
-          </span>
+          <img
+            src="/images/aion_aegis_logo.jpg"
+            alt="AION Aegis"
+            className="h-10 w-10 object-contain mix-blend-screen shrink-0"
+          />
           {!isCollapsed && (
             <div className="leading-none whitespace-nowrap">
               <span className="font-['Hanken_Grotesk'] text-base font-extrabold tracking-wider text-white">

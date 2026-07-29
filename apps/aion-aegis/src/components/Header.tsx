@@ -19,10 +19,12 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSettings }) => {
     <header className="flex justify-between items-center w-full px-8 h-20 sticky top-0 bg-[#070709]/90 backdrop-blur-2xl z-40 border-b border-white/5">
       {/* LEFT SECTION STITCH 1:1 */}
       <div className="flex items-center gap-6">
-        <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-[#7C3AED] text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>
-            shield
-          </span>
+        <div className="flex items-center gap-3">
+          <img
+            src="/images/aion_aegis_logo.jpg"
+            alt="AION Aegis Logo"
+            className="h-10 w-auto object-contain mix-blend-screen"
+          />
           <h2 className="font-['Manrope'] text-[12px] text-[#E5E1E5] font-bold tracking-[0.2em] uppercase">
             AION AEGIS CORE
           </h2>
