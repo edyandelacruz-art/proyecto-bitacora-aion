@@ -1,0 +1,91 @@
+{
+  "checked_at": "2026-08-12",
+  "policy": {
+    "default_mode": "review-before-install",
+    "credentials": "Use isolated API keys with spending limits. Never reuse production secrets during evaluation.",
+    "security_tools": "Run only against owned or explicitly authorized systems."
+  },
+  "repositories": [
+    {
+      "repo": "virgiliojr94/book-to-skill",
+      "score": 9.5,
+      "priority": "A+",
+      "role": "knowledge-to-skill",
+      "license": "MIT",
+      "recommended": true,
+      "notes": "Convert books and document collections into on-demand Agent Skills; validate extraction, OCR scans first."
+    },
+    {
+      "repo": "lfnovo/open-notebook",
+      "score": 9.5,
+      "priority": "A+",
+      "role": "knowledge-base-rag",
+      "license": "MIT",
+      "recommended": true,
+      "notes": "Self-hosted research/knowledge base with REST API and multiple model providers; external providers may receive submitted content."
+    },
+    {
+      "repo": "petergyang/no-ai-slop",
+      "score": 9.0,
+      "priority": "A",
+      "role": "writing-quality-skill",
+      "license": "MIT",
+      "recommended": true,
+      "notes": "Useful global editing skill for removing repetitive AI-writing patterns while preserving voice."
+    },
+    {
+      "repo": "usestrix/strix",
+      "score": 9.0,
+      "priority": "A",
+      "role": "security-pentesting",
+      "license": "Apache-2.0",
+      "recommended": true,
+      "notes": "Agentic pentesting and CI security. Authorized targets only; isolate from production secrets."
+    },
+    {
+      "repo": "ayghri/i-have-adhd",
+      "score": 8.5,
+      "priority": "A-",
+      "role": "agent-output-discipline",
+      "license": "MIT",
+      "recommended": true,
+      "notes": "Action-first, numbered, low-tangent response discipline; adapt for operational agents, not long-form reports."
+    },
+    {
+      "repo": "every-app/open-seo",
+      "score": 8.5,
+      "priority": "B+",
+      "role": "seo-mcp-marketing",
+      "license": "MIT",
+      "recommended": true,
+      "notes": "SEO workflows plus MCP/skills. Self-hosted use still requires paid DataForSEO usage."
+    },
+    {
+      "repo": "diegosouzapw/OmniRoute",
+      "score": 8.0,
+      "priority": "B+",
+      "role": "llm-gateway-routing",
+      "license": "MIT",
+      "recommended": "sandbox-first",
+      "notes": "Useful provider routing/fallback layer; high-trust component because it handles keys and model traffic."
+    },
+    {
+      "repo": "MadsLorentzen/ai-job-search",
+      "score": 8.0,
+      "priority": "B",
+      "role": "agent-workflow-reference",
+      "license": "MIT",
+      "recommended": "adapt",
+      "notes": "Strong workflow patterns for profile, ranking, drafting, review and tracking; bundled job portals are largely Denmark-focused."
+    },
+    {
+      "repo": "Anil-matcha/Open-Generative-AI",
+      "score": 6.5,
+      "priority": "C+",
+      "role": "creative-media-lab",
+      "license": "MIT",
+      "recommended": "lab-only",
+      "notes": "Broad media UI, but many capabilities are powered by MuAPI; audit costs, dependencies and credentials before adoption."
+    }
+  ]
+}
