@@ -1,0 +1,94 @@
+version: 1
+owner: edyandelacruz-art
+updated: 2026-09-26
+
+principles:
+  - GitHub remains source of truth for code.
+  - Forge registers capabilities; it does not vendor every repository into itself.
+  - Mirrors/reference repositories are read-only inputs unless explicitly promoted.
+  - Product repositories are writable only through scoped tasks, worktrees and review gates.
+
+repositories:
+  products:
+    - id: aion-core
+      repo: edyandelacruz-art/proyecto-bitacora-aion
+      visibility: public
+      role: ecosystem-core-and-forge-host
+      write_policy: scoped-pr-only
+    - id: aion-edu
+      repo: edyandelacruz-art/aion-edu-gestion-academica
+      visibility: private
+      role: academic-multiagent-product
+      write_policy: scoped-pr-only
+    - id: betca-docente
+      repo: edyandelacruz-art/betca-docente-web
+      visibility: private
+      role: education-platform
+      write_policy: scoped-pr-only
+    - id: after-eight
+      repo: edyandelacruz-art/after-eight
+      visibility: private
+      role: godot-game
+      write_policy: scoped-pr-only
+
+  toolchain:
+    - id: impeccable
+      repo: edyandelacruz-art/impeccable
+      role: design-audit-polish-hardening
+      default_access: read-execute
+    - id: skillui
+      repo: edyandelacruz-art/npxskillui
+      role: design-system-extraction
+      default_access: read-execute
+    - id: playwright-cli
+      repo: edyandelacruz-art/playwright-cli
+      role: browser-qa-and-automation
+      default_access: read-execute
+    - id: ui-ux-pro-max
+      repo: edyandelacruz-art/ui-ux-pro-max-skill
+      role: design-system-reasoning
+      default_access: read-execute
+
+  reference_mirrors:
+    - id: system-prompts-leaks
+      repo: edyandelacruz-art/edyandelacruz-art
+      ref: mirror-system-prompts-leaks/main
+      role: architecture-research-reference
+      default_access: read-only
+    - id: claude-system-prompts
+      repo: edyandelacruz-art/edyandelacruz-art
+      ref: mirror-claude-system-prompts/main
+      role: versioned-claude-prompt-reference
+      default_access: read-only
+
+  planned_external_adapters:
+    - id: anthropic-skills
+      upstream: anthropics/skills
+      strategy: upstream-reference-or-submodule
+    - id: model-context-protocol
+      upstream: modelcontextprotocol/modelcontextprotocol
+      strategy: protocol-reference
+    - id: openai-agents-python
+      upstream: openai/openai-agents-python
+      strategy: adapter-reference
+    - id: pydantic-ai
+      upstream: pydantic/pydantic-ai
+      strategy: candidate-runtime
+    - id: graphiti
+      upstream: getzep/graphiti
+      strategy: candidate-temporal-memory
+    - id: temporal
+      upstream: temporalio/sdk-python
+      strategy: candidate-durable-workflow
+    - id: phoenix
+      upstream: Arize-ai/phoenix
+      strategy: observability-reference
+    - id: promptfoo
+      upstream: promptfoo/promptfoo
+      strategy: eval-security-reference
+
+unmaterialized_projects:
+  - id: predictive
+    status: repository-not-confirmed-in-current-github-inventory
+  - id: hilo
+    status: repository-not-confirmed-in-current-github-inventory

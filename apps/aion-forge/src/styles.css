@@ -1,0 +1,104 @@
+:root {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #f5f2ff;
+  background: #09090c;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; min-height: 100vh; background: radial-gradient(circle at 75% -10%, rgba(139, 92, 246, .16), transparent 30%), #09090c; }
+button, textarea { font: inherit; }
+button { cursor: pointer; }
+
+.shell { min-height: 100vh; display: grid; grid-template-columns: 250px 1fr; }
+.sidebar { position: sticky; top: 0; height: 100vh; padding: 26px 18px; border-right: 1px solid #232329; background: rgba(12, 12, 16, .96); display: flex; flex-direction: column; }
+.brand { display: flex; gap: 12px; align-items: center; padding: 0 8px 30px; }
+.brandMark { width: 38px; height: 38px; display: grid; place-items: center; border: 1px solid #7c5ce6; border-radius: 12px; background: linear-gradient(145deg, #2c214b, #15121e); font-weight: 800; }
+.brand strong, .brand span { display: block; }
+.brand span { margin-top: 3px; color: #8f8b9b; font-size: 12px; }
+nav { display: grid; gap: 6px; }
+.navItem { display: flex; gap: 10px; align-items: center; border: 0; border-radius: 10px; color: #aaa6b5; background: transparent; padding: 11px 12px; text-align: left; }
+.navItem:hover, .navItem.active { background: #18161f; color: #f4efff; }
+.navItem.active { box-shadow: inset 2px 0 #9676ff; }
+.sidebarFoot { margin-top: auto; display: grid; gap: 10px; }
+.securityState { display: flex; align-items: center; gap: 8px; padding: 10px; color: #b9b3c7; font-size: 12px; border: 1px solid #24212b; border-radius: 10px; }
+.killSwitch { display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 10px; border: 1px solid #5b2b33; color: #ffb9c0; background: #1a0f12; padding: 10px 12px; }
+
+main { width: min(1280px, 100%); margin: 0 auto; padding: 42px 42px 60px; }
+header { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 24px; }
+.eyebrow { margin: 0 0 8px; letter-spacing: .14em; font-size: 10px; font-weight: 800; color: #a487ff; }
+h1 { margin: 0; max-width: 720px; font-size: clamp(30px, 4vw, 50px); line-height: 1.02; letter-spacing: -.04em; }
+.sub { max-width: 720px; color: #9f9aa9; line-height: 1.6; }
+.mobileBadge { display: flex; gap: 8px; align-items: center; border: 1px solid #2b2734; background: #111116; color: #bdb7c8; border-radius: 999px; padding: 9px 12px; font-size: 12px; }
+
+.commandCard { border: 1px solid #2d2738; background: linear-gradient(180deg, rgba(31, 26, 42, .84), rgba(17, 16, 22, .94)); border-radius: 18px; padding: 16px; box-shadow: 0 26px 80px rgba(0,0,0,.28); }
+.commandCard textarea { width: 100%; min-height: 118px; resize: vertical; color: #f9f6ff; background: transparent; border: 0; outline: 0; font-size: 18px; line-height: 1.55; }
+.commandActions { display: flex; justify-content: space-between; gap: 20px; align-items: center; border-top: 1px solid #29242f; padding-top: 14px; color: #85808f; font-size: 12px; }
+.commandActions > div { display: flex; gap: 10px; }
+.primary, .secondary, .wideSecondary, .textButton { border-radius: 10px; padding: 10px 14px; border: 1px solid transparent; }
+.primary { display: inline-flex; align-items: center; gap: 7px; background: #8e6cff; color: white; }
+.primary:hover { background: #9d81ff; }
+.secondary, .wideSecondary { background: #16141b; border-color: #302b39; color: #d8d3e0; }
+.textButton { background: transparent; color: #aaa4b6; display: inline-flex; align-items: center; gap: 4px; }
+
+.statusGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 18px 0; }
+.statusCard { min-width: 0; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; border: 1px solid #24212a; border-radius: 14px; background: #101014; padding: 14px; }
+.iconBox { width: 38px; height: 38px; display: grid; place-items: center; color: #af98ff; background: #181420; border-radius: 11px; }
+.statusCard strong, .statusCard span { display: block; }
+.statusCard strong { font-size: 13px; }
+.statusCard > div:nth-child(2) span { color: #817d89; font-size: 11px; margin-top: 3px; }
+.onlineDot { color: #80d8a0; font-size: 10px; text-transform: uppercase; letter-spacing: .08em; }
+
+.contentGrid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(260px, .7fr); gap: 18px; }
+.panel { border: 1px solid #24212a; border-radius: 16px; background: #0f0f13; padding: 18px; }
+.panelTitle { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 12px; }
+.panel h2 { margin: 0; font-size: 19px; }
+.taskList { display: grid; }
+.task { display: grid; grid-template-columns: 1fr minmax(160px, 240px); gap: 24px; align-items: center; padding: 16px 0; border-top: 1px solid #211f26; }
+.task:first-child { border-top: 0; }
+.taskMain strong, .taskMain span { display: block; }
+.taskMain strong { margin: 6px 0; font-size: 14px; }
+.taskMain span { color: #817d89; font-size: 11px; }
+.taskId { color: #a88fff; display: flex; gap: 6px; align-items: center; font-size: 11px; font-weight: 700; }
+.progressMeta { display: flex; justify-content: space-between; color: #85808e; font-size: 10px; margin-bottom: 7px; }
+.progressTrack { height: 5px; border-radius: 999px; background: #222028; overflow: hidden; }
+.progressBar { height: 100%; border-radius: inherit; background: linear-gradient(90deg, #7a58e9, #b19bff); }
+.teamRow { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; border-top: 1px solid #211f26; padding: 14px 0; }
+.teamRow:first-of-type { border-top: 0; }
+.avatar { width: 34px; height: 34px; display: grid; place-items: center; background: #6f50ce; border-radius: 10px; font-weight: 800; }
+.avatar.muted { background: #211d2a; color: #b9aacd; }
+.teamRow strong, .teamRow span { display: block; }
+.teamRow strong { font-size: 12px; }
+.teamRow span { margin-top: 3px; color: #7e7988; font-size: 10px; }
+.wideSecondary { width: 100%; margin-top: 8px; }
+
+.approvalBanner { display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: center; margin-top: 18px; padding: 18px; border: 1px solid #4d3b22; border-radius: 16px; background: linear-gradient(90deg, #18130c, #121014); }
+.approvalIcon { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 12px; color: #e1bb67; background: #21180d; }
+.approvalBanner h3 { margin: 0 0 4px; font-size: 15px; }
+.approvalBanner span { color: #8c8591; font-size: 11px; }
+.approvalActions { display: flex; gap: 8px; }
+
+@media (max-width: 980px) {
+  .shell { grid-template-columns: 1fr; }
+  .sidebar { position: static; height: auto; padding: 14px 18px; border-right: 0; border-bottom: 1px solid #232329; }
+  .brand { padding-bottom: 10px; }
+  nav { display: none; }
+  .sidebarFoot { display: none; }
+  main { padding: 26px 18px 50px; }
+  .statusGrid { grid-template-columns: repeat(2, 1fr); }
+  .contentGrid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 620px) {
+  header { display: block; }
+  .mobileBadge { width: fit-content; margin-top: 14px; }
+  .commandActions { align-items: flex-start; flex-direction: column; }
+  .commandActions > div { width: 100%; }
+  .commandActions button { flex: 1; justify-content: center; }
+  .statusGrid { grid-template-columns: 1fr; }
+  .task { grid-template-columns: 1fr; gap: 12px; }
+  .approvalBanner { grid-template-columns: auto 1fr; }
+  .approvalActions { grid-column: 1 / -1; }
+  .approvalActions button { flex: 1; }
+}

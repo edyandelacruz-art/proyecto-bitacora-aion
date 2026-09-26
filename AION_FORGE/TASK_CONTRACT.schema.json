@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aion.local/schemas/forge-task-contract.json",
+  "title": "AION Forge Task Contract",
+  "type": "object",
+  "required": ["id", "projectId", "title", "goal", "risk", "autonomy", "scope", "acceptanceCriteria", "requiredChecks"],
+  "properties": {
+    "id": { "type": "string", "minLength": 3 },
+    "projectId": { "type": "string", "minLength": 1 },
+    "title": { "type": "string", "minLength": 1 },
+    "goal": { "type": "string", "minLength": 1 },
+    "risk": { "enum": ["low", "medium", "high", "critical"] },
+    "autonomy": { "enum": ["auto", "supervised", "manual"] },
+    "scope": {
+      "type": "object",
+      "required": ["allowedPaths", "forbiddenPaths", "allowDelete", "allowDependencies", "allowDatabaseSchemaChanges", "allowProductionDeploy"],
+      "properties": {
+        "repository": { "type": "string" },
+        "baseRef": { "type": "string" },
+        "allowedPaths": { "type": "array", "items": { "type": "string" } },
+        "forbiddenPaths": { "type": "array", "items": { "type": "string" } },
+        "allowDelete": { "type": "boolean" },
+        "allowDependencies": { "type": "boolean" },
+        "allowDatabaseSchemaChanges": { "type": "boolean" },
+        "allowProductionDeploy": { "type": "boolean" },
+        "maxFilesChanged": { "type": "integer", "minimum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "acceptanceCriteria": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+    "requiredChecks": { "type": "array", "items": { "type": "string" } },
+    "preferredCapabilities": { "type": "array", "items": { "type": "string" } },
+    "deadline": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

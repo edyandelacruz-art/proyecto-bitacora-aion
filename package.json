@@ -9,12 +9,16 @@
   ],
   "scripts": {
     "dev": "npm run dev --workspace=apps/aion-aegis",
+    "dev:forge": "npm run dev --workspace=apps/aion-forge",
     "build": "npm run build --workspaces --if-present",
+    "build:forge": "npm run build --workspace=apps/aion-forge",
+    "typecheck:forge-core": "npm run typecheck --workspace=packages/aion-forge-core",
     "test": "npm run test --workspaces --if-present"
   },
   "keywords": [
     "aion",
     "aegis",
+    "forge",
     "bitacora-inteligente",
     "multiagente",
     "aion-protocol"

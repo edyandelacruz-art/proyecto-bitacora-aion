@@ -1,0 +1,51 @@
+name: AION Forge CI
+
+on:
+  pull_request:
+    paths:
+      - 'apps/aion-forge/**'
+      - 'packages/aion-forge-core/**'
+      - 'AION_FORGE/**'
+      - 'infra/home-worker/**'
+      - 'infra/supabase/aion-forge-schema.sql'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/aion-forge-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-forge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install workspace dependencies
+        run: npm install --ignore-scripts
+
+      - name: Typecheck Forge core
+        run: npm run typecheck:forge-core
+
+      - name: Build Forge UI
+        run: npm run build:forge
+
+      - name: Verify no committed runtime secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          bad=$(git ls-files | grep -E '(^|/)(\.env($|\.)|config\.json$|secrets/|.*\.(pem|key|p12|pfx)$)' | grep -v '\.env\.example$' || true)
+          if [ -n "$bad" ]; then
+            echo 'Potential secret/runtime files are tracked:'
+            echo "$bad"
+            exit 1
+          fi
