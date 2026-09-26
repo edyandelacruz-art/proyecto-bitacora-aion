@@ -1,0 +1,17 @@
+{
+  "workerId": "home-pc-01",
+  "name": "AION Home PC",
+  "forgeApiBaseUrl": "https://forge.example.invalid/api",
+  "workspaceRoot": "D:\\AION_DEV",
+  "heartbeatSeconds": 30,
+  "maxConcurrent": 3,
+  "allowedTools": ["git", "node", "npm", "python", "godot", "playwright", "ffmpeg"],
+  "allowedRepositories": [
+    "edyandelacruz-art/proyecto-bitacora-aion",
+    "edyandelacruz-art/after-eight",
+    "edyandelacruz-art/betca-docente-web"
+  ],
+  "denyProductionDeploy": true,
+  "denySecretMutation": true,
+  "denyArbitraryAdminShell": true
+}
