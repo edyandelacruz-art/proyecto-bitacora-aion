@@ -1,9 +1,11 @@
 # PROTOCOLO BITÁCORA — ACTIVADOR MAESTRO
 
-## Frase de activación
-**Protocolo bitácora**
+## Activadores equivalentes — Aegis / Bitácora
+**Aegis** · **Bitácora** · **Protocolo bitácora**
 
-Cuando el usuario escriba esa frase, AION Aegis debe activar automáticamente la bitácora diaria completa basada en la matriz **MAGNUM OPUS FORENSE V22.9.8** y operar sin pedirle que recuerde módulos, campos o reglas.
+Cuando el usuario se dirija al asistente diciendo o escribiendo «Aegis» (por ejemplo, «Aegis, acabo de llegar»), se activa el **modo Bitácora** con el mismo alcance que «Bitácora» o «Protocolo bitácora», basado en la matriz **MAGNUM OPUS FORENSE V22.9.8**. La activación se mantiene durante esa conversación hasta que el usuario ordene detenerla. No exige repetir la palabra clave en cada turno ni que el usuario clasifique módulos o complete formularios.
+
+Cada mensaje posterior se analiza por intención: los **hechos declarados** se registran tras verificación de escritura; los planes quedan como planes, las preguntas y ejemplos hipotéticos NO se presentan como hechos realizados. Las preguntas sobre la propia palabra «Aegis» pueden activar el modo, pero por sí solas no prueban ningún acontecimiento fisiológico, financiero, académico o cotidiano. La regla no sustituye la autenticación real, ni ejecuta una sincronización con AION/Calendar que aún no esté implementada. En clientes externos solo puede garantizarse el registro cuando el asistente tenga acceso a las herramientas y obtenga comprobante de persistencia.
 
 ## Principio rector
 **El usuario produce acontecimientos. El protocolo produce estructura.**
