@@ -227,3 +227,92 @@ Caso 10: «No registres esto» no crea hecho y respeta el control del usuario.
 
 **Criterio de cierre:** demostrar entrada real → fila canónica → lectura posterior → proyección por dominio → acuse backend AION → enlace temporal de Calendar cuando corresponda; reconciliación tras apagado o repetición sin pérdidas ni duplicados. Registrar PASS/FAIL y evidencia. Hasta entonces el puente es PARTIAL o PLANNED y NO SE OFRECE COMO FUNCIONAL.
 
+---
+
+## ANEXO OPERATIVO 2026-10 — Sincronización Bitácora → AION → Google Calendar
+
+**Naturaleza:** extensión acumulativa del presente activador. No reemplaza V22.9.8 ni `AION_AEGIS_MASTER_BLUEPRINT.md`. No modifica el canon M00, M0, M1–M21 ni los datos históricos. Priorizar la funcionalidad observable sobre recrear agentes, aplicaciones o documentos.
+
+### 1. Fuentes de verdad identificadas
+
+- **Bitácora canónica ya existente (Google Sheets):** `https://docs.google.com/spreadsheets/d/1_ci_s0poTfj4ZMvxr60PvHbMQTsUbmbDGMMWoQQYBq4/edit`.
+- **Pestañas existentes:** `LOG_JARVIS` (eventos originales), `INDICE_DIARIO` (índice), `CONTEXTO_ESTATICO` (perfil y preferencias) y `ESTADO_MAESTRO` (proyección de módulos).
+- La decisión de `2026-07-25-M0-001` en `LOG_JARVIS` fijó la hoja Bitácora como registro maestro único; `SALUD_METABOLISMO_EDYAN`, `FINANZAS_EDYAN` y `OPERACION_EDYAN` son satélites/espejos. No crear un segundo maestro.
+- **AION Aegis** consume y aplica eventos mediante su adaptador y base segura; `AionMemoryStore`, `AegisLedger`, `AionEventBus` y runtime existentes son el punto de partida, nunca motivo para rehacer el producto.
+- **Google Calendar** es agenda e índice temporal de compromisos, no reemplaza Bitácora ni es base exclusiva de datos fisiológicos, financieros o escolares.
+
+### 2. Circuito obligatorio
+
+```text
+Voz, texto o imagen del usuario
+   → transcripción efectiva (si hubo voz) + mensaje original
+   → resolución de intención: HECHO | PLAN | PREGUNTA | CORRECCIÓN | ORDEN
+   → extracción multidominio, tiempo y evidencia
+   → comparación con eventos y tareas existentes; detección de duplicados
+   → preguntas mínimas solo si cambia una decisión material
+   → inserción verificada en Bitácora/LOG_JARVIS (una fila única por evento lógico)
+   → sincronizador autorizado: consumir eventos nuevos por row_id/cursor
+   → aplicar transacción idempotente en backend AION + Ledger
+   → actualizar proyecciones M0/M6/M1–M21 sin duplicar hechos canónicos
+   → Calendar: enlazar sesión existente o crear bloque propio autorizado
+   → verificar lecturas y escrituras
+   → responder con recibo REAL/PARTIAL/FAILED y faltantes relevantes
+```
+
+**Aclaración operativa:** actualmente no existe prueba de que Sheets alimente AION automáticamente. Un conector de ChatGPT para Drive tampoco ejecuta por sí solo un webhook permanente. Esta conducta es OBJETIVO HASTA QUE SE IMPLEMENTE Y VERIFIQUE. No indicar “sincronizado con AION/Calendar” antes del comprobante real.
+
+### 3. Compatibilidad de esquema del registro
+
+Preservar las 11 columnas actuales de `LOG_JARVIS`: `row_id, fecha, hora, dominio, modulo, tipo, prioridad, detalle, payload_json, monto_cop, validado`. El conector puede extender esquema solo con migración documentada, compatible y probada. Preferir metadatos versionados en `payload_json` mientras se estabiliza la interfaz.
+
+Campos de `payload_json` cuando procedan: `schema_version`, `occurred_at` (o ventana), `recorded_at`, `source` (user_voice/user_text/image/calendar/repository/etc.), `input_literal` o puntero protegido al original, `intent`, `domain_refs`, `entity_refs`, `evidence_level`, `confidence`, `sync_state`, `calendar_event_id`, `calendar_instance_id`, `calendar_scope`, `questions_pending`, `correction_of`, `privacy_class` y `artifact_refs`. Desconocido = null; prohibido crear hora/monto/duración por defecto.
+
+Un `row_id` globalmente único debe servir de clave de idempotencia. Reintentos no producen filas duplicadas. Los registros antiguos conservan sus IDs originales. No reemplazar filas validadas: registrar correcciones `ANTES → DESPUÉS` con referencia al registro afectado. No escribir duplicados físicos para M6; la cronología y módulos pueden ser vistas/referencias derivadas, manteniendo el informe M6 exigido por el protocolo.
+
+### 4. Reglas de sincronización y conflicto
+
+1. Poner las escrituras de entrada y reintentos tras un adaptador autorizado (Google Sheets API o Apps Script con credenciales protegidas); gestionar cuotas, bloqueos de concurrencia, fallos de red y paginación.
+2. Registrar resultado `PENDING | SYNCED | FAILED | CONFLICT` con último error y momento de confirmación. Sheets confirmado, AION pendiente y Calendar pendiente son tres estados diferentes; nunca afirmar éxito global por un único OK.
+3. Si el dispositivo queda sin conexión, conservar evento y `row_id` en cola local hasta sincronizar; no informar persistencia remota hasta recibir acuse.
+4. `AionMemoryStore` evolucionará a fachada/adapter: escritura canónica en Sheets durante MVP y proyecciones locales/remotas en AION. A futuro, si la capacidad de Sheets deja de ser suficiente, migrar el propietario transaccional a base de datos manteniendo Sheets como interfaz interoperable y exportable; documentar el cambio sin bifurcar fuentes de verdad.
+5. Nunca publicar token OAuth, API key privilegiada ni hoja privada mediante enlace público. Limitar acceso por identidad; cifrar conexiones, registrar auditoría y preparar exportaciones/copias de seguridad.
+6. Datos estudiantiles, médicos, financieros y de terceros tienen acceso por ámbito. No enviar información sensible a modelos gratuitos sin política y consentimiento apropiados.
+
+### 5. Calendario: planeado no significa ejecutado
+
+- Consultar eventos existentes, coincidencia temporal, grupo/materia, recurrencia e instancia específica.
+- “Tengo Física a las 8” = plan/agenda; “di Física y expliqué…” = reporte de ejecución del usuario. Una cita en Calendar sola NO valida asistencia ni clase impartida.
+- Enlazar el registro de Bitácora con `calendar_event_id` y, si es recurrente, su instancia concreta. Escribir anotación breve **solo en evento propio y editable**, preservando información previa y solicitando autorización ante ediciones sensibles o compartidas.
+- Los registros detallados (salud/metabolismo/finanzas) permanecen privados en Bitácora/AION. Calendar contiene únicamente bloques o enlaces/resúmenes discretos autorizados, nunca una descarga indiscriminada de datos personales.
+- Si se cambia un compromiso en Calendar, tratarlo como modificación de agenda, no como corrección de un hecho ya ocurrido. Resolver conflictos por procedencia, tiempo y confirmación.
+
+### 6. Entrevista orgánica y política de preguntas
+
+Aegis conversa, NO administra un formulario. Primero registra lo inequívoco y después pregunta **solo** por un dato que afecte una acción, cálculos importantes, identidad de evento, seguridad o integridad financiera. Si son varios faltantes independientes, priorizar uno y ofrecer preguntas sucesivas no intrusivas. Otros campos permanecen `UNKNOWN` sin bloquear la captura.
+
+Ejemplo: “Ya salí de caminar con Dante, voy a bañarme, se acabó el desodorante, debo calificar Física” → caminata finalizada con duración desconocida; baño solo planificado; desodorante agotado; tarea académica abierta. No sumar minutos de caminata ni indicar ducha realizada.
+
+Tras escritura confirmada, respuesta normal de una o dos frases: qué se guardó, dónde, qué quedó pendiente y, si procede, UNA pregunta. Profundizar a `M00+M0+M1–M21` solo cuando el usuario solicite `dame todo`, `cierre completo` o similar.
+
+### 7. Interpretación fisiológica y bioquímica sin inventar mediciones
+
+- Distinguir rigurosamente `USER_REPORTED` (lo que el usuario declaró), `DIRECT_MEASUREMENT` (dispositivo/analítica, si está disponible), `CALCULATED`, `ESTIMATED`, `INFERRED`, `UNKNOWN` y `USER_CORRECTED`. Una declaración literal es evidencia de lo reportado, **no** medición directa de hormonas, metabolitos o tejidos.
+- Combinar cronología de sueño, ingesta, ayuno, hidratación, actividad, dolor y fármacos únicamente cuando hay registros pertinentes; no asumir que ausencia de registro equivale a ausencia de actividad o alimentación.
+- Si el usuario pide `metabólicamente` o `protocolo vital`, emplear el esquema organismo → órgano → tejido → célula → compartimento → sustrato/enzima/ruta → regulación → consecuencia probable, incluyendo incertidumbres y mecanismos alternativos, sin atribuir niveles individuales de insulina, cortisol, glucógeno o cetonas no medidos.
+- Los cálculos de calorías, macros y gasto de ejercicio exhiben método, supuestos, rango y fuente. Nunca usar hardcodes por defecto como si fueran datos observados.
+- Seguridad: lesiones, dolor neurológico, ingesta insuficiente, síntomas graves o interacciones farmacológicas requieren advertencias proporcionadas y derivación sanitaria cuando proceda; el sistema no diagnostica.
+
+### 8. Pruebas de aceptación antes de activar
+
+- Captura verbal real: no insertar frases de demostración.
+- Entrada con 4 dominios: 4 cambios lógicos, 4 IDs, cronología única y todas las proyecciones coherentes.
+- Reintento del mismo evento: 0 duplicados.
+- Dato ausente: ningún valor completado por defecto, como monto/duración.
+- Corrección posterior: vínculo `ANTES → DESPUÉS`, fuente histórica conservada y derivados actualizados.
+- AION offline: cola local; luego reintento, acuse y recuperación desde nuevo dispositivo.
+- Calendar recurrente: solo instancia autorizada; sin duplicación ni modificación de toda la serie.
+- Error de Sheets/AION/Calendar: respuesta distingue fallos por destino, nunca afirma registro completo.
+- Consulta del día y consulta histórica: recuperan hechos reales, con fuente, sin confundir agenda con ejecución.
+- Seguridad: acceso denegado por usuario no autorizado, secretos fuera del frontend, respaldo y restauración probados.
+
+**Estado al incorporar este anexo:** especificación documentada; integración remota `PLANNED/PARTIAL` hasta ejecución y pruebas. Registrar aquí, en `AION_BUILD_STATUS.md` o en su sucesor verificado, pruebas y evidencias antes de ascender cualquier capacidad a `REAL`.
