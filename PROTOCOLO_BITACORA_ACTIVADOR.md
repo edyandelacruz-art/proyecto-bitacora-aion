@@ -271,7 +271,7 @@ Un `row_id` globalmente único debe servir de clave de idempotencia. Reintentos 
 
 ### 4. Reglas de sincronización y conflicto
 
-1. Poner las escrituras de entrada y reintentos tras un adaptador autorizado (Google Sheets API o Apps Script con credenciales protegidas); gestionar cuotas, bloqueos de concurrencia, fallos de red y paginación.
+1. Poner las escrituras de entrada y reintentos tras un adaptador autorizado (Google Sheets API o Apps Script con credenciales protegidas); gestionar cuotas, bloqueos de concurrencia, fallos de red y paginación. **No implementar el puente con un trigger `onEdit` dependiente de escrituras por API:** las solicitudes de API y los cambios hechos por scripts no disparan esos triggers. Preferir un endpoint autenticado que persista y notifique en el mismo flujo o un sincronizador incremental con activador horario y cursor, con reintentos idempotentes.
 2. Registrar resultado `PENDING | SYNCED | FAILED | CONFLICT` con último error y momento de confirmación. Sheets confirmado, AION pendiente y Calendar pendiente son tres estados diferentes; nunca afirmar éxito global por un único OK.
 3. Si el dispositivo queda sin conexión, conservar evento y `row_id` en cola local hasta sincronizar; no informar persistencia remota hasta recibir acuse.
 4. `AionMemoryStore` evolucionará a fachada/adapter: escritura canónica en Sheets durante MVP y proyecciones locales/remotas en AION. A futuro, si la capacidad de Sheets deja de ser suficiente, migrar el propietario transaccional a base de datos manteniendo Sheets como interfaz interoperable y exportable; documentar el cambio sin bifurcar fuentes de verdad.
