@@ -26,7 +26,7 @@
     },
     {
       "repo": "petergyang/no-ai-slop",
-      "score": 9.0,
+      "score": 9,
       "priority": "A",
       "role": "writing-quality-skill",
       "license": "MIT",
@@ -35,7 +35,7 @@
     },
     {
       "repo": "usestrix/strix",
-      "score": 9.0,
+      "score": 9,
       "priority": "A",
       "role": "security-pentesting",
       "license": "Apache-2.0",
@@ -62,7 +62,7 @@
     },
     {
       "repo": "diegosouzapw/OmniRoute",
-      "score": 8.0,
+      "score": 8,
       "priority": "B+",
       "role": "llm-gateway-routing",
       "license": "MIT",
@@ -71,7 +71,7 @@
     },
     {
       "repo": "MadsLorentzen/ai-job-search",
-      "score": 8.0,
+      "score": 8,
       "priority": "B",
       "role": "agent-workflow-reference",
       "license": "MIT",
@@ -86,6 +86,15 @@
       "license": "MIT",
       "recommended": "lab-only",
       "notes": "Broad media UI, but many capabilities are powered by MuAPI; audit costs, dependencies and credentials before adoption."
+    },
+    {
+      "repo": "Panniantong/Agent-Reach",
+      "score": null,
+      "priority": "REVIEW",
+      "role": "agent-internet-tooling",
+      "license": "MIT",
+      "recommended": "sandbox-first",
+      "notes": "Source code snapshot stored in isolated branch archive/agent-reach-2026-10-15; raw media assets omitted from snapshot. Full upstream clone supported by sync-repos.sh. Review credentials, platform terms and dependencies before execution."
     }
   ]
 }

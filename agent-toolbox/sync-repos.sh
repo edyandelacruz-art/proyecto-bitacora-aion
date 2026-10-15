@@ -18,6 +18,7 @@ repos=(
   "diegosouzapw/OmniRoute"
   "MadsLorentzen/ai-job-search"
   "Anil-matcha/Open-Generative-AI"
+  "Panniantong/Agent-Reach"
 )
 
 for repo in "${repos[@]}"; do

@@ -1,0 +1,773 @@
+{
+  "source": "https://github.com/Panniantong/Agent-Reach",
+  "source_commit": "94f06c1969dfc1834001269d79d3ad0972d9dee6",
+  "source_license": "MIT",
+  "captured_on": "2026-10-15",
+  "source_total_files": 121,
+  "copied_text_files": 114,
+  "omitted_binary_files": [
+    {
+      "path": "docs/assets/logo-1.png",
+      "git_blob_sha": "1b251c8f9137c5689d6665dca48cd049acf15e1e",
+      "size": 62369
+    },
+    {
+      "path": "docs/assets/logo-2.png",
+      "git_blob_sha": "bedeb769cfa848805095f0466d9b9375999112d2",
+      "size": 92351
+    },
+    {
+      "path": "docs/assets/logo-3.png",
+      "git_blob_sha": "be0694e5d20be8efc94e8de473f530d0944f2089",
+      "size": 48799
+    },
+    {
+      "path": "docs/assets/sponsors/astraflow.png",
+      "git_blob_sha": "86974af77eff64b5c06dd3c1ff1a85e190c4dcd9",
+      "size": 37174
+    },
+    {
+      "path": "docs/assets/sponsors/browseract.png",
+      "git_blob_sha": "266187cab2c39d0ea762efba6d8f157f79dc4f62",
+      "size": 4458
+    },
+    {
+      "path": "docs/assets/sponsors/coreclaw.png",
+      "git_blob_sha": "258ef6e2a798414c9ad4c02b7d96a0df4ae7f077",
+      "size": 23725
+    },
+    {
+      "path": "docs/wechat-group-qr.jpg",
+      "git_blob_sha": "d20bb589b9fb6b1d796baaaa77347bdafcc23bc5",
+      "size": 148332
+    }
+  ],
+  "files": [
+    {
+      "path": ".env.example",
+      "mode": "100644",
+      "sha": "989daba3af1542a9af750316c8501e1a5bf2506b",
+      "size": 646
+    },
+    {
+      "path": ".github/workflows/pytest.yml",
+      "mode": "100644",
+      "sha": "4371ace8f436c785f486ab02df862af66413846f",
+      "size": 2927
+    },
+    {
+      "path": ".gitignore",
+      "mode": "100644",
+      "sha": "f3d65c6dc8da353cbe304fac70a400884838614f",
+      "size": 199
+    },
+    {
+      "path": ".openteams/specs/2026-07-10-agent-skills-hub-friend-link-design.html",
+      "mode": "100644",
+      "sha": "a5735b6395365fbe2ffb36adf6d982f03c73a7c4",
+      "size": 2136
+    },
+    {
+      "path": ".openteams/specs/2026-08-04-readme-partner-section-design.html",
+      "mode": "100644",
+      "sha": "6bc76fc787cc012520a15ab8814daa3df08560a8",
+      "size": 4797
+    },
+    {
+      "path": "CHANGELOG.md",
+      "mode": "100644",
+      "sha": "dc367cb17f0722f32bfe020057f170e46c33cc49",
+      "size": 7596
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "mode": "100644",
+      "sha": "299b814511e96013e0f914b19a2d23eb31997691",
+      "size": 2258
+    },
+    {
+      "path": "LICENSE",
+      "mode": "100644",
+      "sha": "85cfac9168cbcc87f55dc3939311e7f612e5c648",
+      "size": 1067
+    },
+    {
+      "path": "README.md",
+      "mode": "100644",
+      "sha": "5ef5446b64ae5a5c9931691e63566f0b3403ad2f",
+      "size": 22830
+    },
+    {
+      "path": "SECURITY.md",
+      "mode": "100644",
+      "sha": "26196874211ebd98f5f6fe0de06a7a38312219f5",
+      "size": 1307
+    },
+    {
+      "path": "agent_reach/__init__.py",
+      "mode": "100644",
+      "sha": "f60634abc0c307cb458d89e1ca344a63193ff3a7",
+      "size": 212
+    },
+    {
+      "path": "agent_reach/backends/__init__.py",
+      "mode": "100644",
+      "sha": "fa7ff2db7d6f87f839b64cff074a7d0c78e0be15",
+      "size": 429
+    },
+    {
+      "path": "agent_reach/backends/opencli.py",
+      "mode": "100644",
+      "sha": "5118bed04d08adc31da1d53c28699b7f50097cdf",
+      "size": 7942
+    },
+    {
+      "path": "agent_reach/channels/__init__.py",
+      "mode": "100644",
+      "sha": "a748cce49330d512911ec60e6aac10e47e5094e1",
+      "size": 1519
+    },
+    {
+      "path": "agent_reach/channels/_opencli_site.py",
+      "mode": "100644",
+      "sha": "2c7ec3da1d8dacdb8cb249376cc98782e31c80cf",
+      "size": 1495
+    },
+    {
+      "path": "agent_reach/channels/base.py",
+      "mode": "100644",
+      "sha": "2afec0a72338bf3c54718c0945029d17c692f94b",
+      "size": 3048
+    },
+    {
+      "path": "agent_reach/channels/bilibili.py",
+      "mode": "100644",
+      "sha": "5c500585f6f6b8e546c807fe94217a9a3d5ad5d8",
+      "size": 4610
+    },
+    {
+      "path": "agent_reach/channels/boss.py",
+      "mode": "100644",
+      "sha": "4c78629aab77becd16f02dbe1cb96e6ccab2ad5a",
+      "size": 14515
+    },
+    {
+      "path": "agent_reach/channels/exa_search.py",
+      "mode": "100644",
+      "sha": "74427ddc8b8cd4c33fb0c8f181f8d6a3b1e6cdef",
+      "size": 1623
+    },
+    {
+      "path": "agent_reach/channels/facebook.py",
+      "mode": "100644",
+      "sha": "3ae8bd87d24fda3e6b69740668fb6ef7b8d0950e",
+      "size": 443
+    },
+    {
+      "path": "agent_reach/channels/github.py",
+      "mode": "100644",
+      "sha": "8441fa2cfe03b36cf0999469bdb68ecb3df78dc4",
+      "size": 4767
+    },
+    {
+      "path": "agent_reach/channels/instagram.py",
+      "mode": "100644",
+      "sha": "6d607d4b277b06e20c8c0f087b7ad8cad88e4979",
+      "size": 456
+    },
+    {
+      "path": "agent_reach/channels/linkedin.py",
+      "mode": "100644",
+      "sha": "b3a535e2dbf3d14b81c1715657ae4ae1ca3829a6",
+      "size": 2612
+    },
+    {
+      "path": "agent_reach/channels/mcporter.py",
+      "mode": "100644",
+      "sha": "0d7ee8a17cb6421e18dd5af1c6ac9ed8a56f7bae",
+      "size": 5356
+    },
+    {
+      "path": "agent_reach/channels/reddit.py",
+      "mode": "100644",
+      "sha": "83c681fb9dd9a59ea71e5fd2e12807611af68e42",
+      "size": 6322
+    },
+    {
+      "path": "agent_reach/channels/rss.py",
+      "mode": "100644",
+      "sha": "5f630727ce14e686ad6517015195cabbf393a599",
+      "size": 958
+    },
+    {
+      "path": "agent_reach/channels/twitter.py",
+      "mode": "100644",
+      "sha": "006a85b21e9a206178c824f7761583326b87aa50",
+      "size": 5249
+    },
+    {
+      "path": "agent_reach/channels/v2ex.py",
+      "mode": "100644",
+      "sha": "d11d24556e4431797e5aa51d6eea09da99132eae",
+      "size": 11831
+    },
+    {
+      "path": "agent_reach/channels/web.py",
+      "mode": "100644",
+      "sha": "dfbea21389d5974c5b36c17128d4fefb1209313d",
+      "size": 2505
+    },
+    {
+      "path": "agent_reach/channels/xiaohongshu.py",
+      "mode": "100644",
+      "sha": "a72dd0bf5478e97697ac4e94d033bb1a3ea67a8f",
+      "size": 11717
+    },
+    {
+      "path": "agent_reach/channels/xiaoyuzhou.py",
+      "mode": "100644",
+      "sha": "5afee0e1a919d7a2b70e0989c83cd5e42d4984d8",
+      "size": 2443
+    },
+    {
+      "path": "agent_reach/channels/xueqiu.py",
+      "mode": "100644",
+      "sha": "1ecf45b5767336c2673eb63d02f37809bfdeb001",
+      "size": 10605
+    },
+    {
+      "path": "agent_reach/channels/youtube.py",
+      "mode": "100644",
+      "sha": "2d358c292f449ba6f4d31c510d16b65a519a853d",
+      "size": 5429
+    },
+    {
+      "path": "agent_reach/cli.py",
+      "mode": "100644",
+      "sha": "358b21823558731944619c33d769e6b5ee5f5920",
+      "size": 89749
+    },
+    {
+      "path": "agent_reach/config.py",
+      "mode": "100644",
+      "sha": "49b7c8453ba899cab643e26ea297d77a2fe22bf8",
+      "size": 7390
+    },
+    {
+      "path": "agent_reach/cookie_extract.py",
+      "mode": "100644",
+      "sha": "d2f6595225b427af9a79f40fa3394cf5dcbf3b1b",
+      "size": 16398
+    },
+    {
+      "path": "agent_reach/core.py",
+      "mode": "100644",
+      "sha": "075d9de15abebfa7bfd7f1609f6d5e921c9e9c23",
+      "size": 1277
+    },
+    {
+      "path": "agent_reach/doctor.py",
+      "mode": "100644",
+      "sha": "9ee98cf2b335ccbe32765e328e215d8cb0473a1a",
+      "size": 5304
+    },
+    {
+      "path": "agent_reach/guides/setup-exa.md",
+      "mode": "100644",
+      "sha": "3dc0ab892f1d648b7ca4aa18d615601e9a92aaac",
+      "size": 1277
+    },
+    {
+      "path": "agent_reach/guides/setup-groq.md",
+      "mode": "100644",
+      "sha": "071da35d843581423a559cc10e45ced9894495da",
+      "size": 1221
+    },
+    {
+      "path": "agent_reach/guides/setup-reddit.md",
+      "mode": "100644",
+      "sha": "8e733dd35d9691f2f7da462186b3643d3d756647",
+      "size": 1441
+    },
+    {
+      "path": "agent_reach/guides/setup-twitter.md",
+      "mode": "100644",
+      "sha": "da9d563c544144dc7261d4f357b6fc659146fd5a",
+      "size": 2911
+    },
+    {
+      "path": "agent_reach/guides/setup-xiaohongshu.md",
+      "mode": "100644",
+      "sha": "b1eb09789086b6eb90e7ca28f9f4b4473bf4e8f1",
+      "size": 2586
+    },
+    {
+      "path": "agent_reach/integrations/__init__.py",
+      "mode": "100644",
+      "sha": "40a96afc6ff09d58a702b76e3f7dd412fe975e26",
+      "size": 24
+    },
+    {
+      "path": "agent_reach/integrations/mcp_server.py",
+      "mode": "100644",
+      "sha": "9b2267063dc7c7d44293501f6a28e2e49f875412",
+      "size": 2247
+    },
+    {
+      "path": "agent_reach/probe.py",
+      "mode": "100644",
+      "sha": "3652d8b9219512dadfdfff12d429a62d01d4343f",
+      "size": 4019
+    },
+    {
+      "path": "agent_reach/scripts/transcribe_xiaoyuzhou.sh",
+      "mode": "100755",
+      "sha": "d5ab63960c48a7652c2fda4eb737ff1bddd85332",
+      "size": 13161
+    },
+    {
+      "path": "agent_reach/skill/SKILL.md",
+      "mode": "100644",
+      "sha": "462f4c282c8644744510ba7f47e1f8eb7efde622",
+      "size": 8636
+    },
+    {
+      "path": "agent_reach/skill/SKILL_en.md",
+      "mode": "100644",
+      "sha": "4d7466d9cda598716a697f2a63774d399d2b1333",
+      "size": 8294
+    },
+    {
+      "path": "agent_reach/skill/references/career.md",
+      "mode": "100644",
+      "sha": "2a96576112913318170880cfaba28e2b43a10122",
+      "size": 9249
+    },
+    {
+      "path": "agent_reach/skill/references/dev.md",
+      "mode": "100644",
+      "sha": "ca2476223b06520a1ee0e4f4019cb372c590b4ab",
+      "size": 1383
+    },
+    {
+      "path": "agent_reach/skill/references/finance.md",
+      "mode": "100644",
+      "sha": "bebfce9350973f10f52bf2ad746cea27f245ed41",
+      "size": 1474
+    },
+    {
+      "path": "agent_reach/skill/references/search.md",
+      "mode": "100644",
+      "sha": "d571c2efda7fc0e17ea98c59e8bb41f6c6e603c6",
+      "size": 1066
+    },
+    {
+      "path": "agent_reach/skill/references/social.md",
+      "mode": "100644",
+      "sha": "a2b6f47b905f8acb3a883d173d5b9e67084cab10",
+      "size": 10521
+    },
+    {
+      "path": "agent_reach/skill/references/video.md",
+      "mode": "100644",
+      "sha": "54d449489d92fd199be8dc00c4f2770c37fcc5ab",
+      "size": 5515
+    },
+    {
+      "path": "agent_reach/skill/references/web.md",
+      "mode": "100644",
+      "sha": "bbfa3c04e1b61ee437ec58d953faaa7d88ebceef",
+      "size": 1087
+    },
+    {
+      "path": "agent_reach/transcribe.py",
+      "mode": "100644",
+      "sha": "e7a0c6c407e169e1da6c343c06f443acfe1ad3b2",
+      "size": 16108
+    },
+    {
+      "path": "agent_reach/utils/paths.py",
+      "mode": "100644",
+      "sha": "fb814ce3b3946472a30bb7cfc2cd66bd76c159af",
+      "size": 7197
+    },
+    {
+      "path": "agent_reach/utils/process.py",
+      "mode": "100644",
+      "sha": "27766163d3743c59c403c9e26413523aa67edee6",
+      "size": 706
+    },
+    {
+      "path": "agent_reach/utils/text.py",
+      "mode": "100644",
+      "sha": "9ab61b993e7ade2448ac90e1c0528b9ff9a1e8b0",
+      "size": 1138
+    },
+    {
+      "path": "agent_reach/utils/url.py",
+      "mode": "100644",
+      "sha": "c88ac22bc2ccdeaff0cff3308e6317b069b151ac",
+      "size": 3700
+    },
+    {
+      "path": "config/mcporter.json",
+      "mode": "100644",
+      "sha": "82a7b98b9223afc3a0b2d5d96f56d69ee4d723cf",
+      "size": 178
+    },
+    {
+      "path": "constraints.txt",
+      "mode": "100644",
+      "sha": "20fb6d390ee350cb5972fe3feea11e346924bb00",
+      "size": 329
+    },
+    {
+      "path": "docs/README_en.md",
+      "mode": "100644",
+      "sha": "b15b3ce6a807af6980202c09a00b6d197f0a6ded",
+      "size": 21927
+    },
+    {
+      "path": "docs/README_ja.md",
+      "mode": "100644",
+      "sha": "aea5aa8b4a44c44c04293fce4fe43967b8e7a976",
+      "size": 21946
+    },
+    {
+      "path": "docs/README_ko.md",
+      "mode": "100644",
+      "sha": "56ef7ff663463badd8cb31e85c824fb8eed666be",
+      "size": 20790
+    },
+    {
+      "path": "docs/assets/logo-1.png",
+      "mode": "100644",
+      "sha": "1b251c8f9137c5689d6665dca48cd049acf15e1e",
+      "size": 62369
+    },
+    {
+      "path": "docs/assets/logo-1.svg",
+      "mode": "100644",
+      "sha": "dd4fb112e7344d4f0e85b4fb5c268ecba4b8f0b1",
+      "size": 1572
+    },
+    {
+      "path": "docs/assets/logo-2.png",
+      "mode": "100644",
+      "sha": "bedeb769cfa848805095f0466d9b9375999112d2",
+      "size": 92351
+    },
+    {
+      "path": "docs/assets/logo-2.svg",
+      "mode": "100644",
+      "sha": "7fc073fd88de3a094bcd94e514219ef9e33567e7",
+      "size": 2533
+    },
+    {
+      "path": "docs/assets/logo-3.png",
+      "mode": "100644",
+      "sha": "be0694e5d20be8efc94e8de473f530d0944f2089",
+      "size": 48799
+    },
+    {
+      "path": "docs/assets/logo-3.svg",
+      "mode": "100644",
+      "sha": "dc6c4b53bf44588cf84589b0efc836930e5bd00f",
+      "size": 1558
+    },
+    {
+      "path": "docs/assets/sponsors/astraflow.png",
+      "mode": "100644",
+      "sha": "86974af77eff64b5c06dd3c1ff1a85e190c4dcd9",
+      "size": 37174
+    },
+    {
+      "path": "docs/assets/sponsors/browseract.png",
+      "mode": "100644",
+      "sha": "266187cab2c39d0ea762efba6d8f157f79dc4f62",
+      "size": 4458
+    },
+    {
+      "path": "docs/assets/sponsors/coreclaw.png",
+      "mode": "100644",
+      "sha": "258ef6e2a798414c9ad4c02b7d96a0df4ae7f077",
+      "size": 23725
+    },
+    {
+      "path": "docs/assets/sponsors/tencent-cloud.svg",
+      "mode": "100644",
+      "sha": "572a2e306171314fa3f67505966f46b1fab24f6d",
+      "size": 3458
+    },
+    {
+      "path": "docs/cookie-export.md",
+      "mode": "100644",
+      "sha": "5f7fb98cb2c941720bf9ac5844022fbdb9ce608d",
+      "size": 2249
+    },
+    {
+      "path": "docs/dependency-locking.md",
+      "mode": "100644",
+      "sha": "23a3fdb4cb0c75cc8f6199a38946d2f042019088",
+      "size": 636
+    },
+    {
+      "path": "docs/install.md",
+      "mode": "100644",
+      "sha": "91ca53f8a1cbeff4da75dda3687f7dd8d958d523",
+      "size": 22167
+    },
+    {
+      "path": "docs/troubleshooting.md",
+      "mode": "100644",
+      "sha": "e89bb474637af510c230080a3f898f5effa77249",
+      "size": 4136
+    },
+    {
+      "path": "docs/update.md",
+      "mode": "100644",
+      "sha": "2ef00bb90690e54faaff4e138ffbde5e8119e56f",
+      "size": 4974
+    },
+    {
+      "path": "docs/wechat-group-qr.jpg",
+      "mode": "100644",
+      "sha": "d20bb589b9fb6b1d796baaaa77347bdafcc23bc5",
+      "size": 148332
+    },
+    {
+      "path": "llms.txt",
+      "mode": "100644",
+      "sha": "f56304e889724ebb5cf15d8774da9c668e5bc1de",
+      "size": 2333
+    },
+    {
+      "path": "pyproject.toml",
+      "mode": "100644",
+      "sha": "919f2a199058eced2f182ca946d7edc90600ab3e",
+      "size": 2160
+    },
+    {
+      "path": "scripts/sync-upstream.sh",
+      "mode": "100755",
+      "sha": "b5710f3b5a6a4c38e0f41d957acceb53261951bc",
+      "size": 2315
+    },
+    {
+      "path": "test.sh",
+      "mode": "100644",
+      "sha": "6910dc07aa0985e493f4b80b75436bf378b10563",
+      "size": 2727
+    },
+    {
+      "path": "tests/conftest.py",
+      "mode": "100644",
+      "sha": "6d203e962e3a60e0a391da7cf0f34d433deebeb7",
+      "size": 3388
+    },
+    {
+      "path": "tests/test_auth_guidance_policy.py",
+      "mode": "100644",
+      "sha": "f30c3e7555253510d5b0fb73087692356cf7309b",
+      "size": 8843
+    },
+    {
+      "path": "tests/test_boss_channel.py",
+      "mode": "100644",
+      "sha": "d378e925fd3b103e0765ba36943d54b8ed67d333",
+      "size": 10818
+    },
+    {
+      "path": "tests/test_channel_contracts.py",
+      "mode": "100644",
+      "sha": "7b51b02a6316406d2abfa756fec767eed02cf204",
+      "size": 7153
+    },
+    {
+      "path": "tests/test_channels.py",
+      "mode": "100644",
+      "sha": "a7cc31ead680c8c4b55472287fb6e0a6f2dd4669",
+      "size": 65038
+    },
+    {
+      "path": "tests/test_cli.py",
+      "mode": "100644",
+      "sha": "aaca7a4be1c8a13d06a7c3b2d11a843366c6a730",
+      "size": 17925
+    },
+    {
+      "path": "tests/test_config.py",
+      "mode": "100644",
+      "sha": "51408a38db6809f70554316b2cbb900a9eb89d68",
+      "size": 11361
+    },
+    {
+      "path": "tests/test_cookie_extract_perms.py",
+      "mode": "100644",
+      "sha": "579ca117bdc6ed8cc71e8549bddfc25ed90234a3",
+      "size": 6189
+    },
+    {
+      "path": "tests/test_cookie_security.py",
+      "mode": "100644",
+      "sha": "0e1ab4c415cafe6e235e3e52fed3d03bdfa1c454",
+      "size": 6822
+    },
+    {
+      "path": "tests/test_core.py",
+      "mode": "100644",
+      "sha": "0db1996a5df2c28fdd70c3fee2582229a8276d63",
+      "size": 715
+    },
+    {
+      "path": "tests/test_doctor.py",
+      "mode": "100644",
+      "sha": "e181dd9af95432a39ffb2223c0e31fa0cea1594d",
+      "size": 10392
+    },
+    {
+      "path": "tests/test_doctor_credential_boundaries.py",
+      "mode": "100644",
+      "sha": "82f3cf00ff58cc20e202bee63203960cbc7cfafd",
+      "size": 4993
+    },
+    {
+      "path": "tests/test_home_isolation.py",
+      "mode": "100644",
+      "sha": "c572c97d2f8440f8f53deb13da66422f79050443",
+      "size": 1192
+    },
+    {
+      "path": "tests/test_integration_script.py",
+      "mode": "100644",
+      "sha": "a3058ec4a9d78d6ab159f9e313933f388d88413d",
+      "size": 1339
+    },
+    {
+      "path": "tests/test_mcp_server.py",
+      "mode": "100644",
+      "sha": "d70f39174cb91fb9efc6e67e90ee34f12d18cd50",
+      "size": 2810
+    },
+    {
+      "path": "tests/test_mcporter_config.py",
+      "mode": "100644",
+      "sha": "fe8641053f9bf910319881159d586f8358f17a57",
+      "size": 4596
+    },
+    {
+      "path": "tests/test_opencli_backend.py",
+      "mode": "100644",
+      "sha": "5eeb19f39702557bdb8661f1f7d6f95f02ebb81a",
+      "size": 6230
+    },
+    {
+      "path": "tests/test_opencode_skill.py",
+      "mode": "100644",
+      "sha": "bee5d39162d742a788f3bb4d6da2468f53b85d66",
+      "size": 3516
+    },
+    {
+      "path": "tests/test_p0_cli.py",
+      "mode": "100644",
+      "sha": "116bb57f54010830e47c1ed2609e4d32454f0174",
+      "size": 40315
+    },
+    {
+      "path": "tests/test_paths.py",
+      "mode": "100644",
+      "sha": "c0d0bbde360d637bbdddc1dd21f45cba525b3c07",
+      "size": 1273
+    },
+    {
+      "path": "tests/test_private_file_writes.py",
+      "mode": "100644",
+      "sha": "2f8466c497bb95cdd3784e626fa98c589a780997",
+      "size": 20874
+    },
+    {
+      "path": "tests/test_probe.py",
+      "mode": "100644",
+      "sha": "ac8e2d9cbb0a5abd1b653ca5d9cb9657c34b58a9",
+      "size": 4139
+    },
+    {
+      "path": "tests/test_process.py",
+      "mode": "100644",
+      "sha": "550acfb96f39ad4256233783f720be7f8d08c806",
+      "size": 498
+    },
+    {
+      "path": "tests/test_reddit_channel.py",
+      "mode": "100644",
+      "sha": "f4232758532d38b64379b158814447c9e62c8289",
+      "size": 7147
+    },
+    {
+      "path": "tests/test_scrub_credentials.py",
+      "mode": "100644",
+      "sha": "4687326cd3025119cc101d39102f29083427525b",
+      "size": 3119
+    },
+    {
+      "path": "tests/test_skill_command.py",
+      "mode": "100644",
+      "sha": "38a702cf83b67b837ba7c94e8a1ddf8803b76e00",
+      "size": 11098
+    },
+    {
+      "path": "tests/test_transcribe.py",
+      "mode": "100644",
+      "sha": "4c2d6ba2c7599fa32a71bb97f6522f969865236e",
+      "size": 32193
+    },
+    {
+      "path": "tests/test_twitter_channel.py",
+      "mode": "100644",
+      "sha": "12dc2251e39b8c416df6cae444e7c317b3bbcd07",
+      "size": 5437
+    },
+    {
+      "path": "tests/test_url_security.py",
+      "mode": "100644",
+      "sha": "e7f5255e9bd69fb380e1d8478eccb2b49757b2a6",
+      "size": 5023
+    },
+    {
+      "path": "tests/test_v2ex_channel.py",
+      "mode": "100644",
+      "sha": "4704c09afbef61a98fc2b0aa292f2c0752e74ac0",
+      "size": 11272
+    },
+    {
+      "path": "tests/test_web_channel.py",
+      "mode": "100644",
+      "sha": "91606ef16c55f24d247aed138b4f470bfb22b2a9",
+      "size": 7524
+    },
+    {
+      "path": "tests/test_xhs_format.py",
+      "mode": "100644",
+      "sha": "787ba186953655d16f7d58f545b43fd72df0dedd",
+      "size": 4965
+    },
+    {
+      "path": "tests/test_xiaoyuzhou_install.py",
+      "mode": "100644",
+      "sha": "15eb0157cbcb5b5990ac0b9e73732a52c862e782",
+      "size": 9699
+    },
+    {
+      "path": "tests/test_xueqiu_channel.py",
+      "mode": "100644",
+      "sha": "4b1ace2bbdfc7ad051e712b8bd90d30274f4873e",
+      "size": 9277
+    },
+    {
+      "path": "tests/test_youtube_channel.py",
+      "mode": "100644",
+      "sha": "1281e882afabba135cbdaa7888b16cebe7473b19",
+      "size": 8904
+    }
+  ]
+}

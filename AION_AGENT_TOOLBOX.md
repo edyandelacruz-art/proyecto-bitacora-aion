@@ -117,3 +117,14 @@ Interfaz amplia para imagen, video, audio y otros flujos creativos, con licencia
 ## Regla de integración
 
 No ejecutar instaladores de terceros ni entregar credenciales automáticamente. Primero clonar, revisar `README`, `LICENSE`, dependencias, workflows y scripts; después habilitar por proyecto. Para servicios que reciban API keys, usar claves separadas con límites de gasto y nunca reutilizar secretos productivos durante pruebas.
+
+
+## Incorporación 2026-10-15: Agent Reach
+
+- Origen: https://github.com/Panniantong/Agent-Reach
+- Licencia declarada en el repositorio fuente: MIT; conservar `LICENSE` al reutilizar.
+- Snapshot de código y documentación: rama `archive/agent-reach-2026-10-15`, ruta `agent-toolbox/snapshots/agent-reach-2026-10-15/`.
+- Fuente congelada: commit `94f06c1969dfc1834001269d79d3ad0972d9dee6`.
+- Limitación explícita: 114 archivos de texto/código copiados de 121; faltan siete recursos gráficos binarios. No es un fork completo ni conserva el historial de Git del proyecto fuente.
+- Para obtener el original completo, ejecutar **después de auditar** `bash agent-toolbox/sync-repos.sh`; el script clona fuentes sin ejecutar sus instaladores.
+- Integración en Codex/AION: pendiente de auditoría y pruebas en un entorno aislado; no instalado, no conectado a credenciales.
