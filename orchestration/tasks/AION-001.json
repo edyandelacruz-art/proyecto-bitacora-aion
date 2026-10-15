@@ -1,0 +1,22 @@
+{
+  "id": "AION-001",
+  "status": "DRAFT",
+  "risk": "LOW",
+  "engine": "antigravity",
+  "objective": "Auditar en modo lectura las instalaciones y el entorno de agentes AION en el PC, sin alterar componentes existentes.",
+  "allowed_paths": [
+    "orchestration/",
+    "AGENTS.md",
+    "AION_BUILD_STATUS.md"
+  ],
+  "acceptance_criteria": [
+    "Informe con evidencia de versiones y herramientas realmente disponibles",
+    "Indicar tareas realizables con Codex y Antigravity y las limitaciones verificadas",
+    "Ningún cambio productivo, despliegue o envío de información personal"
+  ],
+  "constraints": [
+    "Sin instalaciones",
+    "Sin acceder a claves o información personal",
+    "No commit, push, merge ni despliegue"
+  ]
+}
