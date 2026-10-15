@@ -1,0 +1,24 @@
+name: AION control-plane validation
+on:
+  push:
+    paths:
+      - 'orchestration/**'
+      - '.github/workflows/aion-control-plane-tests.yml'
+  pull_request:
+    paths:
+      - 'orchestration/**'
+      - '.github/workflows/aion-control-plane-tests.yml'
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Syntax check
+        run: python -m py_compile orchestration/dispatch.py
+      - name: Unit tests
+        run: python -m unittest discover -s orchestration/tests -v
